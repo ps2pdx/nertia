@@ -1,0 +1,15 @@
+{
+  "routes": [
+    {
+      "src": "/(.*)",
+      "has": [
+        { "type": "host", "value": "www.nertia.ai" }
+      ],
+      "status": 301,
+      "headers": {
+        "Location": "https://nertia.ai/$1"
+      }
+    }
+  ]
+}
+
