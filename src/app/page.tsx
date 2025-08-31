@@ -85,7 +85,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>📷</span>
-          Instagram @scottysup
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -94,7 +93,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>🎵</span>
-          TikTok @scottysup
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -103,16 +101,14 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>💻</span>
-          GitHub @ps2pdx
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://youtube.com/@ps2pdx"
+          href="https://www.youtube.com/@scottysup"
           target="_blank"
           rel="noopener noreferrer"
         >
           <span aria-hidden>▶️</span>
-          YouTube @ps2pdx
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -121,7 +117,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>𝕏</span>
-          X @ps2pdx
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -130,7 +125,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>🧵</span>
-          Threads @scottysup
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -139,7 +133,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span aria-hidden>in</span>
-          LinkedIn @scottsuper
         </a>
       </footer>
     </div>
