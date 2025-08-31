@@ -90,7 +90,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>🎵</span>
+          <span aria-hidden>🧩</span>
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -98,7 +98,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>💻</span>
+          <span aria-hidden>👾</span>
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -114,7 +114,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>𝕏</span>
+          <span aria-hidden>🐦</span>
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -130,7 +130,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>in</span>
+          <span aria-hidden>👨‍💻</span>
         </a>
       </footer>
     </div>
