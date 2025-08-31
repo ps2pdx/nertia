@@ -7,7 +7,7 @@ export default function Home() {
         <div className="text-4xl sm:text-5xl font-semibold tracking-tight">
           nertia
         </div>
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
+        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             <a
               href="https://vantagecompute.ai"
@@ -82,7 +82,13 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>📷</span>
+          <img
+            src="https://cdn.simpleicons.org/instagram/000000"
+            alt="Instagram"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -90,7 +96,13 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>🧩</span>
+          <img
+            src="https://cdn.simpleicons.org/tiktok/000000"
+            alt="TikTok"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -98,15 +110,27 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>👾</span>
+          <img
+            src="https://cdn.simpleicons.org/github/000000"
+            alt="GitHub"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://www.youtube.com/@scottysup"
+          href="https://www.youtube.com/@ps2pdx"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>▶️</span>
+          <img
+            src="https://cdn.simpleicons.org/youtube/000000"
+            alt="YouTube"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -114,7 +138,13 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>🐦</span>
+          <img
+            src="https://cdn.simpleicons.org/x/000000"
+            alt="X"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -122,7 +152,13 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>🧵</span>
+          <img
+            src="https://cdn.simpleicons.org/threads/000000"
+            alt="Threads"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -130,7 +166,13 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span aria-hidden>👨‍💻</span>
+          <img
+            src="https://cdn.simpleicons.org/linkedin/000000"
+            alt="LinkedIn"
+            width="16"
+            height="16"
+            className="dark:invert"
+          />
         </a>
       </footer>
     </div>
