@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="w-full border-b border-black/[.08] dark:border-white/[.145]">
+        <header className="w-full sticky top-0 z-50 bg-background/80 supports-[backdrop-filter]:bg-background/60 backdrop-blur border-b border-black/[.08] dark:border-white/[.145]">
           <div className="mx-auto max-w-5xl flex items-center justify-between p-4 sm:p-6">
             <Link href="/" className="font-semibold tracking-tight text-lg sm:text-xl">
               nertia

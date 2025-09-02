@@ -42,7 +42,7 @@ export default function Home() {
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <form
-            className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 sm:items-center"
+            className="w-full sm:w-auto flex flex-col gap-2"
             method="post"
             encType="text/plain"
             action={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@nertia.ai"}`}
@@ -169,8 +169,8 @@ export default function Home() {
           <img
             src="https://cdn.simpleicons.org/linkedin/000000"
             alt="LinkedIn"
-            width="16"
-            height="16"
+            width="18"
+            height="18"
             className="dark:invert"
           />
         </a>
