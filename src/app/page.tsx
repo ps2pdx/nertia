@@ -28,7 +28,7 @@ export default function Home() {
               alisharifirugs.net
             </a>
           </li>
-          <li className="tracking-[-.01em]">
+          <li className="mb-2 tracking-[-.01em]">
             <a
               href="https://purps.world"
               target="_blank"
@@ -36,6 +36,16 @@ export default function Home() {
               className="hover:underline"
             >
               purps.world
+            </a>
+          </li>
+          <li className="tracking-[-.01em]">
+            <a
+              href="https://kalcontracting.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              kalcontracting.com
             </a>
           </li>
         </ol>
