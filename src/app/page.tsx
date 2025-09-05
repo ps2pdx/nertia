@@ -102,48 +102,6 @@ export default function Home() {
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://tiktok.com/@scottysup"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://cdn.simpleicons.org/tiktok/000000"
-            alt="TikTok"
-            width="16"
-            height="16"
-            className="dark:invert"
-          />
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://github.com/ps2pdx"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://cdn.simpleicons.org/github/000000"
-            alt="GitHub"
-            width="16"
-            height="16"
-            className="dark:invert"
-          />
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://www.youtube.com/@ps2pdx"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://cdn.simpleicons.org/youtube/000000"
-            alt="YouTube"
-            width="16"
-            height="16"
-            className="dark:invert"
-          />
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://x.com/ps2pdx"
           target="_blank"
           rel="noopener noreferrer"
@@ -153,34 +111,6 @@ export default function Home() {
             alt="X"
             width="16"
             height="16"
-            className="dark:invert"
-          />
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://www.threads.net/@scottysup"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://cdn.simpleicons.org/threads/000000"
-            alt="Threads"
-            width="16"
-            height="16"
-            className="dark:invert"
-          />
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://www.linkedin.com/in/scottsuper"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://cdn.simpleicons.org/linkedin/000000"
-            alt="LinkedIn"
-            width="18"
-            height="18"
             className="dark:invert"
           />
         </a>
