@@ -30,6 +30,42 @@ export default function Home() {
               <span className="text-foreground">purps.world</span>
               <span className="text-xs text-gray-500">Community, culture, and creative platform</span>
             </a>
+            <a
+              href="https://vantagecompute.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">vantagecompute.ai</span>
+              <span className="text-xs text-gray-500">AI compute platform</span>
+            </a>
+            <a
+              href="https://alisharifirugs.net"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">alisharifirugs.net</span>
+              <span className="text-xs text-gray-500">Handmade rugs e-commerce</span>
+            </a>
+            <a
+              href="https://kalcontracting.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">kalcontracting.com</span>
+              <span className="text-xs text-gray-500">Construction & contracting</span>
+            </a>
+            <a
+              href="https://super35.media"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">super35.media</span>
+              <span className="text-xs text-gray-500">Media & production studio</span>
+            </a>
           </div>
         </section>
 
