@@ -66,6 +66,15 @@ export default function Home() {
               <span className="text-foreground">super35.media</span>
               <span className="text-xs text-gray-500">Media & production studio</span>
             </a>
+            <a
+              href="https://equisearchrecruiting.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">equisearchrecruiting.com</span>
+              <span className="text-xs text-gray-500">Executive search & recruiting</span>
+            </a>
           </div>
         </section>
 
