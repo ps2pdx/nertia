@@ -7,9 +7,24 @@ export default function Home() {
         <div className="text-4xl sm:text-5xl font-semibold tracking-tight">
           nertia
         </div>
-        
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+        {/* Recent Work Section */}
+        <section className="w-full max-w-xl flex flex-col gap-4 mt-2">
+          <div className="text-lg font-medium mb-1">Recent Work</div>
+          <div className="flex flex-col gap-2">
+            <a
+              href="https://lillard.nertia.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] bg-background/80 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] transition-colors px-5 py-3 flex flex-col sm:flex-row items-center gap-2 text-base font-medium shadow-sm"
+            >
+              <span className="text-foreground">lillard.nertia.ai</span>
+              <span className="text-xs text-gray-500">NBA stats & visualization</span>
+            </a>
+          </div>
+        </section>
+
+        <div className="flex gap-4 items-center flex-col sm:flex-row mt-6">
           <form
             className="w-full sm:w-auto flex flex-col gap-2"
             method="post"
@@ -36,6 +51,12 @@ export default function Home() {
               Send
             </button>
           </form>
+          <a
+            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
+            href="/work"
+          >
+            Work
+          </a>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
