@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Work() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -5,6 +7,11 @@ export default function Work() {
         <div className="text-4xl sm:text-5xl font-semibold tracking-tight">
           nertia
         </div>
+        <nav className="flex gap-4 text-sm">
+          <Link href="/" className="hover:underline">Home</Link>
+          <Link href="/battlezone" className="hover:underline">Battlezone</Link>
+          <a href="/Scott_Campbell_Resume_ATS.txt" className="hover:underline">Resume</a>
+        </nav>
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             <a
@@ -14,6 +21,16 @@ export default function Work() {
               className="hover:underline"
             >
               vantagecompute.ai
+            </a>
+          </li>
+          <li className="mb-2 tracking-[-.01em]">
+            <a
+              href="https://lillard.nertia.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              lillard.nertia.ai
             </a>
           </li>
           <li className="mb-2 tracking-[-.01em]">
@@ -44,6 +61,16 @@ export default function Work() {
               className="hover:underline"
             >
               kalcontracting.com
+            </a>
+          </li>
+          <li className="mb-2 tracking-[-.01em]">
+            <a
+              href="https://equisearchrecruiting.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              equisearchrecruiting.com
             </a>
           </li>
           <li className="tracking-[-.01em]">

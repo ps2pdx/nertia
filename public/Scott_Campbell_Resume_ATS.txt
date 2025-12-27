@@ -1,0 +1,78 @@
+SCOTT CAMPBELL
+Portland, OR | linkedin.com/in/scottsuper | nertia.ai
+
+SUMMARY
+Technical Product Marketing Manager specializing in AI Infrastructure, Developer Experience, and Brand Strategy. Bridge engineering and GTM teams to translate complex technical capabilities into positioning, messaging, and sales enablement that drives revenue. Background spanning product marketing, brand strategy, business development, and frontend development.
+
+EXPERIENCE
+
+Product Marketing Lead
+Vantage Compute | January 2025 - Present
+
+Series A HPC cloud provider offering GPU compute for AI/ML, simulation, and life sciences workloads. Retained as strategic consultant following restructuring to oversee platform messaging and web architecture.
+
+- Technical Positioning and GTM Strategy: Architected core messaging positioning Vantage as the futurecompute layer for AI and HPC. Defined vertical-specific narratives for R&D Simulation, Advanced Manufacturing, and Life Sciences, aligning platform capabilities to buyer pain points. Partnered with engineering to translate Slurm orchestration, NVIDIA GPU lifecycles (H100, A100, L40S), and hybrid cloud architecture into buyer-centric value propositions.
+
+- Executive Advisory: Acted as strategic advisor to CEO on product roadmap articulation, GTM sequencing, and narrative alignment during Series A fundraising. Served as connective layer between engineering, sales, and leadership to ensure consistent technical, commercial, and brand narratives.
+
+- Sales and Investor Enablement: Designed technical one-pagers, product overviews, and Figma-based asset libraries for VC pitches, sales demos, and partnership meetings.
+
+- Competitive Intelligence: Reverse-engineered web stacks, positioning, pricing, and branding of 50+ AI and Neocloud competitors (CoreWeave, Lambda Labs, Together AI) to inform differentiation strategy.
+
+- Website and Brand Systems: Delivered accelerated site launch in 3 months to support fundraising, followed by ground-up redesign. Developed scalable design system, led Webflow migration, and optimized Core Web Vitals. Created and trademarked VirtuallyLimitless tagline and established brand voice guidelines.
+
+- Content and Creative Production: Built top-of-funnel content marketing engine (blog, social, newsletter) optimized for SEO/GEO. Created infographics visualizing hybrid compute architectures and custom Lottie animations. Pioneered AI-driven video production using Sora, Claude, and Gemini, reducing production time by 80%.
+
+Founder and Brand Strategist
+Nertia | January 2021 - Present
+
+- Brand Systems: Developed Identity in Motion frameworks, moving clients beyond static assets into modular, scalable design systems for digital-first environments.
+
+- Web Architecture: Designed and developed performance-focused e-commerce platform for TerpScouts. Owned full stack from Figma prototyping to Webflow implementation.
+
+- Strategic Positioning: Defined tone, voice, and system-based branding philosophies for emerging retail and lifestyle clients.
+
+Founding President
+SCOUTCAMP | January 2020 - January 2025
+
+- Product Launch: Launched Bolts pre-roll brand, owning positioning, go-to-market strategy, and sales channel activation.
+
+- Network Scale: Established sales and distribution network for TerpScouts and associated brands, driving over $10M in revenue (2020). Led sales team and managed dozens of vendor relationships to streamline supply chain.
+
+- Business Operations: Owned P&L, CRM, and email automation. Certified Metrc administrator managing compliance and inventory tracking across operations.
+
+Business Development Manager
+LTRMN | January 2019 - December 2020
+
+- Market Expansion: Managed 80+ customer accounts via Zoho CRM, boosting market saturation by over 100% through data-driven territory mapping.
+
+- Sales Enablement: Produced high-impact visual collateral for internal initiatives and new business ventures.
+
+Account Executive, Enterprise Sales
+The Sweet Life | October 2017 - December 2018
+
+- Revenue Growth: Managed 150+ accounts via CRM, achieving 300% increase in territory revenue through consultative selling.
+
+- Performance: Ranked highest-grossing account executive in territory by identifying and capitalizing on new vertical opportunities.
+
+UI/UX Designer and Frontend Developer
+Cloud Engage | March 2014 - October 2017
+
+- Account-Based Marketing: Built custom demo environments and sales collateral tailored to enterprise target accounts (T-Mobile, Columbia Sportswear), enabling personalized buyer experiences that supported deal progression for localization software platform.
+
+- Product Design: Partnered with Lead Engineers to overhaul UI/UX of core application and customer-facing chat interfaces.
+
+- Cross-Functional: Worked with Marketing Director to unify brand identity across WordPress instances and print media.
+
+TECHNICAL SKILLS
+
+Marketing and Strategy: GTM Strategy, Product Positioning, SEO/GEO (AI Search), Sales Enablement, Competitive Intelligence, CRM (Zoho), Email Automation
+
+Infrastructure Fluency: HPC Concepts, Slurm Workload Manager, NVIDIA GPU Operator, Cloud vs. On-Prem Architecture, Python
+
+Creative and Tools: Webflow (CMS and Logic), Figma, Adobe Creative Suite, AI Creative Tools (Sora, Midjourney, Claude), HTML/CSS
+
+EDUCATION
+
+A.A.S., Web Development and Design - Portland Community College, 2014
+A.A.S. Transfer Degree, Computer Science - Central Oregon Community College, 2012
