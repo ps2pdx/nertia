@@ -79,68 +79,80 @@ export default function About() {
                             {/* Step 1 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-                                        <Caterpillar className="w-16 h-16" />
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-[var(--accent)]">
+                                        <span className="text-2xl font-bold">1</span>
                                     </div>
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
                                         Understand the story.
                                     </h3>
-                                    <p className="text-muted leading-relaxed max-w-xl">
+                                    <p className="text-muted leading-relaxed max-w-xl mb-6">
                                         We map your product architecture, interview your buyers, reverse-engineer your competitors. We find the insight that makes you different.
                                     </p>
+                                    <div className="text-[var(--foreground)] opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <Caterpillar className="w-20 h-20" />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Step 2 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-                                        <FormingChrysalis className="w-16 h-16" />
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-[var(--accent)]">
+                                        <span className="text-2xl font-bold">2</span>
                                     </div>
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
                                         Shape the narrative.
                                     </h3>
-                                    <p className="text-muted leading-relaxed max-w-xl">
+                                    <p className="text-muted leading-relaxed max-w-xl mb-6">
                                         We craft a positioning framework and messaging strategy that resonates across your entire stakeholder ladder, from developers shipping code to VCs evaluating risk to enterprise procurement teams.
                                     </p>
+                                    <div className="text-[var(--foreground)] opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <FormingChrysalis className="w-20 h-20" />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Step 3 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-                                        <Chrysalis className="w-16 h-16" />
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-[var(--accent)]">
+                                        <span className="text-2xl font-bold">3</span>
                                     </div>
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
                                         Design the system.
                                     </h3>
-                                    <p className="text-muted leading-relaxed max-w-xl">
+                                    <p className="text-muted leading-relaxed max-w-xl mb-6">
                                         We build modular brand frameworks. Visual languages that scale. Design tokens and component libraries. Everything integrates into how you actually work.
                                     </p>
+                                    <div className="text-[var(--foreground)] opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <Chrysalis className="w-20 h-20" />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Step 4 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-                                        <ButterflyEmerging className="w-16 h-16" />
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-[var(--accent)]">
+                                        <span className="text-2xl font-bold">4</span>
                                     </div>
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
                                         Ship it.
                                     </h3>
-                                    <p className="text-muted leading-relaxed max-w-xl">
+                                    <p className="text-muted leading-relaxed max-w-xl mb-6">
                                         We don&apos;t hand off wireframes and wait. We architect and build with React, Next.js, and Tailwind. Design tokens live in code. Brand updates are git commits, not dozens of file edits across disconnected tools.
                                     </p>
+                                    <div className="text-[var(--foreground)] opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <ButterflyEmerging className="w-20 h-20" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
