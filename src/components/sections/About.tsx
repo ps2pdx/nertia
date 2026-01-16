@@ -1,170 +1,158 @@
+'use client';
+
 import Image from 'next/image';
+import PageSidebar, { SidebarSection } from '@/components/PageSidebar';
+import BrandSystemFlow from '@/components/brand-system/BrandSystemFlow';
+import ConveyorBelt from '@/components/brand-system/ConveyorBelt';
+import Alert from '@/components/ui/Alert';
+
+const sections: SidebarSection[] = [
+    { id: 'what-nertia-does', label: 'What Nertia Does' },
+    { id: 'how-it-works', label: 'How It Works' },
+    { id: 'what-you-receive', label: 'What You Receive' },
+    { id: 'about-nertia', label: 'About Nertia' },
+];
 
 export default function About() {
     return (
-        <>
-            {/* SECTION 1: WHAT NERTIA DOES */}
-            <section id="what-nertia-does" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    {/* Left column - Empty for sidebar alignment */}
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 pt-24 lg:p-12 lg:pt-24">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted lg:hidden">What Nertia Does</span>
-                        </div>
-                    </div>
+        <div className="w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12">
+                {/* Sidebar */}
+                <PageSidebar
+                    sections={sections}
+                    title="About"
+                    description="Who we are and how we work."
+                />
 
-                    {/* Right column - Content */}
-                    <div className="lg:col-span-9 p-8 pt-24 lg:p-12 lg:pt-24">
+                {/* Content */}
+                <div className="lg:col-span-9">
+                    {/* SECTION 1: WHAT NERTIA DOES */}
+                    <section id="what-nertia-does" className="p-8 lg:p-12 border-t border-[var(--card-border)]">
                         <div className="max-w-2xl">
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8 leading-tight">
                                 WHAT NERTIA DOES
                             </h1>
-                            <div className="space-y-6 text-muted leading-relaxed text-base sm:text-lg">
+                            <div className="space-y-6 text-muted leading-relaxed text-base sm:text-lg mb-10">
                                 <p>
                                     Nertia builds positioning, brand systems, and technical execution for companies moving fast.
                                 </p>
                                 <p>
                                     We start with products nobody fully understands yet (AI infrastructure, developer tooling, complex SaaS) and turn them into compelling narratives. We design the identity systems that carry those narratives. We ship the web infrastructure and interactive components that bring them to life.
                                 </p>
-                                <p>
-                                    The outcome: positioning, brand, and code that all move together.
+                            </div>
+
+                            <Alert variant="accent" title="The Outcome">
+                                <p className="mb-4">
+                                    Positioning, brand, and code that all move together.
                                 </p>
+                                <a
+                                    href="#"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white text-xs font-medium tracking-wide hover:bg-[var(--accent-hover)] transition-colors"
+                                >
+                                    Schedule a Call
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            </Alert>
+                        </div>
+
+                        {/* Conveyor Belt Animation */}
+                        <div className="-mx-8 lg:-mx-12 my-10">
+                            <ConveyorBelt />
+                        </div>
+                    </section>
+
+                    {/* SECTION 2: HOW IT WORKS */}
+                    <section id="how-it-works" className="border-t border-[var(--card-border)] min-h-[90vh]">
+                        <div className="p-8 lg:p-12">
+                            <div className="max-w-2xl">
+                                <h2 className="text-3xl sm:text-4xl font-bold mb-12">
+                                    HOW IT WORKS
+                                </h2>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* SECTION 2: HOW IT WORKS */}
-            <section id="how-it-works" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    {/* Left column - Empty for sidebar alignment */}
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 pt-24 lg:p-12 lg:pt-24">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted lg:hidden">How It Works</span>
-                        </div>
-                    </div>
-
-                    {/* Right column - Content */}
-                    <div className="lg:col-span-9 p-8 pt-24 lg:p-12 lg:pt-24">
-                        <div className="max-w-2xl">
-                            <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-                                HOW IT WORKS
-                            </h2>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Steps as cards - matching services layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    {/* Left column - Empty for alignment */}
-                    <div className="hidden lg:block lg:col-span-3 lg:border-r border-[var(--card-border)]"></div>
-
-                    {/* Right column - Steps list */}
-                    <div className="lg:col-span-9">
-                        {/* Step 1 */}
-                        <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group border-b border-[var(--card-border)]">
-                            {/* Number */}
-                            <div className="flex-shrink-0">
-                                <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                    <span className="text-2xl font-bold">1</span>
+                        {/* Steps */}
+                        <div className="divide-y divide-[var(--card-border)]">
+                            {/* Step 1 */}
+                            <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
+                                <div className="flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
+                                        <span className="text-2xl font-bold">1</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
+                                        Understand the story.
+                                    </h3>
+                                    <p className="text-muted leading-relaxed max-w-xl">
+                                        We map your product architecture, interview your buyers, reverse-engineer your competitors. We find the insight that makes you different.
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
-                                    Understand the story.
-                                </h3>
-                                <p className="text-muted leading-relaxed max-w-xl">
-                                    We map your product architecture, interview your buyers, reverse-engineer your competitors. We find the insight that makes you different.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group border-b border-[var(--card-border)]">
-                            {/* Number */}
-                            <div className="flex-shrink-0">
-                                <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                    <span className="text-2xl font-bold">2</span>
+                            {/* Step 2 */}
+                            <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
+                                <div className="flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
+                                        <span className="text-2xl font-bold">2</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
+                                        Shape the narrative.
+                                    </h3>
+                                    <p className="text-muted leading-relaxed max-w-xl">
+                                        We craft a positioning framework and messaging strategy that resonates across your entire stakeholder ladder, from developers shipping code to VCs evaluating risk to enterprise procurement teams.
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
-                                    Shape the narrative.
-                                </h3>
-                                <p className="text-muted leading-relaxed max-w-xl">
-                                    We craft a positioning framework and messaging strategy that resonates across your entire stakeholder ladder, from developers shipping code to VCs evaluating risk to enterprise procurement teams.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Step 3 */}
-                        <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group border-b border-[var(--card-border)]">
-                            {/* Number */}
-                            <div className="flex-shrink-0">
-                                <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                    <span className="text-2xl font-bold">3</span>
+                            {/* Step 3 */}
+                            <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
+                                <div className="flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
+                                        <span className="text-2xl font-bold">3</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
+                                        Design the system.
+                                    </h3>
+                                    <p className="text-muted leading-relaxed max-w-xl">
+                                        We build modular brand frameworks. Visual languages that scale. Design tokens and component libraries. Everything integrates into how you actually work.
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
-                                    Design the system.
-                                </h3>
-                                <p className="text-muted leading-relaxed max-w-xl">
-                                    We build modular brand frameworks. Visual languages that scale. Design tokens and component libraries. Everything integrates into how you actually work.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Step 4 */}
-                        <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
-                            {/* Number */}
-                            <div className="flex-shrink-0">
-                                <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                    <span className="text-2xl font-bold">4</span>
+                            {/* Step 4 */}
+                            <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
+                                <div className="flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
+                                        <span className="text-2xl font-bold">4</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
+                                        Ship it.
+                                    </h3>
+                                    <p className="text-muted leading-relaxed max-w-xl">
+                                        We don&apos;t hand off wireframes and wait. We architect and build with React, Next.js, and Tailwind. Design tokens live in code. Brand updates are git commits, not dozens of file edits across disconnected tools.
+                                    </p>
                                 </div>
                             </div>
-
-                            {/* Content */}
-                            <div className="flex-1">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-3 uppercase tracking-tight">
-                                    Ship it.
-                                </h3>
-                                <p className="text-muted leading-relaxed max-w-xl">
-                                    We don&apos;t hand off wireframes and wait. We architect and build. Website infrastructure. Sales enablement. Dashboard components. Whatever moves the narrative forward.
-                                </p>
-                            </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                    </section>
 
-            {/* SECTION 3: WHAT YOU RECEIVE */}
-            <section id="what-you-receive" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    {/* Left column - Empty for sidebar alignment */}
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 pt-24 lg:p-12 lg:pt-24">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted lg:hidden">What You Receive</span>
-                        </div>
-                    </div>
-
-                    {/* Right column - Content */}
-                    <div className="lg:col-span-9 p-8 pt-24 lg:p-12 lg:pt-24">
+                    {/* SECTION 3: WHAT YOU RECEIVE */}
+                    <section id="what-you-receive" className="p-8 lg:p-12 border-t border-[var(--card-border)] min-h-[90vh]">
                         <div className="max-w-2xl">
                             <h2 className="text-3xl sm:text-4xl font-bold mb-12">
                                 WHAT YOU RECEIVE
                             </h2>
 
-                            {/* Deliverables list */}
                             <div className="space-y-8">
-                                {/* Item 1 */}
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">
                                         Positioning framework &amp; messaging strategy
@@ -174,27 +162,18 @@ export default function About() {
                                     </p>
                                 </div>
 
-                                {/* Item 2 */}
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">
                                         Brand system
                                     </h3>
-                                    <p className="text-muted leading-relaxed">
+                                    <p className="text-muted leading-relaxed mb-8">
                                         Identity guidelines, design tokens, visual language, tone of voice
                                     </p>
+                                    <div className="-mx-8 lg:-mx-12">
+                                        <BrandSystemFlow />
+                                    </div>
                                 </div>
 
-                                {/* Item 3 */}
-                                <div>
-                                    <h3 className="text-xl font-bold mb-2">
-                                        Sales &amp; GTM enablement
-                                    </h3>
-                                    <p className="text-muted leading-relaxed">
-                                        Technical one-pagers, competitive battlecards, pitch deck strategy
-                                    </p>
-                                </div>
-
-                                {/* Item 4 */}
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">
                                         Web infrastructure
@@ -204,7 +183,15 @@ export default function About() {
                                     </p>
                                 </div>
 
-                                {/* Item 5 */}
+                                <div>
+                                    <h3 className="text-xl font-bold mb-2">
+                                        Sales &amp; GTM enablement
+                                    </h3>
+                                    <p className="text-muted leading-relaxed">
+                                        Technical one-pagers, competitive battlecards, pitch deck strategy
+                                    </p>
+                                </div>
+
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">
                                         Strategic advisory
@@ -215,22 +202,10 @@ export default function About() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                    </section>
 
-            {/* SECTION 4: ABOUT NERTIA */}
-            <section id="about-nertia" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    {/* Left column - Empty for sidebar alignment */}
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 pt-24 lg:p-12 lg:pt-24">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted lg:hidden">About Nertia</span>
-                        </div>
-                    </div>
-
-                    {/* Right column - Content */}
-                    <div className="lg:col-span-9 p-8 pt-24 lg:p-12 lg:pt-24 pb-32">
+                    {/* SECTION 4: ABOUT NERTIA */}
+                    <section id="about-nertia" className="p-8 lg:p-12 pb-32 border-t border-[var(--card-border)] min-h-[90vh]">
                         <div className="max-w-2xl">
                             {/* Avatar */}
                             <div className="mb-10">
@@ -248,12 +223,10 @@ export default function About() {
                                 </div>
                             </div>
 
-                            {/* Headline */}
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 leading-tight">
                                 About Nertia
                             </h2>
 
-                            {/* Body */}
                             <div className="space-y-6 text-muted leading-relaxed text-base sm:text-lg mb-10">
                                 <p>
                                     Founded and led by Scott Campbell, a technical product marketer and builder specializing in AI infrastructure, brand strategy, and web architecture.
@@ -314,9 +287,9 @@ export default function About() {
                                 </a>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
-            </section>
-        </>
+            </div>
+        </div>
     );
 }

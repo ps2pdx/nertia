@@ -4,6 +4,26 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/sections/Footer';
 import PageContent from '@/components/PageContent';
+import PageSidebar, { SidebarSection } from '@/components/PageSidebar';
+import MotionSystem from '@/components/design-system/MotionSystem';
+import TableSystem from '@/components/design-system/TableSystem';
+import DataVizSystem from '@/components/design-system/DataVizSystem';
+import IconSystem from '@/components/design-system/IconSystem';
+import Alert from '@/components/ui/Alert';
+
+const sections: SidebarSection[] = [
+    { id: 'colors', label: 'Colors' },
+    { id: 'typography', label: 'Typography' },
+    { id: 'icons', label: 'Icons' },
+    { id: 'components', label: 'Components' },
+    { id: 'motion', label: 'Motion' },
+    { id: 'tables', label: 'Tables' },
+    { id: 'data-viz', label: 'Data Viz' },
+    { id: 'spacing', label: 'Spacing' },
+    { id: 'logo', label: 'Logo' },
+    { id: 'grid', label: 'Grid' },
+    { id: 'voice', label: 'Voice & Tone' },
+];
 
 export default function DesignSystemPage() {
     const [copiedToken, setCopiedToken] = useState<string | null>(null);
@@ -45,15 +65,18 @@ export default function DesignSystemPage() {
     return (
         <main className="pb-24">
             <PageContent>
-                {/* Colors */}
-            <section id="colors" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">01</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 border-t border-[var(--card-border)]">
+                    {/* Sidebar Navigation */}
+                    <PageSidebar
+                        sections={sections}
+                        title="Design System"
+                        description="A comprehensive guide to Nertia's visual language, components, and patterns."
+                    />
+
+                    {/* Content Sections */}
+                    <div className="lg:col-span-9">
+                        {/* Colors */}
+                        <section id="colors" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
                         <h2 className="text-xl font-bold mb-4">Colors</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Semantic color tokens that adapt to light and dark mode automatically.
@@ -89,19 +112,10 @@ export default function DesignSystemPage() {
                             <h3 className="text-xl font-bold mb-2">Accent: Green 500</h3>
                             <p className="opacity-90">The primary accent color used for CTAs, active states, and interactive elements. Hex: #22c55e</p>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Typography */}
-            <section id="typography" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">02</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                        {/* Typography */}
+                        <section id="typography" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
                         <h2 className="text-xl font-bold mb-4">Typography</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Two font families: Helvetica Neue for headings, Space Mono for body text.
@@ -144,19 +158,19 @@ export default function DesignSystemPage() {
                                 ))}
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Components */}
-            <section id="components" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">03</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12 space-y-12">
+                        {/* Icons */}
+                        <section id="icons" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
+                            <h2 className="text-xl font-bold mb-4">Icons</h2>
+                            <p className="text-muted text-sm leading-relaxed mb-8">
+                                Custom icon set for consistent visual language. Click any icon to copy usage code.
+                            </p>
+                            <IconSystem />
+                        </section>
+
+                        {/* Components */}
+                        <section id="components" className="p-8 lg:p-12 border-b border-[var(--card-border)] space-y-12">
                         <h2 className="text-xl font-bold mb-4">Components</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Reusable UI patterns used throughout the site.
@@ -240,6 +254,28 @@ export default function DesignSystemPage() {
                             </div>
                         </div>
 
+                        {/* Alerts */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-6">Alerts / Callouts</h3>
+                            <div className="space-y-4 mb-4">
+                                <Alert variant="default" title="Default Alert">
+                                    Standard alert with left border accent matching the foreground color.
+                                </Alert>
+                                <Alert variant="accent" title="Accent Alert">
+                                    Highlighted alert using the brand accent color for important callouts.
+                                </Alert>
+                                <Alert variant="muted" title="Muted Alert">
+                                    Subtle alert for secondary information or notes.
+                                </Alert>
+                                <Alert>
+                                    Alert without a title - just the message content.
+                                </Alert>
+                            </div>
+                            <p className="text-sm text-muted">
+                                <code>{'<Alert variant="accent" title="Title">Content</Alert>'}</code>
+                            </p>
+                        </div>
+
                         {/* Form Elements */}
                         <div>
                             <h3 className="text-lg font-semibold mb-6">Form Elements</h3>
@@ -262,19 +298,19 @@ export default function DesignSystemPage() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Spacing */}
-            <section id="spacing" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">04</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                        {/* Motion System */}
+                        <MotionSystem />
+
+                        {/* Tables */}
+                        <TableSystem />
+
+                        {/* Data Visualization */}
+                        <DataVizSystem />
+
+                        {/* Spacing */}
+                        <section id="spacing" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
                         <h2 className="text-xl font-bold mb-4">Spacing</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Consistent spacing scale based on Tailwind defaults.
@@ -306,19 +342,10 @@ export default function DesignSystemPage() {
                                 ))}
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Logo */}
-            <section id="logo" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">05</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                        {/* Logo */}
+                        <section id="logo" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
                         <h2 className="text-xl font-bold mb-4">Logo</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Logo variants for different contexts and backgrounds.
@@ -404,19 +431,10 @@ export default function DesignSystemPage() {
                                 Maintain minimum clear space around the logo equal to the height of the &quot;n&quot; in the wordmark. This ensures the logo remains legible and impactful across all applications.
                             </p>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Grid System */}
-            <section id="grid" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">06</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                        {/* Grid System */}
+                        <section id="grid" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
                         <h2 className="text-xl font-bold mb-4">Grid System</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             12-column grid with 3/9 split for content sections.
@@ -449,19 +467,10 @@ export default function DesignSystemPage() {
                                 Primary layout pattern used for all content sections. Sidebar contains section labels and navigation; content area contains the main content.
                             </p>
                         </div>
-                    </div>
-                </div>
-            </section>
+                        </section>
 
-            {/* Voice & Tone */}
-            <section id="voice" className="w-full min-h-[90vh]">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                    <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 lg:p-12">
-                        <div className="lg:sticky lg:top-24">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted">07</span>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-9 p-8 lg:p-12">
+                        {/* Voice & Tone */}
+                        <section id="voice" className="p-8 lg:p-12">
                         <h2 className="text-xl font-bold mb-4">Voice & Tone</h2>
                         <p className="text-muted text-sm leading-relaxed mb-8">
                             Writing guidelines for consistent communication.
@@ -502,9 +511,9 @@ export default function DesignSystemPage() {
                                 </div>
                             </div>
                         </div>
+                        </section>
                     </div>
                 </div>
-            </section>
 
                 <Footer />
             </PageContent>

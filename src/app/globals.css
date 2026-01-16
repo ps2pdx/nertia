@@ -46,6 +46,60 @@
   transform-origin: center center;
 }
 
+/* Conveyor belt animations */
+@keyframes conveyor-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes conveyor-out {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-conveyor-in {
+  animation: conveyor-in 0.6s ease-out forwards;
+}
+
+.animate-conveyor-out {
+  animation: conveyor-out 0.6s ease-out forwards;
+}
+
+/* Conveyor belt line movement */
+@keyframes conveyor-line-move {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -24;
+  }
+}
+
+.animate-conveyor-line {
+  animation: conveyor-line-move 1s linear infinite;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 * {
   scroll-behavior: smooth;
 }
