@@ -1,5 +1,6 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getDatabase, Database } from 'firebase/database';
+import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyAMNLbRC_TbVE6_e6f1azjW7Rvl5H4af68',
@@ -12,15 +13,24 @@ const firebaseConfig = {
 };
 
 let database: Database | null = null;
+let auth: Auth | null = null;
 
 try {
-  const app = initializeApp(firebaseConfig);
+  // Check if Firebase app already exists to avoid duplicate initialization
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   database = getDatabase(app);
+  auth = getAuth(app);
 } catch (error) {
   console.error('Firebase initialization failed:', error);
 }
 
-export { database };
+// Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+});
+
+export { database, auth, googleProvider };
 
 // Suppress Firebase errors in console
 if (typeof window !== 'undefined') {
