@@ -6,7 +6,7 @@ import { useState } from 'react';
 const Icon = ({ name, className = '' }: { name: string; className?: string }) => {
     const baseClass = `w-6 h-6 ${className}`;
 
-    const icons: Record<string, JSX.Element> = {
+    const icons: Record<string, React.ReactNode> = {
         // Brand Input Icons (from ConveyorBelt)
         logo: (
             <svg className={baseClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

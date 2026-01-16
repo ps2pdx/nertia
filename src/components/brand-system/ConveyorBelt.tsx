@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, ReactNode } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 // Input icons as mini graphics
 const InputIcon = ({ type, className = '' }: { type: string; className?: string }) => {
@@ -107,7 +107,6 @@ export default function ConveyorBelt() {
     useEffect(() => {
         if (isResetting) return;
 
-        let timer: NodeJS.Timeout;
         const stepDuration = 400;
         const processDuration = 1200;
 
@@ -162,7 +161,7 @@ export default function ConveyorBelt() {
         const current = phaseMap[phase];
         if (!current || phase === 'idle') return;
 
-        timer = setTimeout(() => {
+        const timer = setTimeout(() => {
             current.action?.();
 
             if (phase === 'complete') {
