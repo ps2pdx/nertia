@@ -4,6 +4,7 @@ import Image from 'next/image';
 import PageSidebar, { SidebarSection } from '@/components/PageSidebar';
 import BrandSystemFlow from '@/components/brand-system/BrandSystemFlow';
 import ConveyorBelt from '@/components/brand-system/ConveyorBelt';
+import { Caterpillar, FormingChrysalis, Chrysalis, ButterflyEmerging } from '@/components/brand-system/MetamorphosisIllustrations';
 import Alert from '@/components/ui/Alert';
 
 const sections: SidebarSection[] = [
@@ -78,8 +79,8 @@ export default function About() {
                             {/* Step 1 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                        <span className="text-2xl font-bold">1</span>
+                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
+                                        <Caterpillar className="w-16 h-16" />
                                     </div>
                                 </div>
                                 <div className="flex-1">
@@ -95,8 +96,8 @@ export default function About() {
                             {/* Step 2 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                        <span className="text-2xl font-bold">2</span>
+                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
+                                        <FormingChrysalis className="w-16 h-16" />
                                     </div>
                                 </div>
                                 <div className="flex-1">
@@ -112,8 +113,8 @@ export default function About() {
                             {/* Step 3 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                        <span className="text-2xl font-bold">3</span>
+                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
+                                        <Chrysalis className="w-16 h-16" />
                                     </div>
                                 </div>
                                 <div className="flex-1">
@@ -129,8 +130,8 @@ export default function About() {
                             {/* Step 4 */}
                             <div className="p-8 lg:p-12 flex flex-col sm:flex-row gap-6 sm:gap-8 group">
                                 <div className="flex-shrink-0">
-                                    <div className="w-16 h-16 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--foreground)] transition-colors group-hover:border-green-500">
-                                        <span className="text-2xl font-bold">4</span>
+                                    <div className="w-16 h-16 flex items-center justify-center text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
+                                        <ButterflyEmerging className="w-16 h-16" />
                                     </div>
                                 </div>
                                 <div className="flex-1">
