@@ -9,11 +9,11 @@ import { navItems } from '@/lib/navigation';
 export default function Header() {
   const pathname = usePathname();
   const [showHeader, setShowHeader] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Check if we're on the home page
   const isHome = pathname === '/';
 
-  // Show header only after scrolling past hero section on home page, always show on other pages
+  // Show header only after scrolling past hero section on home page
   useEffect(() => {
     if (!isHome) {
       setShowHeader(true);
@@ -28,49 +28,63 @@ export default function Header() {
       }
     };
 
-    handleScroll(); // Check initial position
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHome, pathname]);
 
-  // Determine if a nav item is active based on current pathname
-  const isActiveItem = (href: string) => {
-    return pathname === href;
-  };
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  const isActiveItem = (href: string) => pathname === href;
+
+  const shouldShowHeader = !isHome || showHeader;
 
   return (
     <>
-      {/* Desktop Header - Unified sticky bar with logo and navigation */}
-      {(!isHome || showHeader) && (
+      {/* Header - Desktop and Mobile */}
+      {shouldShowHeader && (
         <header
-          className={`hidden lg:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-12 py-6 bg-[var(--background)]/60 backdrop-blur-[36px] border-b border-[var(--card-border)] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 lg:px-12 py-4 lg:py-6 bg-[var(--background)]/60 backdrop-blur-[36px] border-b border-[var(--card-border)] transition-opacity duration-300 ${
             showHeader ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          } lg:opacity-100 lg:pointer-events-auto`}
+          }`}
         >
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            {/* Dark mode logo (white fill) - hidden in light mode */}
             <Image
               src="/logo-light.svg"
               alt="nertia.ai"
-              width={50}
-              height={32}
-              className="hidden dark:block"
+              width={40}
+              height={26}
+              className="hidden dark:block lg:w-[50px] lg:h-[32px]"
               priority
             />
-            {/* Light mode logo (black fill) - hidden in dark mode */}
             <Image
               src="/logo-dark.svg"
               alt="nertia.ai"
-              width={50}
-              height={32}
-              className="block dark:hidden"
+              width={40}
+              height={26}
+              className="block dark:hidden lg:w-[50px] lg:h-[32px]"
               priority
             />
           </Link>
 
-          {/* Navigation */}
-          <nav className="flex items-center gap-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -85,31 +99,56 @@ export default function Header() {
               </Link>
             ))}
           </nav>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            <span
+              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-transform duration-300 ${
+                mobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+              }`}
+            />
+            <span
+              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-opacity duration-300 ${
+                mobileMenuOpen ? 'opacity-0' : ''
+              }`}
+            />
+            <span
+              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-transform duration-300 ${
+                mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+              }`}
+            />
+          </button>
         </header>
       )}
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--background)]/90 backdrop-blur-lg border-t border-[var(--card-border)]">
-        <div className="w-full">
-          <div className="grid grid-cols-5">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`flex items-center justify-center py-4 text-xs font-medium transition-colors border-l border-[var(--card-border)] first:border-l-0 ${
-                  isActiveItem(item.href)
-                    ? 'text-[var(--accent)]'
-                    : 'text-muted hover:text-[var(--foreground)]'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-        {/* Safe area for devices with home indicator */}
-        <div className="h-safe-area-inset-bottom bg-[var(--background)]/90" />
-      </nav>
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`lg:hidden fixed inset-0 z-40 bg-[var(--background)] transition-transform duration-300 ease-out ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <nav className="flex flex-col items-center justify-center h-full gap-8">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`text-2xl font-medium transition-colors ${
+                isActiveItem(item.href)
+                  ? 'text-[var(--accent)]'
+                  : 'text-[var(--foreground)] hover:text-[var(--accent)]'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </>
   );
 }

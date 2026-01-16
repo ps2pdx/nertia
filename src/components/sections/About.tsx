@@ -1,20 +1,8 @@
-'use client';
-
 import Image from 'next/image';
-import ScrollSpyNav from '@/components/ScrollSpyNav';
 
 export default function About() {
-    const sections = [
-        { id: 'what-nertia-does', label: 'What Nertia Does' },
-        { id: 'how-it-works', label: 'How It Works' },
-        { id: 'what-you-receive', label: 'What You Receive' },
-        { id: 'about-nertia', label: 'About Nertia' },
-    ];
-
     return (
         <>
-            <ScrollSpyNav sections={sections} />
-
             {/* SECTION 1: WHAT NERTIA DOES */}
             <section id="what-nertia-does" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
                 <div className="grid grid-cols-1 lg:grid-cols-12">

@@ -1,14 +1,10 @@
 import Work from '@/components/sections/Work';
-import Footer from '@/components/sections/Footer';
-import PageContent from '@/components/PageContent';
+import PageTemplate from '@/components/PageTemplate';
 
 export default function WorkPage() {
   return (
-    <main className="pb-16">
-      <PageContent>
-        <Work />
-        <Footer />
-      </PageContent>
-    </main>
+    <PageTemplate>
+      <Work />
+    </PageTemplate>
   );
 }

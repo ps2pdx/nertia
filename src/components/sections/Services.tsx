@@ -1,13 +1,8 @@
-'use client';
-
-import ScrollSpyNav from '@/components/ScrollSpyNav';
-
 export default function Services() {
     const services = [
         {
             id: 'product-positioning',
             title: 'Product Positioning & Messaging',
-            navLabel: 'Positioning',
             description:
                 'Technical narrative architecture that resonates across your stakeholder ladder. We map your product\'s unique story, from architecture to buyer pain points, and craft messaging frameworks that work for developers, prospects, and VCs alike.',
             icon: (
@@ -24,7 +19,6 @@ export default function Services() {
         {
             id: 'brand-systems',
             title: 'Brand Systems & Identity',
-            navLabel: 'Identity',
             description:
                 'Modular brand frameworks that scale. Logo, visual language, design tokens, tone of voice, all architected as living systems that integrate into your actual workflows. Not static PDFs. Systems that ship.',
             icon: (
@@ -41,7 +35,6 @@ export default function Services() {
         {
             id: 'gtm-strategy',
             title: 'GTM Strategy & Sales Enablement',
-            navLabel: 'Go-to-Market',
             description:
                 'Competitive intelligence, positioning battlecards, technical one-pagers, and pitch deck strategy. We arm your team with the narratives and assets needed to close deals and navigate complex buyer conversations.',
             icon: (
@@ -58,7 +51,6 @@ export default function Services() {
         {
             id: 'technical-content',
             title: 'Technical Content & Thought Leadership',
-            navLabel: 'Content',
             description:
                 'Whitepapers, technical case studies, blog strategy, and SEO/GEO content architecture. We translate your product\'s complexity into educational content that builds authority and captures demand.',
             icon: (
@@ -75,7 +67,6 @@ export default function Services() {
         {
             id: 'web-development',
             title: 'Web Development & Design Systems',
-            navLabel: 'Development',
             description:
                 'Production-ready Webflow builds, custom components, and design system documentation. Everything is responsive, cross-browser tested, and optimized for performance. We write the code ourselves.',
             icon: (
@@ -92,7 +83,6 @@ export default function Services() {
         {
             id: 'executive-advisory',
             title: 'Executive Advisory & Strategy',
-            navLabel: 'Advisory',
             description:
                 'Ongoing guidance on product positioning, GTM sequencing, and narrative alignment. From founder coaching to executive advisory, we act as a strategic sounding board for technical and go-to-market decisions.',
             icon: (
@@ -109,7 +99,6 @@ export default function Services() {
         {
             id: 'dashboard-development',
             title: 'Dashboard & Component Development',
-            navLabel: 'Dashboards',
             description:
                 'Custom interactive visualizations, embedded components, and data-driven UI. Grafana-style dashboards, analytics interfaces, real-time monitoring tools built to specification and shipped production-ready.',
             icon: (
@@ -125,15 +114,8 @@ export default function Services() {
         },
     ];
 
-    const sections = services.map(service => ({
-        id: service.id,
-        label: service.navLabel
-    }));
-
     return (
         <>
-            <ScrollSpyNav sections={sections} />
-
             {/* Services Grid */}
             <div className="w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-12">

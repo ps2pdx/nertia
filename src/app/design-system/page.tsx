@@ -4,20 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Footer from '@/components/sections/Footer';
 import PageContent from '@/components/PageContent';
-import ScrollSpyNav from '@/components/ScrollSpyNav';
 
 export default function DesignSystemPage() {
     const [copiedToken, setCopiedToken] = useState<string | null>(null);
-
-    const sections = [
-        { id: 'colors', label: 'Colors' },
-        { id: 'typography', label: 'Typography' },
-        { id: 'components', label: 'Components' },
-        { id: 'spacing', label: 'Spacing' },
-        { id: 'logo', label: 'Logo' },
-        { id: 'grid', label: 'Grid' },
-        { id: 'voice', label: 'Voice' },
-    ];
 
     const copyToClipboard = (text: string, tokenName: string) => {
         navigator.clipboard.writeText(text);
@@ -56,8 +45,6 @@ export default function DesignSystemPage() {
     return (
         <main className="pb-24">
             <PageContent>
-                <ScrollSpyNav sections={sections} />
-
                 {/* Colors */}
             <section id="colors" className="w-full border-t border-[var(--card-border)] min-h-[90vh]">
                 <div className="grid grid-cols-1 lg:grid-cols-12">

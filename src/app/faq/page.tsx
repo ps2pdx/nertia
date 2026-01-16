@@ -1,11 +1,10 @@
 import FAQ from '@/components/sections/FAQ';
-import Footer from '@/components/sections/Footer';
+import PageTemplate from '@/components/PageTemplate';
 
 export default function FAQPage() {
   return (
-    <main className="pb-16 pt-24">
+    <PageTemplate>
       <FAQ />
-      <Footer />
-    </main>
+    </PageTemplate>
   );
 }
