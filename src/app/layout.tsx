@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Space_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import "./globals.css";
 
@@ -8,14 +8,29 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "nertia",
-  description: "nertia",
+  title: "Nertia | Brand Systems Studio",
+  description: "Technical product marketing and brand systems. Strategy, design, and code—built by Scott Campbell.",
+  keywords: ["brand systems", "technical marketing", "web development", "product marketing", "AI infrastructure"],
+  authors: [{ name: "Scott Campbell" }],
+  openGraph: {
+    title: "Nertia — Brand Systems Studio",
+    description: "Positioning, identity systems, and production code for companies that refuse to stand still.",
+    url: "https://nertia.ai",
+    siteName: "Nertia",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nertia — Brand Systems Studio",
+    description: "Positioning, identity systems, and production code for companies that refuse to stand still.",
+  },
 };
 
 export default function RootLayout({
@@ -40,7 +55,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${spaceMono.variable} antialiased`}
       >
         <Header />
         {children}

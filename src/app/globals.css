@@ -3,32 +3,165 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --muted: #6b7280;
+  --accent: #22c55e;
+  --accent-hover: #16a34a;
+  --card-bg: #f9fafb;
+  --card-border: #e5e7eb;
+  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: var(--font-space-mono), "Courier New", Courier, monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-space-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --muted: #a8adb8;
+    --accent: #22c55e;
+    --accent-hover: #4ade80;
+    --card-bg: #111111;
+    --card-border: #262626;
   }
+}
+
+/* Orbit animation for hero button - smooth 3 second rotation */
+@keyframes orbit {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbit 3s linear infinite;
+  transform-origin: center center;
+}
+
+* {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  font-family: var(--font-body);
 }
 
-code, pre, kbd, samp {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+.logo {
+  font-family: var(--font-heading);
+}
+
+code,
+pre,
+kbd,
+samp {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* Section spacing */
+.section {
+  padding: 6rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 8rem 2rem;
+  }
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card styles */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+/* Tag styles */
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--card-border);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* Button styles - primary */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 9999px;
+  font-weight: 500;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+/* Button styles - secondary pill (outline) */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 9999px;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Muted text */
+.text-muted {
+  color: var(--muted);
+}
+
+/* Hide battlezone overlay on main pages */
 .fixed.top-0.left-0.w-screen.h-screen.bg-black.overflow-hidden {
   display: none;
 }

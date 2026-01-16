@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export default function Resume() {
   return (
-    <div className="font-sans flex flex-col items-center min-h-screen p-8 pb-20 sm:p-20">
+    <div className="flex flex-col items-center min-h-screen p-8 pb-20 sm:p-20">
       {/* Navigation */}
       <nav className="flex gap-4 text-sm mb-12">
         <Link href="/" className="hover:underline">Home</Link>
-        <Link href="/battlezone" className="text-green-500 hover:underline">Battlezone</Link>
+        <a href="https://www.battlezone.app" target="_blank" rel="noopener noreferrer" className="text-green-500 hover:underline">Battlezone</a>
         <span className="underline">Resume</span>
       </nav>
 
