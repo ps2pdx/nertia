@@ -324,14 +324,15 @@ export default function WebGLBackground() {
 
         initScene();
 
+        const container = containerRef.current;
         return () => {
             isCleanedUp = true;
             if (animationId) {
                 cancelAnimationFrame(animationId);
             }
             if (renderer) {
-                if (renderer.domElement && containerRef.current?.contains(renderer.domElement)) {
-                    containerRef.current.removeChild(renderer.domElement);
+                if (renderer.domElement && container?.contains(renderer.domElement)) {
+                    container.removeChild(renderer.domElement);
                 }
                 renderer.dispose();
             }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Space_Mono } from "next/font/google";
+import Script from "next/script";
 import Header from "@/components/Header";
 import Providers from "@/components/Providers";
 import "./globals.css";
@@ -42,18 +43,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q8VLPZQSJ1"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-Q8VLPZQSJ1');
-            `,
-          }}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-Q8VLPZQSJ1"
+          strategy="afterInteractive"
         />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-Q8VLPZQSJ1');
+          `}
+        </Script>
       </head>
       <body
         className={`${geistSans.variable} ${spaceMono.variable} antialiased`}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useAuth } from '@/lib/auth-context';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
@@ -79,10 +80,12 @@ function GeneratorContent() {
               History
             </Link>
             {user?.photoURL && (
-              <img
+              <Image
                 src={user.photoURL}
                 alt={user.displayName || 'User'}
-                className="w-8 h-8 rounded-full"
+                width={32}
+                height={32}
+                className="rounded-full"
               />
             )}
             <button
