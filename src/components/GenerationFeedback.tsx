@@ -54,7 +54,7 @@ export function GenerationFeedback({ generationId, onFeedbackSubmit }: Generatio
 
   return (
     <div className="border border-[var(--card-border)] rounded-lg p-4 bg-[var(--card-bg)]">
-      <p className="text-sm font-medium mb-3">How's this brand system?</p>
+      <p className="text-sm font-medium mb-3">How&apos;s this brand system?</p>
 
       <div className="flex gap-2 mb-3">
         <button
