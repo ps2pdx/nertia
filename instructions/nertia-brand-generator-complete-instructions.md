@@ -367,18 +367,31 @@ Access at `/admin/generations` to view:
 - [x] Token preview displays colors, typography, voice & tone
 - [x] Feedback submission works
 - [x] Admin dashboard shows generations
-- [ ] Golden examples inject into prompts (needs examples added)
+- [x] Export options (JSON, CSS, Tailwind)
+- [x] Token editing (colors, typography, borders, spacing)
+- [x] History view for past generations
+- [x] Golden examples admin page
 
 ---
 
-## Next Steps
+## Completed Features
 
-1. **Add Golden Examples** - Manually curate 5-10 high-quality generations in Firebase
-2. **Export Options** - Download tokens as JSON, CSS variables, or Tailwind config
-3. **Token Editing** - Allow users to tweak individual values after generation
-4. **History View** - Let users view their past generations
+1. **Export Options** - Download tokens as JSON, CSS variables, or Tailwind config
+2. **Token Editing** - Edit colors (with pickers), typography, borders, spacing after generation
+3. **History View** - View and reuse past generations at `/generator/history`
+4. **Golden Examples Admin** - Curate examples at `/admin/golden-examples`
+
+---
+
+## Future Enhancements
+
+1. **Chat-based editing** - Natural language token updates ("make the accent color more blue")
+2. **Figma export** - Export tokens as Figma variables
+3. **Component previews** - Show sample UI components using the generated tokens
+4. **Batch generation** - Generate variations of a brand system
+5. **Team sharing** - Share brand systems with team members
 
 ---
 
 *Last Updated: January 2026*
-*Branch: main (commit ab0767c)*
+*Branch: main (commit 35e1ec5)*
