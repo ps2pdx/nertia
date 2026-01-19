@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BrandSystem } from '@/types/brand-system';
+import { BrandSystem, ColorValue } from '@/types/brand-system';
 
 interface TokenEditorProps {
   tokens: BrandSystem;
@@ -9,6 +9,18 @@ interface TokenEditorProps {
 }
 
 type ColorMode = 'light' | 'dark';
+
+// Helper to check if a value is a ColorValue
+function isColorValue(value: unknown): value is ColorValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'light' in value &&
+    'dark' in value &&
+    typeof (value as ColorValue).light === 'string' &&
+    typeof (value as ColorValue).dark === 'string'
+  );
+}
 
 export function TokenEditor({ tokens, onTokensChange }: TokenEditorProps) {
   const [activeMode, setActiveMode] = useState<ColorMode>('dark');
@@ -98,17 +110,19 @@ export function TokenEditor({ tokens, onTokensChange }: TokenEditorProps) {
       <div>
         <h3 className="text-sm font-medium mb-3">Colors ({activeMode} mode)</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {Object.entries(tokens.colors).map(([name, value]) => (
-            <ColorInput
-              key={name}
-              label={name}
-              value={value[activeMode]}
-              onChange={(newValue) => updateColor(name, activeMode, newValue)}
-              isEditing={editingPath === `colors.${name}`}
-              onEditStart={() => setEditingPath(`colors.${name}`)}
-              onEditEnd={() => setEditingPath(null)}
-            />
-          ))}
+          {Object.entries(tokens.colors)
+            .filter(([, value]) => isColorValue(value))
+            .map(([name, value]) => (
+              <ColorInput
+                key={name}
+                label={name}
+                value={(value as ColorValue)[activeMode]}
+                onChange={(newValue) => updateColor(name, activeMode, newValue)}
+                isEditing={editingPath === `colors.${name}`}
+                onEditStart={() => setEditingPath(`colors.${name}`)}
+                onEditEnd={() => setEditingPath(null)}
+              />
+            ))}
         </div>
       </div>
 
@@ -159,17 +173,19 @@ export function TokenEditor({ tokens, onTokensChange }: TokenEditorProps) {
           Edit Spacing
         </summary>
         <div className="mt-3 grid grid-cols-5 gap-2">
-          {Object.entries(tokens.spacing).map(([name, value]) => (
-            <div key={name} className="text-center">
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => updateSpacing(name, e.target.value)}
-                className="w-full text-xs text-center bg-transparent border border-[var(--card-border)] rounded px-1 py-1 focus:border-[var(--accent)] outline-none"
-              />
-              <span className="text-xs text-muted">{name}</span>
-            </div>
-          ))}
+          {Object.entries(tokens.spacing)
+            .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+            .map(([name, value]) => (
+              <div key={name} className="text-center">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => updateSpacing(name, e.target.value)}
+                  className="w-full text-xs text-center bg-transparent border border-[var(--card-border)] rounded px-1 py-1 focus:border-[var(--accent)] outline-none"
+                />
+                <span className="text-xs text-muted">{name}</span>
+              </div>
+            ))}
         </div>
       </details>
     </div>

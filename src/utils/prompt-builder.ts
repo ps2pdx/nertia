@@ -122,7 +122,7 @@ export async function buildPrompt(inputs: DiscoveryInputs): Promise<string> {
     ? `- Existing Brand Color: ${inputs.existingBrandColor} (incorporate this as primary or accent)`
     : '';
 
-  return `You are a brand systems architect. Generate a complete design token system.
+  return `You are a brand systems architect. Generate a comprehensive design token system (v2.0).
 
 BRAND INPUTS:
 - Company: ${inputs.companyName}
@@ -143,9 +143,11 @@ REQUIREMENTS:
 2. All colors must work for both light and dark modes
 3. Ensure WCAG AA contrast ratios (4.5:1 for text, 3:1 for UI)
 4. Use semantic naming (background, foreground, accent) not color names
-5. Typography should use widely available Google Fonts
+5. Typography should use widely available Google Fonts (recommend distinct display & body fonts)
 6. Spacing uses rem units based on 4px grid (0.25rem, 0.5rem, 1rem, etc.)
-7. Generate 3 example headlines, 3 CTAs, and 3 descriptions matching the voice
+7. Generate comprehensive voice/tone with attributes, guidelines, and examples
+8. Include imagery guidelines relevant to the industry
+9. Component tokens should be consistent with the overall design language
 
 Return ONLY valid JSON matching this exact schema:
 
@@ -153,7 +155,7 @@ Return ONLY valid JSON matching this exact schema:
   "metadata": {
     "name": "string",
     "generatedAt": "ISO date string",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "colors": {
     "background": { "light": "#hex", "dark": "#hex" },
@@ -165,78 +167,177 @@ Return ONLY valid JSON matching this exact schema:
     "cardBorder": { "light": "#hex", "dark": "#hex" },
     "success": { "light": "#hex", "dark": "#hex" },
     "warning": { "light": "#hex", "dark": "#hex" },
-    "error": { "light": "#hex", "dark": "#hex" }
+    "error": { "light": "#hex", "dark": "#hex" },
+    "surface": {
+      "default": { "light": "#hex", "dark": "#hex" },
+      "elevated": { "light": "#hex", "dark": "#hex" },
+      "sunken": { "light": "#hex", "dark": "#hex" }
+    },
+    "border": {
+      "default": { "light": "#hex", "dark": "#hex" },
+      "subtle": { "light": "#hex", "dark": "#hex" },
+      "strong": { "light": "#hex", "dark": "#hex" },
+      "focus": { "light": "#hex", "dark": "#hex" }
+    },
+    "overlay": { "light": "rgba(...)", "dark": "rgba(...)" },
+    "usageRatios": { "background": 60, "surface": 30, "accent": 10 }
   },
   "typography": {
     "fontFamily": {
-      "sans": "Font Name, sans-serif",
+      "display": "Display Font, sans-serif",
+      "body": "Body Font, sans-serif",
+      "sans": "Fallback Sans, sans-serif",
       "mono": "Mono Font, monospace"
     },
     "fontSize": {
-      "xs": "0.75rem",
-      "sm": "0.875rem",
-      "base": "1rem",
-      "lg": "1.125rem",
-      "xl": "1.25rem",
-      "2xl": "1.5rem",
-      "3xl": "1.875rem",
-      "4xl": "2.25rem"
+      "xs": "0.75rem", "sm": "0.875rem", "base": "1rem", "lg": "1.125rem",
+      "xl": "1.25rem", "2xl": "1.5rem", "3xl": "1.875rem", "4xl": "2.25rem",
+      "5xl": "3rem", "6xl": "3.75rem"
     },
-    "fontWeight": {
-      "normal": 400,
-      "medium": 500,
-      "semibold": 600,
-      "bold": 700
-    },
-    "lineHeight": {
-      "tight": 1.25,
-      "normal": 1.5,
-      "relaxed": 1.75
+    "fontWeight": { "normal": 400, "medium": 500, "semibold": 600, "bold": 700 },
+    "lineHeight": { "tight": 1.25, "normal": 1.5, "relaxed": 1.75 },
+    "letterSpacing": { "tight": "-0.025em", "normal": "0em", "wide": "0.025em", "wider": "0.05em", "widest": "0.1em" },
+    "scale": {
+      "h1": { "size": "3rem", "weight": 700, "lineHeight": 1.15, "font": "display" },
+      "h2": { "size": "2.25rem", "weight": 600, "lineHeight": 1.25, "font": "display" },
+      "h3": { "size": "1.875rem", "weight": 600, "lineHeight": 1.3, "font": "display" },
+      "h4": { "size": "1.5rem", "weight": 500, "lineHeight": 1.4, "font": "body" },
+      "body": { "size": "1rem", "weight": 400, "lineHeight": 1.5, "font": "body" },
+      "label": { "size": "0.875rem", "weight": 500, "lineHeight": 1.5, "font": "body" },
+      "small": { "size": "0.75rem", "weight": 400, "lineHeight": 1.5, "font": "body" },
+      "micro": { "size": "0.625rem", "weight": 500, "lineHeight": 1.4, "font": "body", "letterSpacing": "0.05em", "textTransform": "uppercase" }
     }
+  },
+  "grid": {
+    "desktop": { "columns": 12, "gutter": "24px", "maxWidth": "1280px", "margin": "32px" },
+    "mobile": { "columns": 4, "gutter": "16px", "margin": "16px" }
   },
   "spacing": {
-    "0": "0",
-    "1": "0.25rem",
-    "2": "0.5rem",
-    "3": "0.75rem",
-    "4": "1rem",
-    "6": "1.5rem",
-    "8": "2rem",
-    "12": "3rem",
-    "16": "4rem",
-    "24": "6rem"
-  },
-  "borders": {
-    "radius": {
-      "none": "0",
-      "sm": "0.125rem",
-      "md": "0.375rem",
-      "lg": "0.5rem",
-      "full": "9999px"
-    },
-    "width": {
-      "thin": "1px",
-      "medium": "2px",
-      "thick": "4px"
+    "0": "0", "1": "0.25rem", "2": "0.5rem", "3": "0.75rem", "4": "1rem",
+    "6": "1.5rem", "8": "2rem", "12": "3rem", "16": "4rem", "24": "6rem",
+    "xs": "0.25rem", "sm": "0.5rem", "md": "1rem", "lg": "1.5rem", "xl": "2rem",
+    "2xl": "3rem", "3xl": "4rem", "4xl": "6rem",
+    "semantic": {
+      "section": { "paddingX": "2rem", "paddingY": "4rem" },
+      "card": { "padding": "1.5rem" },
+      "component": { "gap": "1rem" },
+      "text": { "gap": "0.5rem" },
+      "inline": { "gap": "0.25rem" },
+      "container": { "maxWidth": "80rem", "paddingX": "1.5rem" }
     }
   },
+  "icons": {
+    "sizes": { "small": "16px", "default": "24px", "large": "32px", "hero": "48px" },
+    "strokeWeight": "1.5px",
+    "boundingBox": "24px",
+    "strokeCaps": "rounded",
+    "categories": ["category1", "category2", "category3"]
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "foreground": { "light": "#hex", "dark": "#hex" },
+        "backgroundHover": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" }
+      },
+      "secondary": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "foreground": { "light": "#hex", "dark": "#hex" },
+        "backgroundHover": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" }
+      },
+      "outline": {
+        "background": { "light": "transparent", "dark": "transparent" },
+        "foreground": { "light": "#hex", "dark": "#hex" },
+        "backgroundHover": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" }
+      },
+      "paddingX": "1.5rem",
+      "paddingY": "0.75rem",
+      "fontSize": "0.875rem",
+      "fontWeight": 500,
+      "borderRadius": "0.5rem",
+      "letterSpacing": "0.025em"
+    },
+    "card": {
+      "variants": {
+        "feature": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "padding": "1.5rem" },
+        "stat": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "padding": "1.5rem" },
+        "image": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "padding": "0" }
+      },
+      "borderRadius": "0.75rem"
+    },
+    "input": {
+      "background": { "light": "#hex", "dark": "#hex" },
+      "border": { "light": "#hex", "dark": "#hex" },
+      "borderFocus": { "light": "#hex", "dark": "#hex" },
+      "placeholder": { "light": "#hex", "dark": "#hex" },
+      "paddingX": "1rem",
+      "paddingY": "0.75rem",
+      "fontSize": "1rem",
+      "borderRadius": "0.5rem"
+    },
+    "alert": {
+      "variants": {
+        "info": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "icon": "info" },
+        "success": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "icon": "check" },
+        "warning": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "icon": "alert" },
+        "error": { "background": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" }, "icon": "x" }
+      },
+      "padding": "1.5rem",
+      "borderLeftWidth": "4px"
+    },
+    "table": {
+      "headerBackground": { "light": "#hex", "dark": "#hex" },
+      "rowStripe": { "light": "#hex", "dark": "#hex" },
+      "rowHover": { "light": "#hex", "dark": "#hex" },
+      "borderColor": { "light": "#hex", "dark": "#hex" },
+      "cellPaddingX": "1rem",
+      "cellPaddingY": "0.75rem"
+    },
+    "navigation": {
+      "background": { "light": "#hex", "dark": "#hex" },
+      "linkColor": { "light": "#hex", "dark": "#hex" },
+      "linkHover": { "light": "#hex", "dark": "#hex" },
+      "height": "64px"
+    }
+  },
+  "borders": {
+    "radius": { "none": "0", "sm": "0.125rem", "md": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+    "width": { "thin": "1px", "medium": "2px", "thick": "4px" }
+  },
   "shadows": {
-    "sm": "shadow value",
-    "md": "shadow value",
-    "lg": "shadow value",
-    "xl": "shadow value"
+    "sm": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "md": "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+    "lg": "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+    "xl": "0 20px 25px -5px rgb(0 0 0 / 0.1)"
   },
   "motion": {
-    "duration": {
-      "fast": "150ms",
-      "normal": "300ms",
-      "slow": "500ms"
-    },
+    "duration": { "instant": "100ms", "fast": "200ms", "base": "300ms", "slow": "500ms" },
     "easing": {
       "default": "cubic-bezier(0.4, 0, 0.2, 1)",
       "in": "cubic-bezier(0.4, 0, 1, 1)",
       "out": "cubic-bezier(0, 0, 0.2, 1)",
       "inOut": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "interactions": {
+      "hover": { "scale": 1.02, "duration": "200ms" },
+      "fade": { "opacity": [0, 1], "duration": "300ms" },
+      "slide": { "transform": "translateY(8px)", "duration": "200ms" }
+    },
+    "principles": ["Performance first", "Purposeful motion", "Subtle enhancement"]
+  },
+  "imagery": {
+    "styles": ["style1", "style2", "style3"],
+    "guidelines": {
+      "do": ["guideline1", "guideline2", "guideline3"],
+      "dont": ["avoid1", "avoid2", "avoid3"]
+    },
+    "photoTreatment": {
+      "colorGrading": "description",
+      "contrast": "high/medium/low",
+      "style": "description"
     }
   },
   "voiceAndTone": {
@@ -246,7 +347,23 @@ Return ONLY valid JSON matching this exact schema:
       "headlines": ["Headline 1", "Headline 2", "Headline 3"],
       "cta": ["CTA 1", "CTA 2", "CTA 3"],
       "descriptions": ["Description 1", "Description 2", "Description 3"]
-    }
+    },
+    "attributes": {
+      "attr1": { "name": "Attribute Name", "description": "What this means", "example": "Example usage" },
+      "attr2": { "name": "Attribute Name", "description": "What this means", "example": "Example usage" }
+    },
+    "guidelines": {
+      "do": ["writing guideline 1", "writing guideline 2"],
+      "dont": ["avoid 1", "avoid 2"]
+    },
+    "coreMessage": "The central brand message or positioning statement"
+  },
+  "zIndex": {
+    "base": 0, "raised": 10, "dropdown": 20, "sticky": 30,
+    "fixed": 40, "modal": 50, "popover": 60, "tooltip": 70
+  },
+  "breakpoints": {
+    "sm": "640px", "md": "768px", "lg": "1024px", "xl": "1280px", "2xl": "1536px"
   }
 }
 

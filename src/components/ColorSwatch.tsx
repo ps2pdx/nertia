@@ -29,21 +29,40 @@ export function ColorSwatch({ name, lightColor, darkColor, showLabels = true }: 
   );
 }
 
+interface ColorValue {
+  light: string;
+  dark: string;
+}
+
+// Helper to check if a value is a ColorValue
+function isColorValue(value: unknown): value is ColorValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'light' in value &&
+    'dark' in value &&
+    typeof (value as ColorValue).light === 'string' &&
+    typeof (value as ColorValue).dark === 'string'
+  );
+}
+
 interface ColorPaletteProps {
-  colors: Record<string, { light: string; dark: string }>;
+  colors: Record<string, unknown>;
 }
 
 export function ColorPalette({ colors }: ColorPaletteProps) {
   return (
     <div className="grid grid-cols-5 gap-2">
-      {Object.entries(colors).map(([name, value]) => (
-        <ColorSwatch
-          key={name}
-          name={name}
-          lightColor={value.light}
-          darkColor={value.dark}
-        />
-      ))}
+      {Object.entries(colors)
+        .filter(([, value]) => isColorValue(value))
+        .map(([name, value]) => (
+          <ColorSwatch
+            key={name}
+            name={name}
+            lightColor={(value as ColorValue).light}
+            darkColor={(value as ColorValue).dark}
+          />
+        ))}
     </div>
   );
 }

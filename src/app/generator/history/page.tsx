@@ -6,7 +6,19 @@ import AuthGuard from '@/components/AuthGuard';
 import { useAuth } from '@/lib/auth-context';
 import { database } from '@/lib/firebase';
 import { ref, query, orderByChild, equalTo, get } from 'firebase/database';
-import { BrandSystem, DiscoveryInputs } from '@/types/brand-system';
+import { BrandSystem, DiscoveryInputs, ColorValue } from '@/types/brand-system';
+
+// Helper to check if a value is a ColorValue
+function isColorValue(value: unknown): value is ColorValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'light' in value &&
+    'dark' in value &&
+    typeof (value as ColorValue).light === 'string' &&
+    typeof (value as ColorValue).dark === 'string'
+  );
+}
 
 interface Generation {
   id: string;
@@ -141,15 +153,18 @@ function HistoryContent() {
                   <div className="mb-6">
                     <h3 className="text-sm font-medium mb-3">Colors</h3>
                     <div className="flex flex-wrap gap-2">
-                      {Object.entries(selectedGeneration.tokens.colors).slice(0, 6).map(([name, value]) => (
-                        <div key={name} className="text-center">
-                          <div
-                            className="w-12 h-12 rounded-md border border-[var(--card-border)]"
-                            style={{ backgroundColor: value.dark }}
-                          />
-                          <span className="text-xs text-muted">{name}</span>
-                        </div>
-                      ))}
+                      {Object.entries(selectedGeneration.tokens.colors)
+                        .filter(([, value]) => isColorValue(value))
+                        .slice(0, 6)
+                        .map(([name, value]) => (
+                          <div key={name} className="text-center">
+                            <div
+                              className="w-12 h-12 rounded-md border border-[var(--card-border)]"
+                              style={{ backgroundColor: (value as ColorValue).dark }}
+                            />
+                            <span className="text-xs text-muted">{name}</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
 

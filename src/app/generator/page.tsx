@@ -121,16 +121,43 @@ function GeneratorContent() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold">Generated System</h2>
-                    <button
-                      onClick={() => setIsEditing(!isEditing)}
-                      className={`px-3 py-1 text-sm rounded-md border transition-colors ${
-                        isEditing
-                          ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
-                          : 'border-[var(--card-border)] hover:border-[var(--accent)]'
-                      }`}
-                    >
-                      {isEditing ? 'Done Editing' : 'Edit Tokens'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {result._generationId && (
+                        <a
+                          href={`/brand/${result._generationId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 text-sm rounded-md border border-[var(--card-border)] hover:border-[var(--accent)] transition-colors flex items-center gap-1.5"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                          Full View
+                        </a>
+                      )}
+                      <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                          isEditing
+                            ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                            : 'border-[var(--card-border)] hover:border-[var(--accent)]'
+                        }`}
+                      >
+                        {isEditing ? 'Done Editing' : 'Edit Tokens'}
+                      </button>
+                    </div>
                   </div>
                   {isEditing ? (
                     <TokenEditor
