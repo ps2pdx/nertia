@@ -2,6 +2,7 @@
 
 import { BrandSystem } from '@/types/brand-system';
 import { ColorPalette } from './ColorSwatch';
+import { ExportOptions } from './ExportOptions';
 
 interface TokenPreviewProps {
   tokens: BrandSystem;
@@ -106,6 +107,9 @@ export function TokenPreview({ tokens }: TokenPreviewProps) {
           </div>
         </div>
       </div>
+
+      {/* Export Options */}
+      <ExportOptions tokens={tokens} />
 
       {/* Raw JSON (collapsible) */}
       <details className="group">
