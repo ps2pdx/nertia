@@ -4,14 +4,22 @@ import { useState } from 'react';
 import AuthGuard from '@/components/AuthGuard';
 import { useAuth } from '@/lib/auth-context';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
+import { DiscoveryForm } from '@/components/DiscoveryForm';
+import { TokenPreview } from '@/components/TokenPreview';
+import { GeneratingAnimation } from '@/components/GeneratingAnimation';
+import { GenerationFeedback } from '@/components/GenerationFeedback';
+
+interface GenerationResult extends BrandSystem {
+  _generationId?: string;
+}
 
 const defaultInputs: DiscoveryInputs = {
-  companyName: 'Acme Labs',
-  industry: 'Developer Tools',
-  targetAudience: 'Software engineers and technical leaders',
-  personalityAdjectives: ['innovative', 'reliable', 'clear'],
+  companyName: '',
+  industry: 'AI/ML Infrastructure',
+  targetAudience: '',
+  personalityAdjectives: [],
   colorMood: 'cool',
-  colorBrightness: 'balanced',
+  colorBrightness: 'dark',
   typographyStyle: 'modern',
   densityPreference: 'balanced',
 };
@@ -19,19 +27,23 @@ const defaultInputs: DiscoveryInputs = {
 function GeneratorContent() {
   const { user, signOut } = useAuth();
   const [inputs, setInputs] = useState<DiscoveryInputs>(defaultInputs);
-  const [result, setResult] = useState<BrandSystem | null>(null);
+  const [result, setResult] = useState<GenerationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
+    setResult(null);
 
     try {
       const response = await fetch('/api/generate-tokens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inputs),
+        body: JSON.stringify({
+          inputs,
+          userId: user?.uid,
+        }),
       });
 
       if (!response.ok) {
@@ -74,179 +86,43 @@ function GeneratorContent() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Form */}
-          <div className="space-y-6">
+          {/* Left: Discovery Form */}
+          <div>
             <div className="p-6 border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)]">
               <h2 className="text-lg font-semibold mb-4">Brand Discovery</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Company Name</label>
-                  <input
-                    type="text"
-                    value={inputs.companyName}
-                    onChange={(e) => setInputs({ ...inputs, companyName: e.target.value })}
-                    className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Industry</label>
-                  <input
-                    type="text"
-                    value={inputs.industry}
-                    onChange={(e) => setInputs({ ...inputs, industry: e.target.value })}
-                    className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Target Audience</label>
-                  <input
-                    type="text"
-                    value={inputs.targetAudience}
-                    onChange={(e) => setInputs({ ...inputs, targetAudience: e.target.value })}
-                    className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Personality (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={inputs.personalityAdjectives.join(', ')}
-                    onChange={(e) =>
-                      setInputs({
-                        ...inputs,
-                        personalityAdjectives: e.target.value.split(',').map((s) => s.trim()),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    placeholder="innovative, reliable, clear"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Existing Brand Color (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={inputs.existingBrandColor || ''}
-                    onChange={(e) =>
-                      setInputs({
-                        ...inputs,
-                        existingBrandColor: e.target.value || undefined,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    placeholder="#22c55e"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Color Mood</label>
-                    <select
-                      value={inputs.colorMood}
-                      onChange={(e) =>
-                        setInputs({ ...inputs, colorMood: e.target.value as DiscoveryInputs['colorMood'] })
-                      }
-                      className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    >
-                      <option value="warm">Warm</option>
-                      <option value="cool">Cool</option>
-                      <option value="neutral">Neutral</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Brightness</label>
-                    <select
-                      value={inputs.colorBrightness}
-                      onChange={(e) =>
-                        setInputs({
-                          ...inputs,
-                          colorBrightness: e.target.value as DiscoveryInputs['colorBrightness'],
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    >
-                      <option value="vibrant">Vibrant</option>
-                      <option value="muted">Muted</option>
-                      <option value="balanced">Balanced</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Typography Style</label>
-                    <select
-                      value={inputs.typographyStyle}
-                      onChange={(e) =>
-                        setInputs({
-                          ...inputs,
-                          typographyStyle: e.target.value as DiscoveryInputs['typographyStyle'],
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    >
-                      <option value="modern">Modern</option>
-                      <option value="classic">Classic</option>
-                      <option value="geometric">Geometric</option>
-                      <option value="humanist">Humanist</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Density</label>
-                    <select
-                      value={inputs.densityPreference}
-                      onChange={(e) =>
-                        setInputs({
-                          ...inputs,
-                          densityPreference: e.target.value as DiscoveryInputs['densityPreference'],
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-[var(--card-border)] rounded-md bg-transparent focus:border-[var(--accent)] focus:outline-none transition-colors"
-                    >
-                      <option value="spacious">Spacious</option>
-                      <option value="balanced">Balanced</option>
-                      <option value="compact">Compact</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={handleGenerate}
-                disabled={loading}
-                className="w-full mt-6 py-3 bg-[var(--accent)] text-white font-medium rounded-md hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Generating...' : 'Generate Brand System'}
-              </button>
-
-              {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+              <DiscoveryForm
+                inputs={inputs}
+                setInputs={setInputs}
+                onGenerate={handleGenerate}
+                isLoading={loading}
+              />
+              {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             </div>
           </div>
 
-          {/* Output Preview */}
-          <div className="border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)] overflow-hidden">
-            <div className="p-4 border-b border-[var(--card-border)]">
-              <h2 className="text-lg font-semibold">Generated Tokens</h2>
-            </div>
-            <div className="p-4 overflow-auto max-h-[700px]">
-              {result ? (
-                <pre className="text-xs whitespace-pre-wrap font-mono">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
+          {/* Right: Output */}
+          <div>
+            <div className="border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)] overflow-hidden min-h-[500px]">
+              {loading ? (
+                <GeneratingAnimation isGenerating={loading} />
+              ) : result ? (
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold mb-4">Generated System</h2>
+                  <TokenPreview tokens={result} />
+                </div>
               ) : (
-                <p className="text-muted">Generate a brand system to see results</p>
+                <div className="flex items-center justify-center h-[500px] text-muted">
+                  <p>Fill out the form and generate a brand system</p>
+                </div>
               )}
             </div>
+
+            {/* Feedback */}
+            {result && !loading && (
+              <div className="mt-4">
+                <GenerationFeedback generationId={result._generationId} />
+              </div>
+            )}
           </div>
         </div>
       </div>

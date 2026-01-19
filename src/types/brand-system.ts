@@ -116,8 +116,13 @@ export interface DiscoveryInputs {
   targetAudience: string;
   personalityAdjectives: string[]; // 3-5 words like "bold", "trustworthy", "innovative"
   colorMood: 'warm' | 'cool' | 'neutral';
-  colorBrightness: 'vibrant' | 'muted' | 'balanced';
-  typographyStyle: 'modern' | 'classic' | 'geometric' | 'humanist';
+  colorBrightness: 'vibrant' | 'muted' | 'dark';
+  typographyStyle: 'modern' | 'classic' | 'playful' | 'technical';
   densityPreference: 'spacious' | 'balanced' | 'compact';
   existingBrandColor?: string; // Optional hex if they have one
+}
+
+// Generation result with tracking ID
+export interface GenerationResult extends BrandSystem {
+  _generationId?: string;
 }
