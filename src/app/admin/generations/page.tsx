@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { database } from '@/lib/firebase';
 import { ref, query, orderByChild, limitToLast, get } from 'firebase/database';
 import { DiscoveryInputs } from '@/types/brand-system';
@@ -78,7 +79,15 @@ export default function GenerationsAdminPage() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Generation Analytics</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Generation Analytics</h1>
+          <Link
+            href="/admin/golden-examples"
+            className="px-4 py-2 text-sm rounded-md border border-[var(--card-border)] hover:border-[var(--accent)] transition-colors"
+          >
+            Manage Golden Examples
+          </Link>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

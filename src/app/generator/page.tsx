@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
 import { useAuth } from '@/lib/auth-context';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
@@ -8,6 +9,7 @@ import { DiscoveryForm } from '@/components/DiscoveryForm';
 import { TokenPreview } from '@/components/TokenPreview';
 import { GeneratingAnimation } from '@/components/GeneratingAnimation';
 import { GenerationFeedback } from '@/components/GenerationFeedback';
+import { TokenEditor } from '@/components/TokenEditor';
 
 interface GenerationResult extends BrandSystem {
   _generationId?: string;
@@ -30,6 +32,7 @@ function GeneratorContent() {
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -69,6 +72,12 @@ function GeneratorContent() {
             <p className="text-muted mt-1">Generate AI-powered design token systems</p>
           </div>
           <div className="flex items-center gap-4">
+            <Link
+              href="/generator/history"
+              className="text-sm text-muted hover:text-foreground transition-colors"
+            >
+              History
+            </Link>
             {user?.photoURL && (
               <img
                 src={user.photoURL}
@@ -107,8 +116,27 @@ function GeneratorContent() {
                 <GeneratingAnimation isGenerating={loading} />
               ) : result ? (
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold mb-4">Generated System</h2>
-                  <TokenPreview tokens={result} />
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold">Generated System</h2>
+                    <button
+                      onClick={() => setIsEditing(!isEditing)}
+                      className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                        isEditing
+                          ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                          : 'border-[var(--card-border)] hover:border-[var(--accent)]'
+                      }`}
+                    >
+                      {isEditing ? 'Done Editing' : 'Edit Tokens'}
+                    </button>
+                  </div>
+                  {isEditing ? (
+                    <TokenEditor
+                      tokens={result}
+                      onTokensChange={(newTokens) => setResult({ ...newTokens, _generationId: result._generationId })}
+                    />
+                  ) : (
+                    <TokenPreview tokens={result} />
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-[500px] text-muted">
