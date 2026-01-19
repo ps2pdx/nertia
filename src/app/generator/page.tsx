@@ -6,7 +6,9 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useAuth } from '@/lib/auth-context';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
+import { WebsiteDiscoveryResult } from '@/types/website-discovery';
 import { DiscoveryForm } from '@/components/DiscoveryForm';
+import { WebsiteDiscovery } from '@/components/WebsiteDiscovery';
 import { TokenPreview } from '@/components/TokenPreview';
 import { GeneratingAnimation } from '@/components/GeneratingAnimation';
 import { GenerationFeedback } from '@/components/GenerationFeedback';
@@ -34,6 +36,24 @@ function GeneratorContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [discoveryStep, setDiscoveryStep] = useState<'url' | 'form'>('url');
+  const [discoveredData, setDiscoveredData] = useState<WebsiteDiscoveryResult | null>(null);
+
+  const handleDiscoveryComplete = (
+    suggestedInputs: Partial<DiscoveryInputs>,
+    raw: WebsiteDiscoveryResult
+  ) => {
+    setDiscoveredData(raw);
+    setInputs((prev) => ({
+      ...prev,
+      ...suggestedInputs,
+    }));
+    setDiscoveryStep('form');
+  };
+
+  const handleSkipDiscovery = () => {
+    setDiscoveryStep('form');
+  };
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -101,13 +121,40 @@ function GeneratorContent() {
           {/* Left: Discovery Form */}
           <div>
             <div className="p-6 border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)]">
-              <h2 className="text-lg font-semibold mb-4">Brand Discovery</h2>
-              <DiscoveryForm
-                inputs={inputs}
-                setInputs={setInputs}
-                onGenerate={handleGenerate}
-                isLoading={loading}
-              />
+              {discoveryStep === 'url' ? (
+                <WebsiteDiscovery
+                  onDiscoveryComplete={handleDiscoveryComplete}
+                  onSkip={handleSkipDiscovery}
+                />
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold">Brand Discovery</h2>
+                    {discoveredData && (
+                      <button
+                        onClick={() => setDiscoveryStep('url')}
+                        className="text-xs text-muted hover:text-foreground transition-colors"
+                      >
+                        Scan another URL
+                      </button>
+                    )}
+                  </div>
+                  {discoveredData && (
+                    <div className="mb-4 p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/20 rounded-md">
+                      <p className="text-sm">
+                        <span className="text-muted">Pre-filled from:</span>{' '}
+                        <span className="font-medium">{discoveredData.url}</span>
+                      </p>
+                    </div>
+                  )}
+                  <DiscoveryForm
+                    inputs={inputs}
+                    setInputs={setInputs}
+                    onGenerate={handleGenerate}
+                    isLoading={loading}
+                  />
+                </>
+              )}
               {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             </div>
           </div>
