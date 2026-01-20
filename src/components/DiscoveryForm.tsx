@@ -59,7 +59,7 @@ export function DiscoveryForm({ inputs, setInputs, onGenerate, isLoading }: Disc
     <div className="space-y-6">
       {/* Header with Randomize */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Brand Discovery</h3>
+        <h3 className="text-lg font-semibold">Brand Details</h3>
         <button
           type="button"
           onClick={handleRandomize}

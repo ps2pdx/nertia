@@ -18,15 +18,35 @@ export function mapDiscoveryToInputs(
   }
 
   // Set existing brand color from primary discovered color
+  let colorMood: 'warm' | 'cool' | 'neutral' = 'cool';
+  let colorBrightness: 'vibrant' | 'muted' | 'dark' = 'dark';
+
   if (discovery.colors.primary) {
     inputs.existingBrandColor = discovery.colors.primary;
-    inputs.colorMood = inferColorMood(discovery.colors.primary);
-    inputs.colorBrightness = inferColorBrightness(discovery.colors.primary);
+    colorMood = inferColorMood(discovery.colors.primary);
+    colorBrightness = inferColorBrightness(discovery.colors.primary);
+    inputs.colorMood = colorMood;
+    inputs.colorBrightness = colorBrightness;
   }
 
   // Set typography style from discovered fonts
+  let typographyStyle: 'modern' | 'classic' | 'playful' | 'technical' = 'modern';
   if (discovery.fonts.headings) {
-    inputs.typographyStyle = inferTypographyStyle(discovery.fonts.headings);
+    typographyStyle = inferTypographyStyle(discovery.fonts.headings);
+    inputs.typographyStyle = typographyStyle;
+  }
+
+  // Infer personality adjectives from color, typography, and description
+  inputs.personalityAdjectives = inferPersonalityAdjectives(
+    colorMood,
+    colorBrightness,
+    typographyStyle,
+    discovery.description
+  );
+
+  // Infer target audience from description
+  if (discovery.description) {
+    inputs.targetAudience = inferTargetAudience(discovery.description);
   }
 
   return inputs;
@@ -154,6 +174,114 @@ export function inferTypographyStyle(
 
   // Default to modern for unknown fonts
   return 'modern';
+}
+
+/**
+ * Infer personality adjectives based on discovered brand attributes
+ */
+function inferPersonalityAdjectives(
+  colorMood: 'warm' | 'cool' | 'neutral',
+  colorBrightness: 'vibrant' | 'muted' | 'dark',
+  typographyStyle: 'modern' | 'classic' | 'playful' | 'technical',
+  description?: string
+): string[] {
+  const adjectives: string[] = [];
+
+  // Typography-based personality
+  switch (typographyStyle) {
+    case 'modern':
+      adjectives.push('innovative');
+      break;
+    case 'classic':
+      adjectives.push('trustworthy', 'sophisticated');
+      break;
+    case 'playful':
+      adjectives.push('playful', 'friendly');
+      break;
+    case 'technical':
+      adjectives.push('technical');
+      break;
+  }
+
+  // Color mood-based personality
+  switch (colorMood) {
+    case 'warm':
+      if (!adjectives.includes('friendly')) adjectives.push('friendly');
+      if (!adjectives.includes('approachable')) adjectives.push('approachable');
+      break;
+    case 'cool':
+      if (!adjectives.includes('trustworthy')) adjectives.push('trustworthy');
+      break;
+    case 'neutral':
+      if (!adjectives.includes('minimal')) adjectives.push('minimal');
+      break;
+  }
+
+  // Brightness-based personality
+  switch (colorBrightness) {
+    case 'vibrant':
+      if (!adjectives.includes('bold')) adjectives.push('bold');
+      break;
+    case 'dark':
+      if (!adjectives.includes('premium')) adjectives.push('premium');
+      break;
+    case 'muted':
+      if (!adjectives.includes('sophisticated')) adjectives.push('sophisticated');
+      break;
+  }
+
+  // Description-based personality keywords
+  if (description) {
+    const desc = description.toLowerCase();
+    if (desc.includes('innovate') || desc.includes('cutting-edge') || desc.includes('ai')) {
+      if (!adjectives.includes('innovative')) adjectives.push('innovative');
+    }
+    if (desc.includes('trust') || desc.includes('secure') || desc.includes('reliable')) {
+      if (!adjectives.includes('trustworthy')) adjectives.push('trustworthy');
+    }
+    if (desc.includes('bold') || desc.includes('disrupt') || desc.includes('transform')) {
+      if (!adjectives.includes('bold')) adjectives.push('bold');
+    }
+    if (desc.includes('simple') || desc.includes('clean') || desc.includes('minimal')) {
+      if (!adjectives.includes('minimal')) adjectives.push('minimal');
+    }
+    if (desc.includes('premium') || desc.includes('luxury') || desc.includes('enterprise')) {
+      if (!adjectives.includes('premium')) adjectives.push('premium');
+    }
+  }
+
+  // Return 3-5 adjectives, prioritizing the first ones
+  return adjectives.slice(0, 5);
+}
+
+/**
+ * Infer target audience from description
+ */
+function inferTargetAudience(description: string): string {
+  const desc = description.toLowerCase();
+
+  // Developer/tech audience
+  if (desc.includes('developer') || desc.includes('engineer') || desc.includes('devops')) {
+    return 'Developers and engineering teams';
+  }
+
+  // Enterprise audience
+  if (desc.includes('enterprise') || desc.includes('b2b') || desc.includes('business')) {
+    return 'Enterprise teams and business leaders';
+  }
+
+  // Startup audience
+  if (desc.includes('startup') || desc.includes('founder') || desc.includes('entrepreneur')) {
+    return 'Startup founders and entrepreneurs';
+  }
+
+  // Consumer audience
+  if (desc.includes('everyone') || desc.includes('people') || desc.includes('users')) {
+    return 'Digital-savvy consumers';
+  }
+
+  // Default generic audience
+  return 'Technology professionals';
 }
 
 /**
