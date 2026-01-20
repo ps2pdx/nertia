@@ -17,7 +17,7 @@ export default function Hero() {
       <div className="container text-center relative z-10 flex flex-col items-center pt-16">
         {/* Icon logo above headline */}
         <span className="mb-6 block">
-          {/* Dark mode icon */}
+          {/* Dark mode icon - priority since dark is default */}
           <Image
             src="/logo-light.svg"
             alt="Nertia logo"
@@ -33,7 +33,6 @@ export default function Hero() {
             width={64}
             height={64}
             className="mx-auto block dark:hidden"
-            priority
           />
         </span>
         {/* Headline */}

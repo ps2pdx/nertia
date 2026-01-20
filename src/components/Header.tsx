@@ -73,7 +73,6 @@ export default function Header() {
               width={40}
               height={26}
               className="hidden dark:block lg:w-[50px] lg:h-[32px]"
-              priority
             />
             <Image
               src="/logo-dark.svg"
@@ -81,7 +80,6 @@ export default function Header() {
               width={40}
               height={26}
               className="block dark:hidden lg:w-[50px] lg:h-[32px]"
-              priority
             />
           </Link>
 
