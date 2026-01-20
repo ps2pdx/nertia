@@ -71,7 +71,7 @@ src/
 │   │       └── feedback/
 │   │           └── route.ts       # Feedback endpoint (thumbs up/down)
 │   ├── generator/
-│   │   └── page.tsx               # Main generator UI
+│   │   └── page.tsx               # Main generator UI (no auth required)
 │   ├── login/
 │   │   └── page.tsx               # Google Sign-in page
 │   ├── auth/
@@ -83,24 +83,35 @@ src/
 │   ├── layout.tsx
 │   └── globals.css
 ├── components/
-│   ├── AuthGuard.tsx              # Route protection
-│   ├── DiscoveryForm.tsx          # Brand input form with personality toggles
-│   ├── TokenPreview.tsx           # Token visualization (colors, typography, voice)
+│   ├── AuthGuard.tsx              # Route protection (for pages that need it)
+│   ├── DiscoveryForm.tsx          # Brand input form with personality toggles + Randomize
+│   ├── TokenPreview.tsx           # Token visualization with isolated styling
 │   ├── GeneratingAnimation.tsx    # SVG loading animation with orbiting tokens
 │   ├── GenerationFeedback.tsx     # Thumbs up/down rating component
 │   ├── ColorSwatch.tsx            # Color palette display (light/dark modes)
-│   └── Providers.tsx              # Auth provider wrapper
+│   ├── Providers.tsx              # Auth provider wrapper
+│   └── preview/                   # Token-styled preview components
+│       ├── index.ts               # Barrel export
+│       ├── IsolatedPreviewContainer.tsx  # Container with scoped token CSS vars
+│       ├── PreviewButtons.tsx     # Button previews (primary, secondary, outline)
+│       ├── PreviewInput.tsx       # Input field preview
+│       ├── PreviewCard.tsx        # Card component preview
+│       ├── PreviewAlerts.tsx      # Alert variants preview
+│       ├── PreviewTypeScale.tsx   # Typography scale preview
+│       ├── PreviewSpacing.tsx     # Spacing scale visualization
+│       └── PreviewGrid.tsx        # Grid system info
 ├── hooks/
 │   └── useGenerationProgress.ts   # Animation timing and phase management
 ├── lib/
 │   ├── firebase.ts                # Firebase client initialization
-│   └── auth-context.tsx           # Auth context with popup/redirect support
+│   └── auth-context.tsx           # Auth context with popup/redirect support (demo mode fallback)
 ├── types/
 │   ├── brand-system.ts            # TypeScript interfaces
 │   └── user.ts                    # User type
 └── utils/
     ├── tokens-to-css.ts           # CSS variable generation
-    └── prompt-builder.ts          # Dynamic prompt construction with industry intelligence
+    ├── prompt-builder.ts          # Dynamic prompt with industry/personality intelligence
+    └── random-inputs.ts           # Random brand input generator
 ```
 
 ---
@@ -112,9 +123,10 @@ src/
 ```env
 # Anthropic API
 ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
-USE_DEMO_MODE=false
+USE_DEMO_MODE=false  # Set to 'true' to skip Claude API calls (uses intelligent demo generation)
 
 # Firebase Configuration (nertia-ai project)
+# These are OPTIONAL for demo mode - generator works without Firebase
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=nertia-ai.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://nertia-ai-default-rtdb.firebaseio.com
@@ -123,6 +135,13 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=nertia-ai.firebasestorage.app
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 ```
+
+### Demo Mode (No Configuration Required)
+
+The generator works without any environment variables:
+- **No Firebase:** Auth context gracefully falls back to demo mode, generator accessible without login
+- **No API Key:** Uses `USE_DEMO_MODE=true` by default, generates tokens locally with intelligent industry/personality mappings
+- **Anonymous Users:** See "Sign in to save" link instead of sign out button
 
 ### Vercel Production
 
@@ -198,14 +217,34 @@ Collects brand inputs with:
 - Typography style (modern/classic/playful/technical)
 - Density preference (spacious/balanced/compact)
 - Optional existing brand color
+- **Randomize button:** Generates realistic random brand inputs for quick testing
 
 ### TokenPreview
 
-Displays generated brand system with:
+Displays generated brand system with **isolated token styling** (preview uses generated tokens, not site CSS):
+
 - **Color palette:** 10 semantic colors (background, foreground, muted, accent, etc.) with light/dark mode swatches
-- **Typography:** Font family preview with sample headline and description
-- **Voice & Tone:** Personality tags, writing style description
+- **Live Preview** (uses actual token styling):
+  - **Typography scale:** H1-H4, body, small text examples
+  - **Buttons:** Primary, secondary, outline variants with hover states
+  - **Input:** Text input with placeholder and focus state
+  - **Card:** Feature card with token-based styling
+  - **Alerts:** Success, warning, error variants (when defined)
+  - **Grid info:** Column counts, gutters, max width
+  - **Spacing scale:** Visual blocks showing xs-2xl spacing tokens
+  - **Voice & Tone:** Personality tags, writing style, example CTAs as styled buttons
+- **Border radius samples:** Visual examples of border radius scale
+- **Shadow samples:** Visual examples of shadow tokens
+- **Export options:** JSON, CSS variables, Tailwind config
 - **Raw JSON:** Collapsible view of full token output
+
+### IsolatedPreviewContainer
+
+Wrapper component that applies generated CSS variables to scope preview styling:
+- Light/dark mode toggle
+- Converts tokens to CSS custom properties
+- Ensures preview uses actual token colors, not site defaults
+- Passes colorMode to child components for mode-aware rendering
 
 ### GeneratingAnimation
 
@@ -284,22 +323,48 @@ Saves user feedback for a generation.
 
 The prompt builder (`src/utils/prompt-builder.ts`) includes:
 
-1. **Industry-specific color intelligence:**
-   - AI/ML: Dark backgrounds + warm accents (avoid blue/purple)
-   - Developer Tools: Syntax-highlighting inspired
-   - B2B SaaS: Professional blues/teals
-   - Fintech: Trust colors (deep blues, greens, gold accents)
+1. **Enhanced industry-specific color intelligence:**
+   - **AI/ML Infrastructure:** Dark backgrounds, warm accents (coral, green), avoid blue/purple. Examples: OpenAI, Anthropic, Vercel
+   - **Developer Tools:** Dark mode essential, syntax-highlighting inspired (blues, greens, purples). Examples: GitHub, VS Code, Linear
+   - **B2B SaaS:** Professional blues/teals, both modes important. Examples: Stripe, Notion, Figma
+   - **Fintech:** Trust colors (deep blues, greens), gold accents for premium. Examples: Mercury, Robinhood
+   - **Healthcare Tech:** Calming blues/teals, accessibility critical (WCAG AAA). Examples: Oscar Health, One Medical
+   - **E-commerce:** Vibrant CTAs, red/orange accents. Examples: Shopify, Amazon
+   - **Consumer Apps:** Playful, engaging colors. Examples: Spotify, Duolingo
+   - **Climate Tech:** Sophisticated greens, avoid greenwashing. Examples: Stripe Climate, Patch
 
-2. **Golden examples injection:**
+2. **Personality-to-style mappings:**
+   - **innovative:** Vibrant accents, spacious, rounded corners
+   - **trustworthy:** Blue-based, subtle borders, professional motion
+   - **bold:** High contrast, varied radii, impactful animations
+   - **friendly:** Warm tones, very rounded (pills), bouncy motion
+   - **premium:** Dark backgrounds, gold accents, elegant transitions
+   - **technical:** Dark mode primary, monospace-friendly, precise motion
+   - **playful:** Bright palette, very rounded, energetic motion
+   - **minimal:** Monochromatic, subtle borders, purposeful motion
+   - **sophisticated:** Refined palette, serif-friendly, smooth transitions
+   - **approachable:** Warm, balanced contrast, friendly motion
+
+3. **Golden examples injection:**
    - Fetches high-quality examples from Firebase
    - Filters by matching industry or color mood
    - Provides few-shot context for better outputs
 
-3. **Schema requirements:**
+4. **Schema requirements:**
    - WCAG AA contrast ratios
    - Semantic color naming
    - Google Fonts for typography
    - rem-based spacing (4px grid)
+
+## Demo Mode Generation
+
+When `USE_DEMO_MODE=true` or no API key is configured, the generator uses intelligent demo mode (`src/app/api/generate-tokens/route.ts`):
+
+1. **Industry-specific accent palettes:** Each industry has warm/cool/neutral color presets
+2. **Brightness-based backgrounds:** vibrant (high contrast), muted (softer), dark (premium feel)
+3. **Personality-influenced border radius:** playful = rounded, minimal = subtle, bold = varied
+4. **Personality-based CTAs:** playful = "Let's Go", premium = "Request Access", etc.
+5. **Typography by style:** modern (Inter), classic (Playfair/Source Serif), playful (Fredoka/Nunito), technical (JetBrains/IBM Plex)
 
 ---
 
@@ -380,6 +445,12 @@ Access at `/admin/generations` to view:
 2. **Token Editing** - Edit colors (with pickers), typography, borders, spacing after generation
 3. **History View** - View and reuse past generations at `/generator/history`
 4. **Golden Examples Admin** - Curate examples at `/admin/golden-examples`
+5. **Token-Styled Preview** - Preview uses actual generated tokens (not site CSS variables)
+6. **Isolated Preview Container** - Scoped CSS vars with light/dark mode toggle
+7. **Expanded Preview Components** - Buttons, inputs, cards, alerts, type scale, spacing, grid info
+8. **Random Input Generator** - "Randomize" button for quick testing and ideation
+9. **Enhanced Generation Intelligence** - Detailed industry guidance and personality-to-style mappings
+10. **Demo Mode Without Auth** - Generator accessible without login (uses demo mode if Firebase not configured)
 
 ---
 
@@ -387,11 +458,41 @@ Access at `/admin/generations` to view:
 
 1. **Chat-based editing** - Natural language token updates ("make the accent color more blue")
 2. **Figma export** - Export tokens as Figma variables
-3. **Component previews** - Show sample UI components using the generated tokens
+3. ~~**Component previews** - Show sample UI components using the generated tokens~~ (DONE)
 4. **Batch generation** - Generate variations of a brand system
 5. **Team sharing** - Share brand systems with team members
 
 ---
 
+## Changelog
+
+### January 2026 (Latest)
+
+**Token-Styled Preview System**
+- Added `IsolatedPreviewContainer` that applies generated token CSS variables
+- Preview now uses actual token colors instead of site CSS variables
+- Light/dark mode toggle in preview section
+- New preview components: buttons, inputs, cards, alerts, type scale, spacing, grid
+
+**Random Input Generator**
+- Added "Randomize" button to DiscoveryForm
+- Generates realistic company names (e.g., "NovaLabs", "PulseAI")
+- Random industry, audience, and personality combinations
+- Useful for quick testing and ideation
+
+**Enhanced Generation Intelligence**
+- Expanded `COLOR_INTELLIGENCE` with detailed guidance per industry (primary colors, accents, what to avoid, mood, typography notes, examples, dark mode notes)
+- Added `PERSONALITY_MAPPINGS` linking personality adjectives to design decisions (color tendency, typography hints, spacing density, border radius, motion style)
+- Demo mode now uses industry-specific accent palettes
+- Personality-influenced border radius in demo mode
+
+**Demo Mode Without Authentication**
+- Generator page (`/generator`) no longer requires login
+- Auth context handles missing Firebase configuration gracefully
+- Anonymous users can generate brands, see "Sign in to save" link
+- Useful for testing and demos without Firebase setup
+
+---
+
 *Last Updated: January 2026*
-*Branch: main (commit 35e1ec5)*
+*Branch: confident-varahamihira*

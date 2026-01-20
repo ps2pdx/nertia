@@ -1,6 +1,7 @@
 'use client';
 
 import { DiscoveryInputs } from '@/types/brand-system';
+import { generateRandomInputs } from '@/utils/random-inputs';
 
 interface DiscoveryFormProps {
   inputs: DiscoveryInputs;
@@ -50,8 +51,24 @@ export function DiscoveryForm({ inputs, setInputs, onGenerate, isLoading }: Disc
     }
   };
 
+  const handleRandomize = () => {
+    setInputs(generateRandomInputs());
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header with Randomize */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Brand Details</h3>
+        <button
+          type="button"
+          onClick={handleRandomize}
+          className="text-sm text-muted hover:text-foreground transition-colors"
+        >
+          Randomize
+        </button>
+      </div>
+
       {/* Company Name */}
       <div>
         <label className="block text-sm font-medium mb-2">Company Name</label>

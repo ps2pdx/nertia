@@ -34,41 +34,44 @@ Generate a complete brand system from a simple discovery questionnaire:
 - **Social Media** - OG images, Twitter cards, LinkedIn banners, Instagram posts
 - **Slideshow** - Multi-slide brand presentation deck
 
-## Getting Started
+### Additional Features
 
-### Prerequisites
+- **Light/Dark Mode** - Toggle preview between color modes
+- **Token Editing** - Edit colors, typography, borders, spacing after generation
+- **Randomize** - Quick random inputs for testing and ideation
+- **Demo Mode** - Works without API keys or Firebase configuration
 
-- Node.js 18+
-- npm, yarn, pnpm, or bun
-
-### Installation
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/nertia.git
-cd nertia
-
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env.local
-# Add your API keys (Anthropic, Firebase)
-
-# Run development server
+# Start development server
 npm run dev
+
+# Open http://localhost:3000/generator
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to start generating brand systems.
+No configuration required for demo mode. The generator works out of the box with intelligent local token generation.
 
-### Environment Variables
+## Configuration (Optional)
+
+Create `.env.local` for full features:
 
 ```env
-ANTHROPIC_API_KEY=your_api_key
-FIREBASE_API_KEY=your_firebase_key
-FIREBASE_AUTH_DOMAIN=your_domain.firebaseapp.com
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_DATABASE_URL=https://your_project.firebaseio.com
+# Anthropic API (for Claude-powered generation)
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+USE_DEMO_MODE=false
+
+# Firebase (for saving generations and user auth)
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 ```
 
 ## Project Structure
@@ -160,19 +163,26 @@ Request body:
 }
 ```
 
+## Key Pages
+
+- `/generator` - Main brand generator (no auth required)
+- `/generator/history` - Past generations (requires auth)
+- `/admin/generations` - Analytics dashboard
+- `/admin/golden-examples` - Curate example outputs
+
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 with Turbopack
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **AI**: Anthropic Claude API
+- **Styling**: Tailwind CSS + CSS custom properties
+- **AI**: Claude Sonnet 4 via Anthropic SDK
 - **Database**: Firebase Realtime Database
-- **Fonts**: Google Fonts
+- **Auth**: Firebase Authentication with Google OAuth
 
-## Contributing
+## Documentation
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+See [instructions/nertia-brand-generator-complete-instructions.md](./instructions/nertia-brand-generator-complete-instructions.md) for comprehensive documentation.
 
 ## License
 
-MIT License - see LICENSE file for details.
+Private - Nertia AI

@@ -2,50 +2,217 @@ import { database } from '@/lib/firebase';
 import { ref, get, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
 
-// Color intelligence from research (inject industry-specific guidance)
-const COLOR_INTELLIGENCE: Record<string, string> = {
-  'AI/ML Infrastructure': `
-    Use dark backgrounds (#0A0A0A to #212121).
-    Add ONE warm accent (coral #FF7759, terra cotta #D97757, or green #00A67E).
-    Avoid blue/purple - saturated market.
-    Reference: OpenAI #000000 + #00A67E, Anthropic #000000 + #D97757
-  `,
-  'Developer Tools': `
-    Dark themes preferred by developers.
-    Consider syntax-highlighting inspired accents.
-    High contrast for readability.
-  `,
-  'B2B SaaS': `
-    Professional blues and teals still work here.
-    Balance trust (blue) with energy (accent color).
-    Clean, corporate-friendly palettes.
-  `,
-  'Fintech': `
-    Trust colors: deep blues, greens.
-    Avoid overly playful colors.
-    Consider gold/amber accents for premium feel.
-  `,
-  'Healthcare Tech': `
-    Calming colors: soft blues, greens, whites.
-    Accessibility is critical - high contrast.
-    Avoid alarming reds except for actual alerts.
-  `,
-  'E-commerce': `
-    Vibrant accent colors for CTAs.
-    Trust signals matter - clean, professional base.
-    Consider seasonal flexibility in accent colors.
-  `,
-  'Consumer Apps': `
-    Can be more playful and expressive.
-    Consider demographic - younger audiences appreciate bold colors.
-    Ensure accessibility across all color choices.
-  `,
-  'Climate Tech': `
-    Natural greens, earth tones, ocean blues.
-    Avoid greenwashing cliches - be sophisticated.
-    Balance optimism with seriousness of mission.
-  `,
+// Enhanced color intelligence with specific guidance per industry
+interface IndustryGuidance {
+  primaryColors: string[];
+  accentColors: string[];
+  avoid: string[];
+  mood: string;
+  typography: string;
+  examples: string[];
+  darkModeNotes: string;
+}
+
+const COLOR_INTELLIGENCE: Record<string, IndustryGuidance> = {
+  'AI/ML Infrastructure': {
+    primaryColors: ['#0A0A0A', '#121212', '#1A1A1A', '#212121'],
+    accentColors: ['#FF7759', '#D97757', '#00A67E', '#10B981', '#F97316'],
+    avoid: ['blue', 'purple', 'neon colors', 'overly corporate blues'],
+    mood: 'Sophisticated, cutting-edge, technical yet approachable',
+    typography: 'Modern sans-serif (Inter, Plus Jakarta Sans), monospace for code elements',
+    examples: ['OpenAI: #000000 + #00A67E', 'Anthropic: #000000 + #D97757', 'Vercel: #000000 + #FFFFFF'],
+    darkModeNotes: 'Dark mode should be primary. Light mode as secondary option.',
+  },
+  'Developer Tools': {
+    primaryColors: ['#0D1117', '#161B22', '#21262D', '#1E1E1E'],
+    accentColors: ['#58A6FF', '#7EE787', '#FF7B72', '#FFA657', '#A371F7'],
+    avoid: ['overly corporate', 'pastel colors', 'low contrast combinations'],
+    mood: 'Technical, efficient, powerful, trustworthy',
+    typography: 'Clean sans-serif (JetBrains Sans, Inter), excellent monospace (JetBrains Mono, Fira Code)',
+    examples: ['GitHub: #0D1117 + syntax colors', 'VS Code: #1E1E1E + blue accents', 'Linear: #000000 + purple'],
+    darkModeNotes: 'Dark mode is essential. High contrast for code readability.',
+  },
+  'B2B SaaS': {
+    primaryColors: ['#FFFFFF', '#F8FAFC', '#0F172A', '#1E293B'],
+    accentColors: ['#3B82F6', '#0EA5E9', '#6366F1', '#8B5CF6', '#14B8A6'],
+    avoid: ['overly playful colors', 'neon', 'too many competing colors'],
+    mood: 'Professional, trustworthy, efficient, modern',
+    typography: 'Clean sans-serif (Inter, SF Pro, Geist), readable body text',
+    examples: ['Stripe: white + purple gradient', 'Notion: white + black accents', 'Figma: white + multi-color'],
+    darkModeNotes: 'Both modes important. Light mode often primary for business users.',
+  },
+  'Fintech': {
+    primaryColors: ['#0F172A', '#1E3A5F', '#FFFFFF', '#F8FAFC'],
+    accentColors: ['#0066FF', '#00D4AA', '#FFB800', '#10B981', '#3B82F6'],
+    avoid: ['bright red (except errors)', 'playful fonts', 'unprofessional colors'],
+    mood: 'Trustworthy, secure, premium, professional',
+    typography: 'Classic sans-serif (Inter, GT America), clear numbers display',
+    examples: ['Stripe: dark blue + purple', 'Robinhood: white + green', 'Mercury: black + green'],
+    darkModeNotes: 'Dark mode conveys premium feel. Gold accents for premium tier.',
+  },
+  'Healthcare Tech': {
+    primaryColors: ['#FFFFFF', '#F0F9FF', '#EFF6FF', '#F8FAFC'],
+    accentColors: ['#0EA5E9', '#06B6D4', '#10B981', '#3B82F6', '#8B5CF6'],
+    avoid: ['alarming red (except alerts)', 'harsh colors', 'low contrast'],
+    mood: 'Calming, trustworthy, accessible, caring',
+    typography: 'Highly readable fonts (Inter, Source Sans Pro), generous line height',
+    examples: ['Oscar Health: white + blue', 'One Medical: white + teal', 'Headspace: soft colors'],
+    darkModeNotes: 'Light mode primary. Accessibility is critical - WCAG AAA preferred.',
+  },
+  'E-commerce': {
+    primaryColors: ['#FFFFFF', '#F9FAFB', '#18181B', '#27272A'],
+    accentColors: ['#EF4444', '#F97316', '#FBBF24', '#10B981', '#EC4899'],
+    avoid: ['clashing colors', 'too many accents', 'hard-to-read combinations'],
+    mood: 'Vibrant, trustworthy, action-oriented, clean',
+    typography: 'Modern sans-serif, clear product display fonts',
+    examples: ['Shopify: white + green CTA', 'Amazon: white + orange', 'Glossier: pink + minimal'],
+    darkModeNotes: 'Light mode usually primary. CTAs must stand out in both modes.',
+  },
+  'Consumer Apps': {
+    primaryColors: ['#FFFFFF', '#F5F5F5', '#1A1A1A', '#262626'],
+    accentColors: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#FF8C42'],
+    avoid: ['corporate blues (unless targeting professionals)', 'boring palettes'],
+    mood: 'Playful, engaging, friendly, memorable',
+    typography: 'Expressive fonts allowed (Poppins, Outfit), can be more playful',
+    examples: ['Spotify: black + green', 'Instagram: gradient accents', 'Duolingo: green + bright'],
+    darkModeNotes: 'Both modes important. Match the energy of the brand.',
+  },
+  'Climate Tech': {
+    primaryColors: ['#FFFFFF', '#F0FDF4', '#052E16', '#14532D'],
+    accentColors: ['#22C55E', '#10B981', '#0EA5E9', '#84CC16', '#14B8A6'],
+    avoid: ['cliche greenwashing', 'overly literal green', 'cheap-looking combinations'],
+    mood: 'Optimistic, serious, sophisticated, natural',
+    typography: 'Clean modern fonts, can use nature-inspired serifs',
+    examples: ['Stripe Climate: deep green', 'Patch: sophisticated green', 'Tomorrow: minimal + green'],
+    darkModeNotes: 'Both modes work. Deep greens work well in dark mode.',
+  },
 };
+
+// Personality to style mappings
+interface PersonalityStyle {
+  colorTendency: string;
+  typographyHints: string[];
+  spacingDensity: string;
+  borderRadius: string;
+  motionStyle: string;
+}
+
+const PERSONALITY_MAPPINGS: Record<string, PersonalityStyle> = {
+  innovative: {
+    colorTendency: 'Vibrant accents, gradient-friendly, bold contrast',
+    typographyHints: ['modern', 'technical'],
+    spacingDensity: 'spacious',
+    borderRadius: 'rounded (lg, xl)',
+    motionStyle: 'Smooth, slightly playful transitions',
+  },
+  trustworthy: {
+    colorTendency: 'Blue-based, muted tones, consistent palette',
+    typographyHints: ['classic', 'modern'],
+    spacingDensity: 'balanced',
+    borderRadius: 'subtle (sm, md)',
+    motionStyle: 'Subtle, professional transitions',
+  },
+  bold: {
+    colorTendency: 'High contrast, striking accents, dramatic',
+    typographyHints: ['modern', 'display-heavy'],
+    spacingDensity: 'spacious',
+    borderRadius: 'varied (can mix sharp and round)',
+    motionStyle: 'Confident, impactful animations',
+  },
+  friendly: {
+    colorTendency: 'Warm tones, approachable colors, soft palette',
+    typographyHints: ['playful', 'rounded'],
+    spacingDensity: 'spacious',
+    borderRadius: 'rounded (lg, xl, full for pills)',
+    motionStyle: 'Bouncy, welcoming transitions',
+  },
+  premium: {
+    colorTendency: 'Dark backgrounds, gold/amber accents, sophisticated',
+    typographyHints: ['classic', 'serif-friendly'],
+    spacingDensity: 'spacious',
+    borderRadius: 'subtle (sm, md)',
+    motionStyle: 'Elegant, smooth transitions',
+  },
+  technical: {
+    colorTendency: 'Dark mode primary, syntax-inspired accents',
+    typographyHints: ['technical', 'monospace-friendly'],
+    spacingDensity: 'compact to balanced',
+    borderRadius: 'subtle (sm, md)',
+    motionStyle: 'Precise, functional transitions',
+  },
+  playful: {
+    colorTendency: 'Bright, varied palette, can use gradients',
+    typographyHints: ['playful', 'rounded'],
+    spacingDensity: 'balanced to spacious',
+    borderRadius: 'very rounded (xl, 2xl, full)',
+    motionStyle: 'Fun, bouncy, energetic',
+  },
+  minimal: {
+    colorTendency: 'Monochromatic, limited palette, high contrast',
+    typographyHints: ['modern', 'clean'],
+    spacingDensity: 'spacious',
+    borderRadius: 'subtle (none, sm, md)',
+    motionStyle: 'Minimal, subtle, purposeful',
+  },
+  sophisticated: {
+    colorTendency: 'Refined palette, subtle accents, elegant combinations',
+    typographyHints: ['classic', 'serif-friendly'],
+    spacingDensity: 'spacious',
+    borderRadius: 'subtle (sm, md)',
+    motionStyle: 'Smooth, refined transitions',
+  },
+  approachable: {
+    colorTendency: 'Warm, inviting colors, balanced contrast',
+    typographyHints: ['modern', 'rounded'],
+    spacingDensity: 'balanced',
+    borderRadius: 'rounded (md, lg)',
+    motionStyle: 'Friendly, smooth transitions',
+  },
+};
+
+// Format industry guidance for the prompt
+function formatIndustryGuidance(industry: string): string {
+  const guidance = COLOR_INTELLIGENCE[industry];
+  if (!guidance) return '';
+
+  return `
+## Industry Color Intelligence: ${industry}
+
+**Recommended Primary Colors:** ${guidance.primaryColors.join(', ')}
+**Recommended Accent Colors:** ${guidance.accentColors.join(', ')}
+**Colors to Avoid:** ${guidance.avoid.join(', ')}
+**Target Mood:** ${guidance.mood}
+**Typography Notes:** ${guidance.typography}
+**Industry References:** ${guidance.examples.join('; ')}
+**Dark Mode Notes:** ${guidance.darkModeNotes}
+`;
+}
+
+// Format personality guidance for the prompt
+function formatPersonalityGuidance(adjectives: string[]): string {
+  const relevantMappings = adjectives
+    .filter((adj) => PERSONALITY_MAPPINGS[adj])
+    .map((adj) => {
+      const mapping = PERSONALITY_MAPPINGS[adj];
+      return `
+- **${adj}:**
+  - Colors: ${mapping.colorTendency}
+  - Typography: ${mapping.typographyHints.join(', ')}
+  - Spacing: ${mapping.spacingDensity}
+  - Border Radius: ${mapping.borderRadius}
+  - Motion: ${mapping.motionStyle}`;
+    });
+
+  if (relevantMappings.length === 0) return '';
+
+  return `
+## Personality Style Guidance
+
+${relevantMappings.join('\n')}
+
+**Combined Approach:** Find the common ground between these personality traits. Prioritize the first 2-3 traits listed.
+`;
+}
 
 export async function getRelevantExamples(inputs: DiscoveryInputs): Promise<string> {
   if (!database) return '';
@@ -110,17 +277,36 @@ Now generate for the new inputs:
   }
 }
 
-export function getColorIntelligence(industry: string): string {
-  return COLOR_INTELLIGENCE[industry] || '';
+export function getColorIntelligence(industry: string): IndustryGuidance | null {
+  return COLOR_INTELLIGENCE[industry] || null;
+}
+
+export function getPersonalityMapping(adjective: string): PersonalityStyle | null {
+  return PERSONALITY_MAPPINGS[adjective] || null;
 }
 
 export async function buildPrompt(inputs: DiscoveryInputs): Promise<string> {
-  const colorGuidance = getColorIntelligence(inputs.industry);
+  const industryGuidance = formatIndustryGuidance(inputs.industry);
+  const personalityGuidance = formatPersonalityGuidance(inputs.personalityAdjectives);
   const examples = await getRelevantExamples(inputs);
 
   const existingColorLine = inputs.existingBrandColor
     ? `- Existing Brand Color: ${inputs.existingBrandColor} (incorporate this as primary or accent)`
     : '';
+
+  // Brightness guidance
+  const brightnessGuidance = {
+    vibrant: 'Use high saturation colors, strong contrast, energetic palette',
+    muted: 'Use desaturated tones, softer contrast, sophisticated palette',
+    dark: 'Use dark backgrounds as primary, light text, premium feel',
+  };
+
+  // Color mood guidance
+  const moodGuidance = {
+    warm: 'Lean towards oranges, reds, yellows, coral, terra cotta',
+    cool: 'Lean towards blues, teals, cyans, greens',
+    neutral: 'Lean towards grays, blacks, whites, with minimal color accent',
+  };
 
   return `You are a brand systems architect. Generate a comprehensive design token system (v2.0).
 
@@ -129,12 +315,15 @@ BRAND INPUTS:
 - Industry: ${inputs.industry}
 - Target Audience: ${inputs.targetAudience}
 - Personality: ${inputs.personalityAdjectives.join(', ')}
-- Color Mood: ${inputs.colorMood}, ${inputs.colorBrightness}
+- Color Mood: ${inputs.colorMood} (${moodGuidance[inputs.colorMood]})
+- Color Brightness: ${inputs.colorBrightness} (${brightnessGuidance[inputs.colorBrightness]})
 - Typography Style: ${inputs.typographyStyle}
 - Density: ${inputs.densityPreference}
 ${existingColorLine}
 
-${colorGuidance ? `## Industry Color Intelligence\n${colorGuidance}\n` : ''}
+${industryGuidance}
+
+${personalityGuidance}
 
 ${examples}
 

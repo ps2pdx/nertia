@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, Database } from 'firebase/database';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 
@@ -12,23 +12,34 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Check if Firebase is properly configured
+const isFirebaseConfigured =
+  firebaseConfig.apiKey &&
+  firebaseConfig.projectId &&
+  firebaseConfig.databaseURL;
+
 let database: Database | null = null;
 let auth: Auth | null = null;
+let app: FirebaseApp | null = null;
 
-try {
-  // Check if Firebase app already exists to avoid duplicate initialization
-  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-  database = getDatabase(app);
-  auth = getAuth(app);
-} catch (error) {
-  console.error('Firebase initialization failed:', error);
+if (isFirebaseConfigured) {
+  try {
+    // Check if Firebase app already exists to avoid duplicate initialization
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+    database = getDatabase(app);
+    auth = getAuth(app);
+  } catch (error) {
+    console.warn('Firebase initialization failed:', error);
+  }
 }
 
-// Google Auth Provider
+// Google Auth Provider - only create if we have an app
 const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account',
-});
+if (isFirebaseConfigured) {
+  googleProvider.setCustomParameters({
+    prompt: 'select_account',
+  });
+}
 
 export { database, auth, googleProvider };
 
