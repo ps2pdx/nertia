@@ -495,9 +495,15 @@ export async function POST(request: NextRequest) {
 
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
+        max_tokens: 8192,
         messages: [{ role: 'user', content: prompt }],
       });
+
+      // Check if response was truncated
+      if (response.stop_reason === 'max_tokens') {
+        console.error('Claude response was truncated due to max_tokens limit');
+        throw new Error('Response was truncated. The brand system schema may be too complex.');
+      }
 
       // Extract text content
       const textBlock = response.content.find(
@@ -516,7 +522,18 @@ export async function POST(request: NextRequest) {
           .trim();
       }
 
-      tokens = JSON.parse(jsonText);
+      // Debug: Log the raw response for troubleshooting
+      console.log('Claude response length:', jsonText.length);
+      console.log('Claude response preview:', jsonText.substring(0, 500));
+
+      try {
+        tokens = JSON.parse(jsonText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Raw response (first 2000 chars):', jsonText.substring(0, 2000));
+        console.error('Raw response (last 500 chars):', jsonText.substring(jsonText.length - 500));
+        throw new Error(`Failed to parse Claude response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
+      }
       modelVersion = 'claude-sonnet-4-5';
 
       // Ensure metadata is set
