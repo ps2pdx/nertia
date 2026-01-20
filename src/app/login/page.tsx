@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { auth } from '@/lib/firebase';
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [signingIn, setSigningIn] = useState(false);
+
+  // Check if Firebase is configured
+  const isFirebaseConfigured = auth !== null;
 
   useEffect(() => {
     if (!loading && user) {
@@ -23,7 +28,11 @@ export default function LoginPage() {
       await signInWithGoogle();
     } catch (err) {
       console.error('Sign-in failed:', err);
-      setError('Failed to sign in. Please try again.');
+      if (err instanceof Error && err.message.includes('not initialized')) {
+        setError('Authentication is not configured. The generator works in demo mode without login.');
+      } else {
+        setError('Failed to sign in. Please try again.');
+      }
     } finally {
       setSigningIn(false);
     }
@@ -39,6 +48,35 @@ export default function LoginPage() {
 
   if (user) {
     return null;
+  }
+
+  // Show demo mode notice if Firebase isn't configured
+  if (!isFirebaseConfigured) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight">Demo Mode</h1>
+            <p className="mt-3 text-muted">
+              Authentication is not configured. The generator works without login in demo mode.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            <Link
+              href="/generator"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Continue to Generator
+            </Link>
+
+            <p className="text-center text-sm text-muted">
+              To enable sign-in, configure Firebase environment variables.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -81,7 +119,15 @@ export default function LoginPage() {
           </button>
 
           {error && (
-            <p className="text-center text-sm text-red-500">{error}</p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-red-500">{error}</p>
+              <Link
+                href="/generator"
+                className="text-sm text-[var(--accent)] hover:underline"
+              >
+                Continue to generator without signing in
+              </Link>
+            </div>
           )}
         </div>
 

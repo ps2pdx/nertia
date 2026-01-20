@@ -37,28 +37,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!auth) {
-      console.error('Firebase auth not initialized');
       setLoading(false);
       return;
     }
 
-    // Handle redirect result (for browsers that block popups)
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user) {
-          console.log('User signed in via redirect');
-        }
-      })
-      .catch((error) => {
-        console.error('Redirect result error:', error);
+    try {
+      // Handle redirect result (for browsers that block popups)
+      getRedirectResult(auth).catch(() => {
+        // Silently handle redirect errors
       });
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(mapFirebaseUser(firebaseUser));
-      setLoading(false);
-    });
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        setUser(mapFirebaseUser(firebaseUser));
+        setLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch {
+      setLoading(false);
+    }
   }, []);
 
   const signInWithGoogle = async () => {

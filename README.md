@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nertia Brand Generator
 
-## Getting Started
+AI-powered brand systems generator that creates complete design token systems from brand inputs.
 
-First, run the development server:
+## Features
+
+- **Discovery Form** - Collect brand inputs: company name, industry, audience, personality, colors, typography
+- **AI Generation** - Generate comprehensive design tokens using Claude API
+- **Token-Styled Preview** - Live preview that uses actual generated tokens (not site CSS)
+- **Light/Dark Mode** - Toggle preview between color modes
+- **Component Previews** - Buttons, inputs, cards, alerts, typography, spacing, grid
+- **Export Options** - Download as JSON, CSS variables, or Tailwind config
+- **Token Editing** - Edit colors, typography, borders, spacing after generation
+- **Randomize** - Quick random inputs for testing and ideation
+- **Demo Mode** - Works without API keys or Firebase configuration
+
+## Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Open http://localhost:3000/generator
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No configuration required for demo mode. The generator works out of the box with intelligent local token generation.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuration (Optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` for full features:
 
-## Learn More
+```env
+# Anthropic API (for Claude-powered generation)
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+USE_DEMO_MODE=false
 
-To learn more about Next.js, take a look at the following resources:
+# Firebase (for saving generations and user auth)
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework:** Next.js 15 with Turbopack
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + CSS custom properties
+- **AI:** Claude Sonnet 4 via Anthropic SDK
+- **Database:** Firebase Realtime Database
+- **Auth:** Firebase Authentication with Google OAuth
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [instructions/nertia-brand-generator-complete-instructions.md](./instructions/nertia-brand-generator-complete-instructions.md) for comprehensive documentation including:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Project architecture
+- API endpoints
+- Prompt engineering details
+- Firebase setup
+- Development workflow
+
+## Key Pages
+
+- `/generator` - Main brand generator (no auth required)
+- `/generator/history` - Past generations (requires auth)
+- `/admin/generations` - Analytics dashboard
+- `/admin/golden-examples` - Curate example outputs
+
+## License
+
+Private - Nertia AI
