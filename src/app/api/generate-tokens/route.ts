@@ -372,9 +372,6 @@ export async function POST(request: NextRequest) {
     const inputs: DiscoveryInputs = body.inputs || body;
     const userId: string | undefined = body.userId;
 
-    console.log('Generating brand system for:', inputs.companyName);
-    console.log('Demo mode:', USE_DEMO_MODE);
-
     let tokens: BrandSystem;
     let modelVersion = 'demo';
 
@@ -382,7 +379,6 @@ export async function POST(request: NextRequest) {
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
       tokens = generateDemoBrandSystem(inputs);
-      console.log('Demo brand system generated successfully');
     } else {
       // Real API mode with Claude
       const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -450,10 +446,8 @@ export async function POST(request: NextRequest) {
           createdAt: Date.now(),
           updatedAt: Date.now(),
         });
-
-        console.log('Generation saved to Firebase:', generationId);
-      } catch (dbError) {
-        console.error('Failed to save generation:', dbError);
+      } catch {
+        // Database save failed - non-critical, continue with response
       }
     }
 

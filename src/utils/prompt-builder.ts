@@ -301,6 +301,158 @@ Return ONLY valid JSON matching this exact schema:
       "linkColor": { "light": "#hex", "dark": "#hex" },
       "linkHover": { "light": "#hex", "dark": "#hex" },
       "height": "64px"
+    },
+    "tag": {
+      "variants": {
+        "default": { "background": { "light": "#hex", "dark": "#hex" }, "foreground": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" } },
+        "accent": { "background": { "light": "#hex", "dark": "#hex" }, "foreground": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" } },
+        "success": { "background": { "light": "#hex", "dark": "#hex" }, "foreground": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" } },
+        "warning": { "background": { "light": "#hex", "dark": "#hex" }, "foreground": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" } },
+        "error": { "background": { "light": "#hex", "dark": "#hex" }, "foreground": { "light": "#hex", "dark": "#hex" }, "border": { "light": "#hex", "dark": "#hex" } }
+      },
+      "sizes": {
+        "sm": { "paddingX": "0.5rem", "paddingY": "0.125rem", "fontSize": "0.75rem" },
+        "md": { "paddingX": "0.75rem", "paddingY": "0.25rem", "fontSize": "0.875rem" },
+        "lg": { "paddingX": "1rem", "paddingY": "0.375rem", "fontSize": "1rem" }
+      },
+      "borderRadius": "9999px",
+      "fontWeight": 500
+    },
+    "tabs": {
+      "variants": {
+        "bordered": {
+          "background": { "light": "transparent", "dark": "transparent" },
+          "foreground": { "light": "#hex", "dark": "#hex" },
+          "border": { "light": "#hex", "dark": "#hex" },
+          "activeBackground": { "light": "#hex", "dark": "#hex" },
+          "activeForeground": { "light": "#hex", "dark": "#hex" },
+          "activeBorder": { "light": "#hex", "dark": "#hex" }
+        },
+        "underline": {
+          "background": { "light": "transparent", "dark": "transparent" },
+          "foreground": { "light": "#hex", "dark": "#hex" },
+          "border": { "light": "transparent", "dark": "transparent" },
+          "activeBackground": { "light": "transparent", "dark": "transparent" },
+          "activeForeground": { "light": "#hex", "dark": "#hex" },
+          "activeBorder": { "light": "#hex", "dark": "#hex" }
+        },
+        "pill": {
+          "background": { "light": "transparent", "dark": "transparent" },
+          "foreground": { "light": "#hex", "dark": "#hex" },
+          "border": { "light": "transparent", "dark": "transparent" },
+          "activeBackground": { "light": "#hex", "dark": "#hex" },
+          "activeForeground": { "light": "#hex", "dark": "#hex" },
+          "activeBorder": { "light": "transparent", "dark": "transparent" }
+        }
+      },
+      "gap": "0.25rem",
+      "padding": "0.5rem 1rem"
+    },
+    "form": {
+      "textarea": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" },
+        "borderFocus": { "light": "#hex", "dark": "#hex" },
+        "minHeight": "120px",
+        "padding": "0.75rem",
+        "borderRadius": "0.5rem"
+      },
+      "checkbox": {
+        "size": "1.25rem",
+        "borderRadius": "0.25rem",
+        "borderColor": { "light": "#hex", "dark": "#hex" },
+        "checkedBackground": { "light": "#hex", "dark": "#hex" },
+        "checkedBorder": { "light": "#hex", "dark": "#hex" },
+        "checkmarkColor": { "light": "#hex", "dark": "#hex" }
+      },
+      "radio": {
+        "size": "1.25rem",
+        "borderColor": { "light": "#hex", "dark": "#hex" },
+        "checkedBackground": { "light": "#hex", "dark": "#hex" },
+        "checkedBorder": { "light": "#hex", "dark": "#hex" },
+        "dotColor": { "light": "#hex", "dark": "#hex" }
+      },
+      "toggle": {
+        "width": "3rem",
+        "height": "1.5rem",
+        "borderRadius": "9999px",
+        "offBackground": { "light": "#hex", "dark": "#hex" },
+        "onBackground": { "light": "#hex", "dark": "#hex" },
+        "thumbColor": { "light": "#hex", "dark": "#hex" }
+      }
+    },
+    "tableVariants": {
+      "basic": { "headerBackground": { "light": "#hex", "dark": "#hex" }, "rowBackground": { "light": "#hex", "dark": "#hex" }, "borderColor": { "light": "#hex", "dark": "#hex" } },
+      "striped": { "headerBackground": { "light": "#hex", "dark": "#hex" }, "rowEven": { "light": "#hex", "dark": "#hex" }, "rowOdd": { "light": "#hex", "dark": "#hex" }, "borderColor": { "light": "#hex", "dark": "#hex" } },
+      "hover": { "headerBackground": { "light": "#hex", "dark": "#hex" }, "rowBackground": { "light": "#hex", "dark": "#hex" }, "rowHover": { "light": "#hex", "dark": "#hex" }, "borderColor": { "light": "#hex", "dark": "#hex" } },
+      "comparison": { "headerBackground": { "light": "#hex", "dark": "#hex" }, "highlightColumn": { "light": "#hex", "dark": "#hex" }, "rowBackground": { "light": "#hex", "dark": "#hex" }, "borderColor": { "light": "#hex", "dark": "#hex" } },
+      "bordered": { "headerBackground": { "light": "#hex", "dark": "#hex" }, "rowBackground": { "light": "#hex", "dark": "#hex" }, "borderColor": { "light": "#hex", "dark": "#hex" }, "borderWidth": "2px" }
+    }
+  },
+  "dataVisualization": {
+    "statCard": {
+      "default": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" },
+        "labelColor": { "light": "#hex", "dark": "#hex" },
+        "valueColor": { "light": "#hex", "dark": "#hex" },
+        "padding": "1.5rem",
+        "borderRadius": "0.75rem"
+      },
+      "hero": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" },
+        "labelColor": { "light": "#hex", "dark": "#hex" },
+        "valueColor": { "light": "#hex", "dark": "#hex" },
+        "padding": "2rem",
+        "borderRadius": "1rem"
+      }
+    },
+    "progress": {
+      "track": { "light": "#hex", "dark": "#hex" },
+      "fill": { "light": "#hex", "dark": "#hex" },
+      "height": "0.5rem",
+      "borderRadius": "9999px"
+    },
+    "timeline": {
+      "lineColor": { "light": "#hex", "dark": "#hex" },
+      "dotColor": { "light": "#hex", "dark": "#hex" },
+      "dotSize": "0.75rem",
+      "lineWidth": "2px"
+    },
+    "codeBlock": {
+      "background": { "light": "#hex", "dark": "#hex" },
+      "border": { "light": "#hex", "dark": "#hex" },
+      "textColor": { "light": "#hex", "dark": "#hex" },
+      "padding": "1rem",
+      "borderRadius": "0.5rem",
+      "fontFamily": "Mono Font, monospace"
+    }
+  },
+  "logo": {
+    "variants": {
+      "primary": { "description": "Full color logo for primary use", "usage": "Website headers, marketing materials", "background": "any" },
+      "light": { "description": "Light version for dark backgrounds", "usage": "Dark mode, dark sections", "background": "dark" },
+      "dark": { "description": "Dark version for light backgrounds", "usage": "Light mode, print materials", "background": "light" },
+      "wordmark": { "description": "Text-only logo variant", "usage": "Small spaces, text-heavy contexts", "background": "any" },
+      "icon": { "description": "Icon-only logo mark", "usage": "Favicons, app icons, small sizes", "background": "any" }
+    },
+    "clearSpace": {
+      "unit": "x-height of logo",
+      "minimum": "1x"
+    },
+    "sizing": {
+      "minimum": "24px",
+      "recommended": {
+        "header": "32px",
+        "footer": "24px",
+        "favicon": "32px",
+        "social": "400px"
+      }
+    },
+    "guidelines": {
+      "do": ["Maintain aspect ratio", "Use approved color variants", "Ensure adequate contrast"],
+      "dont": ["Stretch or distort", "Add effects or shadows", "Place on busy backgrounds"]
     }
   },
   "borders": {
@@ -326,7 +478,33 @@ Return ONLY valid JSON matching this exact schema:
       "fade": { "opacity": [0, 1], "duration": "300ms" },
       "slide": { "transform": "translateY(8px)", "duration": "200ms" }
     },
-    "principles": ["Performance first", "Purposeful motion", "Subtle enhancement"]
+    "principles": ["Performance first", "Purposeful motion", "Subtle enhancement"],
+    "loading": {
+      "spinner": {
+        "size": { "sm": "1rem", "md": "1.5rem", "lg": "2rem" },
+        "borderWidth": "2px",
+        "color": { "light": "#hex", "dark": "#hex" },
+        "trackColor": { "light": "#hex", "dark": "#hex" },
+        "duration": "750ms"
+      },
+      "skeleton": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "shimmer": { "light": "#hex", "dark": "#hex" },
+        "borderRadius": "0.25rem",
+        "duration": "1.5s"
+      },
+      "pulse": {
+        "color": { "light": "#hex", "dark": "#hex" },
+        "duration": "1s",
+        "scale": [0.95, 1.05]
+      },
+      "dots": {
+        "size": "0.5rem",
+        "gap": "0.25rem",
+        "color": { "light": "#hex", "dark": "#hex" },
+        "duration": "1.4s"
+      }
+    }
   },
   "imagery": {
     "styles": ["style1", "style2", "style3"],

@@ -239,6 +239,165 @@ export function tokensToCssVariables(
     vars['--nav-height'] = nav.height;
   }
 
+  // ---- Components: Tag (v2.1) ----
+  if (tokens.components?.tag) {
+    const tag = tokens.components.tag;
+    vars['--tag-radius'] = tag.borderRadius;
+    vars['--tag-font-weight'] = String(tag.fontWeight);
+    Object.entries(tag.variants).forEach(([variant, v]) => {
+      vars[`--tag-${variant}-bg`] = v.background[mode];
+      vars[`--tag-${variant}-fg`] = v.foreground[mode];
+      vars[`--tag-${variant}-border`] = v.border[mode];
+    });
+    Object.entries(tag.sizes).forEach(([size, s]) => {
+      vars[`--tag-${size}-px`] = s.paddingX;
+      vars[`--tag-${size}-py`] = s.paddingY;
+      vars[`--tag-${size}-font-size`] = s.fontSize;
+    });
+  }
+
+  // ---- Components: Tabs (v2.1) ----
+  if (tokens.components?.tabs) {
+    const tabs = tokens.components.tabs;
+    vars['--tabs-gap'] = tabs.gap;
+    vars['--tabs-padding'] = tabs.padding;
+    Object.entries(tabs.variants).forEach(([variant, v]) => {
+      vars[`--tabs-${variant}-bg`] = v.background[mode];
+      vars[`--tabs-${variant}-fg`] = v.foreground[mode];
+      vars[`--tabs-${variant}-border`] = v.border[mode];
+      vars[`--tabs-${variant}-active-bg`] = v.activeBackground[mode];
+      vars[`--tabs-${variant}-active-fg`] = v.activeForeground[mode];
+      vars[`--tabs-${variant}-active-border`] = v.activeBorder[mode];
+    });
+  }
+
+  // ---- Components: Form Elements (v2.1) ----
+  if (tokens.components?.form) {
+    const form = tokens.components.form;
+    // Textarea
+    vars['--textarea-bg'] = form.textarea.background[mode];
+    vars['--textarea-border'] = form.textarea.border[mode];
+    vars['--textarea-border-focus'] = form.textarea.borderFocus[mode];
+    vars['--textarea-min-height'] = form.textarea.minHeight;
+    vars['--textarea-padding'] = form.textarea.padding;
+    vars['--textarea-radius'] = form.textarea.borderRadius;
+    // Checkbox
+    vars['--checkbox-size'] = form.checkbox.size;
+    vars['--checkbox-radius'] = form.checkbox.borderRadius;
+    vars['--checkbox-border'] = form.checkbox.borderColor[mode];
+    vars['--checkbox-checked-bg'] = form.checkbox.checkedBackground[mode];
+    vars['--checkbox-checked-border'] = form.checkbox.checkedBorder[mode];
+    vars['--checkbox-checkmark'] = form.checkbox.checkmarkColor[mode];
+    // Radio
+    vars['--radio-size'] = form.radio.size;
+    vars['--radio-border'] = form.radio.borderColor[mode];
+    vars['--radio-checked-bg'] = form.radio.checkedBackground[mode];
+    vars['--radio-checked-border'] = form.radio.checkedBorder[mode];
+    vars['--radio-dot'] = form.radio.dotColor[mode];
+    // Toggle
+    vars['--toggle-width'] = form.toggle.width;
+    vars['--toggle-height'] = form.toggle.height;
+    vars['--toggle-radius'] = form.toggle.borderRadius;
+    vars['--toggle-off-bg'] = form.toggle.offBackground[mode];
+    vars['--toggle-on-bg'] = form.toggle.onBackground[mode];
+    vars['--toggle-thumb'] = form.toggle.thumbColor[mode];
+  }
+
+  // ---- Components: Table Variants (v2.1) ----
+  if (tokens.components?.tableVariants) {
+    const tv = tokens.components.tableVariants;
+    // Basic
+    vars['--table-basic-header-bg'] = tv.basic.headerBackground[mode];
+    vars['--table-basic-row-bg'] = tv.basic.rowBackground[mode];
+    vars['--table-basic-border'] = tv.basic.borderColor[mode];
+    // Striped
+    vars['--table-striped-header-bg'] = tv.striped.headerBackground[mode];
+    vars['--table-striped-row-even'] = tv.striped.rowEven[mode];
+    vars['--table-striped-row-odd'] = tv.striped.rowOdd[mode];
+    vars['--table-striped-border'] = tv.striped.borderColor[mode];
+    // Hover
+    vars['--table-hover-header-bg'] = tv.hover.headerBackground[mode];
+    vars['--table-hover-row-bg'] = tv.hover.rowBackground[mode];
+    vars['--table-hover-row-hover'] = tv.hover.rowHover[mode];
+    vars['--table-hover-border'] = tv.hover.borderColor[mode];
+    // Comparison
+    vars['--table-comparison-header-bg'] = tv.comparison.headerBackground[mode];
+    vars['--table-comparison-highlight'] = tv.comparison.highlightColumn[mode];
+    vars['--table-comparison-row-bg'] = tv.comparison.rowBackground[mode];
+    vars['--table-comparison-border'] = tv.comparison.borderColor[mode];
+    // Bordered
+    vars['--table-bordered-header-bg'] = tv.bordered.headerBackground[mode];
+    vars['--table-bordered-row-bg'] = tv.bordered.rowBackground[mode];
+    vars['--table-bordered-border'] = tv.bordered.borderColor[mode];
+    vars['--table-bordered-width'] = tv.bordered.borderWidth;
+  }
+
+  // ---- Data Visualization (v2.1) ----
+  if (tokens.dataVisualization) {
+    const dv = tokens.dataVisualization;
+    // Stat Card Default
+    vars['--stat-card-bg'] = dv.statCard.default.background[mode];
+    vars['--stat-card-border'] = dv.statCard.default.border[mode];
+    vars['--stat-card-label'] = dv.statCard.default.labelColor[mode];
+    vars['--stat-card-value'] = dv.statCard.default.valueColor[mode];
+    vars['--stat-card-padding'] = dv.statCard.default.padding;
+    vars['--stat-card-radius'] = dv.statCard.default.borderRadius;
+    // Stat Card Hero
+    if (dv.statCard.hero) {
+      vars['--stat-card-hero-bg'] = dv.statCard.hero.background[mode];
+      vars['--stat-card-hero-border'] = dv.statCard.hero.border[mode];
+      vars['--stat-card-hero-label'] = dv.statCard.hero.labelColor[mode];
+      vars['--stat-card-hero-value'] = dv.statCard.hero.valueColor[mode];
+      vars['--stat-card-hero-padding'] = dv.statCard.hero.padding;
+      vars['--stat-card-hero-radius'] = dv.statCard.hero.borderRadius;
+    }
+    // Progress
+    vars['--progress-track'] = dv.progress.track[mode];
+    vars['--progress-fill'] = dv.progress.fill[mode];
+    vars['--progress-height'] = dv.progress.height;
+    vars['--progress-radius'] = dv.progress.borderRadius;
+    // Timeline
+    vars['--timeline-line'] = dv.timeline.lineColor[mode];
+    vars['--timeline-dot'] = dv.timeline.dotColor[mode];
+    vars['--timeline-dot-size'] = dv.timeline.dotSize;
+    vars['--timeline-line-width'] = dv.timeline.lineWidth;
+    // Code Block
+    vars['--code-block-bg'] = dv.codeBlock.background[mode];
+    vars['--code-block-border'] = dv.codeBlock.border[mode];
+    vars['--code-block-text'] = dv.codeBlock.textColor[mode];
+    vars['--code-block-padding'] = dv.codeBlock.padding;
+    vars['--code-block-radius'] = dv.codeBlock.borderRadius;
+    vars['--code-block-font'] = dv.codeBlock.fontFamily;
+  }
+
+  // ---- Motion: Loading States (v2.1) ----
+  if (tokens.motion.loading) {
+    const loading = tokens.motion.loading;
+    // Spinner
+    vars['--spinner-sm'] = loading.spinner.size.sm;
+    vars['--spinner-md'] = loading.spinner.size.md;
+    vars['--spinner-lg'] = loading.spinner.size.lg;
+    vars['--spinner-border-width'] = loading.spinner.borderWidth;
+    vars['--spinner-color'] = loading.spinner.color[mode];
+    vars['--spinner-track'] = loading.spinner.trackColor[mode];
+    vars['--spinner-duration'] = loading.spinner.duration;
+    // Skeleton
+    vars['--skeleton-bg'] = loading.skeleton.background[mode];
+    vars['--skeleton-shimmer'] = loading.skeleton.shimmer[mode];
+    vars['--skeleton-radius'] = loading.skeleton.borderRadius;
+    vars['--skeleton-duration'] = loading.skeleton.duration;
+    // Pulse
+    vars['--pulse-color'] = loading.pulse.color[mode];
+    vars['--pulse-duration'] = loading.pulse.duration;
+    vars['--pulse-scale-min'] = String(loading.pulse.scale[0]);
+    vars['--pulse-scale-max'] = String(loading.pulse.scale[1]);
+    // Dots
+    vars['--dots-size'] = loading.dots.size;
+    vars['--dots-gap'] = loading.dots.gap;
+    vars['--dots-color'] = loading.dots.color[mode];
+    vars['--dots-duration'] = loading.dots.duration;
+  }
+
   // ---- Border Radius ----
   Object.entries(tokens.borders.radius).forEach(([key, value]) => {
     if (typeof value === 'string') {

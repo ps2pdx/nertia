@@ -21,6 +21,202 @@ export interface TypeScaleEntry {
 }
 
 // ============================================================================
+// Data Visualization Types (v2.1)
+// ============================================================================
+
+export interface StatCardSpec {
+  background: ColorValue;
+  border: ColorValue;
+  labelColor: ColorValue;
+  valueColor: ColorValue;
+  padding: string;
+  borderRadius: string;
+}
+
+export interface ProgressSpec {
+  track: ColorValue;
+  fill: ColorValue;
+  height: string;
+  borderRadius: string;
+}
+
+export interface TimelineSpec {
+  lineColor: ColorValue;
+  dotColor: ColorValue;
+  dotSize: string;
+  lineWidth: string;
+}
+
+export interface CodeBlockSpec {
+  background: ColorValue;
+  border: ColorValue;
+  textColor: ColorValue;
+  padding: string;
+  borderRadius: string;
+  fontFamily: string;
+}
+
+export interface DataVisualization {
+  statCard: {
+    default: StatCardSpec;
+    hero?: StatCardSpec;
+  };
+  progress: ProgressSpec;
+  timeline: TimelineSpec;
+  codeBlock: CodeBlockSpec;
+}
+
+// ============================================================================
+// Logo Types (v2.1)
+// ============================================================================
+
+export interface LogoVariant {
+  description: string;
+  usage: string;
+  background: 'light' | 'dark' | 'any';
+}
+
+export interface LogoSection {
+  variants: {
+    primary: LogoVariant;
+    light: LogoVariant;
+    dark: LogoVariant;
+    wordmark?: LogoVariant;
+    icon?: LogoVariant;
+  };
+  clearSpace: {
+    unit: string;
+    minimum: string;
+  };
+  sizing: {
+    minimum: string;
+    recommended: {
+      header: string;
+      footer: string;
+      favicon: string;
+      social: string;
+    };
+  };
+  guidelines: {
+    do: string[];
+    dont: string[];
+  };
+}
+
+// ============================================================================
+// Extended Component Types (v2.1)
+// ============================================================================
+
+export interface TagComponent {
+  variants: {
+    default: { background: ColorValue; foreground: ColorValue; border: ColorValue };
+    accent: { background: ColorValue; foreground: ColorValue; border: ColorValue };
+    success: { background: ColorValue; foreground: ColorValue; border: ColorValue };
+    warning: { background: ColorValue; foreground: ColorValue; border: ColorValue };
+    error: { background: ColorValue; foreground: ColorValue; border: ColorValue };
+  };
+  sizes: {
+    sm: { paddingX: string; paddingY: string; fontSize: string };
+    md: { paddingX: string; paddingY: string; fontSize: string };
+    lg: { paddingX: string; paddingY: string; fontSize: string };
+  };
+  borderRadius: string;
+  fontWeight: number;
+}
+
+export interface TabVariant {
+  background: ColorValue;
+  foreground: ColorValue;
+  border: ColorValue;
+  activeBackground: ColorValue;
+  activeForeground: ColorValue;
+  activeBorder: ColorValue;
+}
+
+export interface NavigationTabsComponent {
+  variants: {
+    bordered: TabVariant;
+    underline: TabVariant;
+    pill: TabVariant;
+  };
+  gap: string;
+  padding: string;
+}
+
+export interface FormElements {
+  textarea: {
+    background: ColorValue;
+    border: ColorValue;
+    borderFocus: ColorValue;
+    minHeight: string;
+    padding: string;
+    borderRadius: string;
+  };
+  checkbox: {
+    size: string;
+    borderRadius: string;
+    borderColor: ColorValue;
+    checkedBackground: ColorValue;
+    checkedBorder: ColorValue;
+    checkmarkColor: ColorValue;
+  };
+  radio: {
+    size: string;
+    borderColor: ColorValue;
+    checkedBackground: ColorValue;
+    checkedBorder: ColorValue;
+    dotColor: ColorValue;
+  };
+  toggle: {
+    width: string;
+    height: string;
+    borderRadius: string;
+    offBackground: ColorValue;
+    onBackground: ColorValue;
+    thumbColor: ColorValue;
+  };
+}
+
+export interface TableVariants {
+  basic: { headerBackground: ColorValue; rowBackground: ColorValue; borderColor: ColorValue };
+  striped: { headerBackground: ColorValue; rowEven: ColorValue; rowOdd: ColorValue; borderColor: ColorValue };
+  hover: { headerBackground: ColorValue; rowBackground: ColorValue; rowHover: ColorValue; borderColor: ColorValue };
+  comparison: { headerBackground: ColorValue; highlightColumn: ColorValue; rowBackground: ColorValue; borderColor: ColorValue };
+  bordered: { headerBackground: ColorValue; rowBackground: ColorValue; borderColor: ColorValue; borderWidth: string };
+}
+
+// ============================================================================
+// Loading States Types (v2.1)
+// ============================================================================
+
+export interface LoadingStates {
+  spinner: {
+    size: { sm: string; md: string; lg: string };
+    borderWidth: string;
+    color: ColorValue;
+    trackColor: ColorValue;
+    duration: string;
+  };
+  skeleton: {
+    background: ColorValue;
+    shimmer: ColorValue;
+    borderRadius: string;
+    duration: string;
+  };
+  pulse: {
+    color: ColorValue;
+    duration: string;
+    scale: [number, number];
+  };
+  dots: {
+    size: string;
+    gap: string;
+    color: ColorValue;
+    duration: string;
+  };
+}
+
+// ============================================================================
 // Main Brand System Interface
 // ============================================================================
 
@@ -254,7 +450,18 @@ export interface BrandSystem {
       linkHover: ColorValue;
       height: string;
     };
+    // v2.1 additions
+    tag?: TagComponent;
+    tabs?: NavigationTabsComponent;
+    form?: FormElements;
+    tableVariants?: TableVariants;
   };
+
+  // ---- 6b. Data Visualization (v2.1, optional) ----
+  dataVisualization?: DataVisualization;
+
+  // ---- 6c. Logo (v2.1, optional) ----
+  logo?: LogoSection;
 
   // ---- 7. Borders ----
   borders: {
@@ -304,6 +511,8 @@ export interface BrandSystem {
       slide?: { transform: string; duration: string };
     };
     principles?: string[]; // e.g., ["Performance first", "Purposeful motion"]
+    // v2.1 additions
+    loading?: LoadingStates;
   };
 
   // ---- 10. Imagery Guidelines (v2, optional) ----
