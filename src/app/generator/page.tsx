@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
+import { WebsiteDiscoveryResult } from '@/types/website-discovery';
 import { DiscoveryForm } from '@/components/DiscoveryForm';
+import { WebsiteDiscovery } from '@/components/WebsiteDiscovery';
 import { TokenPreview } from '@/components/TokenPreview';
 import { GeneratingAnimation } from '@/components/GeneratingAnimation';
 import { GenerationFeedback } from '@/components/GenerationFeedback';
@@ -27,13 +28,31 @@ const defaultInputs: DiscoveryInputs = {
 };
 
 function GeneratorContent() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [inputs, setInputs] = useState<DiscoveryInputs>(defaultInputs);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [discoveryStep, setDiscoveryStep] = useState<'url' | 'form'>('url');
+  const [, setDiscoveredData] = useState<WebsiteDiscoveryResult | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const handleDiscoveryComplete = (
+    suggestedInputs: Partial<DiscoveryInputs>,
+    raw: WebsiteDiscoveryResult
+  ) => {
+    setDiscoveredData(raw);
+    setInputs((prev) => ({
+      ...prev,
+      ...suggestedInputs,
+    }));
+    setDiscoveryStep('form');
+  };
+
+  const handleSkipDiscovery = () => {
+    setDiscoveryStep('form');
+  };
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -95,54 +114,51 @@ function GeneratorContent() {
             <h1 className="text-3xl font-bold">Brand Systems Generator</h1>
             <p className="text-muted mt-1">Generate AI-powered design token systems</p>
           </div>
-          <div className="flex items-center gap-4">
-            {user && (
-              <Link
-                href="/generator/history"
-                className="text-sm text-muted hover:text-foreground transition-colors"
-              >
-                History
-              </Link>
-            )}
-            {user?.photoURL && (
-              <Image
-                src={user.photoURL}
-                alt={user.displayName || 'User'}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-            )}
-            {user ? (
-              <button
-                onClick={signOut}
-                className="text-sm text-muted hover:text-foreground transition-colors"
-              >
-                Sign out
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                className="text-sm text-muted hover:text-foreground transition-colors"
-              >
-                Sign in to save
-              </Link>
-            )}
-          </div>
+          {user && (
+            <Link
+              href="/generator/history"
+              className="text-sm text-muted hover:text-foreground transition-colors"
+            >
+              History
+            </Link>
+          )}
         </div>
 
         {/* Single column layout */}
         <div className="space-y-8">
+          {/* Discovery Step */}
+          {discoveryStep === 'url' && !result && (
+            <div className="p-6 border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)]">
+              <WebsiteDiscovery
+                onDiscoveryComplete={handleDiscoveryComplete}
+                onSkip={handleSkipDiscovery}
+              />
+            </div>
+          )}
+
           {/* Discovery Form */}
-          <div className="p-6 border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)]">
-            <DiscoveryForm
-              inputs={inputs}
-              setInputs={setInputs}
-              onGenerate={handleGenerate}
-              isLoading={loading}
-            />
-            {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
-          </div>
+          {discoveryStep === 'form' && !result && (
+            <div className="p-6 border border-[var(--card-border)] rounded-lg bg-[var(--card-bg)]">
+              <DiscoveryForm
+                inputs={inputs}
+                setInputs={setInputs}
+                onGenerate={handleGenerate}
+                isLoading={loading}
+              />
+              {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
+              <div className="mt-4 pt-4 border-t border-[var(--card-border)]">
+                <button
+                  onClick={() => {
+                    setDiscoveryStep('url');
+                    setInputs(defaultInputs);
+                  }}
+                  className="text-sm text-muted hover:text-foreground transition-colors"
+                >
+                  &larr; Back to URL discovery
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Output */}
           {loading ? (
@@ -235,6 +251,16 @@ function GeneratorContent() {
                       }`}
                     >
                       {isEditing ? 'Done Editing' : 'Edit Tokens'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setResult(null);
+                        setDiscoveryStep('url');
+                        setInputs(defaultInputs);
+                      }}
+                      className="px-3 py-1.5 text-sm rounded-md border border-[var(--card-border)] hover:border-[var(--accent)] transition-colors"
+                    >
+                      New Brand
                     </button>
                   </div>
                 </div>
