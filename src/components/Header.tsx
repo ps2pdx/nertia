@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { navItems } from '@/lib/navigation';
+import { useAuth } from '@/lib/auth-context';
 
 export default function Header() {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
   const [showHeader, setShowHeader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -100,6 +102,42 @@ export default function Header() {
             ))}
           </nav>
 
+          {/* User Auth Section - Desktop */}
+          <div className="hidden lg:flex items-center gap-4">
+            {user ? (
+              <>
+                <Link
+                  href="/generator"
+                  className="text-sm font-medium text-muted hover:text-[var(--foreground)] transition-colors"
+                >
+                  Generator
+                </Link>
+                {user.photoURL && (
+                  <Image
+                    src={user.photoURL}
+                    alt={user.displayName || 'User'}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                )}
+                <button
+                  onClick={signOut}
+                  className="text-sm text-muted hover:text-[var(--foreground)] transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-sm font-medium px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -147,6 +185,50 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+
+          {/* Mobile Auth Section */}
+          <div className="mt-4 pt-4 border-t border-[var(--card-border)] flex flex-col items-center gap-4">
+            {user ? (
+              <>
+                <div className="flex items-center gap-3">
+                  {user.photoURL && (
+                    <Image
+                      src={user.photoURL}
+                      alt={user.displayName || 'User'}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                  )}
+                  <span className="text-sm text-muted">{user.displayName || user.email}</span>
+                </div>
+                <Link
+                  href="/generator"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-xl font-medium text-[var(--accent)]"
+                >
+                  Generator
+                </Link>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-lg text-muted hover:text-[var(--foreground)] transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-6 py-3 bg-[var(--accent)] text-white font-medium text-lg rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
         </nav>
       </div>
     </>
