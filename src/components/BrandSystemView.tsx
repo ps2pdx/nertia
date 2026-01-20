@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BrandSystem, DiscoveryInputs, ColorValue } from '@/types/brand-system';
 import { ExportOptions } from './ExportOptions';
+import { tokensToCssVariables, applyCssVariables } from '@/utils/tokens-to-css';
 
 interface BrandSystemViewProps {
   tokens: BrandSystem;
@@ -15,12 +16,14 @@ const SECTIONS = [
   { id: 'colors', label: 'Colors' },
   { id: 'typography', label: 'Typography' },
   { id: 'spacing', label: 'Spacing & Grid' },
+  { id: 'logo', label: 'Logo' },
   { id: 'components', label: 'Components' },
+  { id: 'data-viz', label: 'Data Viz' },
   { id: 'motion', label: 'Motion' },
   { id: 'imagery', label: 'Imagery' },
   { id: 'voice', label: 'Voice & Tone' },
   { id: 'utilities', label: 'Utilities' },
-];
+] as const;
 
 function ColorSwatch({ name, value, mode }: { name: string; value: ColorValue; mode: 'light' | 'dark' }) {
   const color = value[mode];
@@ -49,13 +52,30 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
   const [activeSection, setActiveSection] = useState('overview');
   const [colorMode, setColorMode] = useState<'light' | 'dark'>('dark');
 
+  // Apply brand CSS variables to document root
   useEffect(() => {
+    const cssVars = tokensToCssVariables(tokens, colorMode);
+    applyCssVariables(cssVars);
+  }, [tokens, colorMode]);
+
+  useEffect(() => {
+    // Cache section references for better performance
+    let sectionRefs: (HTMLElement | null)[] = [];
+
+    const updateSectionRefs = () => {
+      sectionRefs = SECTIONS.map((s) => document.getElementById(s.id));
+    };
+
     const handleScroll = () => {
-      const sections = SECTIONS.map((s) => document.getElementById(s.id));
+      // Initialize refs if not yet cached
+      if (sectionRefs.length === 0) {
+        updateSectionRefs();
+      }
+
       const scrollPosition = window.scrollY + 100;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
+      for (let i = sectionRefs.length - 1; i >= 0; i--) {
+        const section = sectionRefs[i];
         if (section && section.offsetTop <= scrollPosition) {
           setActiveSection(SECTIONS[i].id);
           break;
@@ -63,7 +83,9 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // Initial setup
+    updateSectionRefs();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -451,6 +473,98 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
           )}
         </section>
 
+        {/* Logo Section */}
+        <section id="logo" className="mb-20">
+          <SectionHeader title="Logo" description="Logo variants, sizing, and usage guidelines" />
+
+          {tokens.logo ? (
+            <div className="space-y-8">
+              {/* Logo Variants */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Logo Variants</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Object.entries(tokens.logo.variants).map(([name, variant]) => (
+                    <div key={name} className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium capitalize">{name}</h4>
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                          variant.background === 'dark' ? 'bg-gray-800 text-white' :
+                          variant.background === 'light' ? 'bg-gray-100 text-gray-800' :
+                          'bg-[var(--card-bg)] border border-[var(--card-border)]'
+                        }`}>
+                          {variant.background} bg
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted mb-2">{variant.description}</p>
+                      <p className="text-xs text-muted italic">{variant.usage}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Clear Space & Sizing */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                  <h3 className="text-sm font-semibold mb-3">Clear Space</h3>
+                  <dl className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-muted">Unit</dt>
+                      <dd className="font-mono">{tokens.logo.clearSpace.unit}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-muted">Minimum</dt>
+                      <dd className="font-mono">{tokens.logo.clearSpace.minimum}</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                  <h3 className="text-sm font-semibold mb-3">Sizing</h3>
+                  <dl className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-muted">Minimum</dt>
+                      <dd className="font-mono">{tokens.logo.sizing.minimum}</dd>
+                    </div>
+                    {Object.entries(tokens.logo.sizing.recommended).map(([context, size]) => (
+                      <div key={context} className="flex justify-between">
+                        <dt className="text-muted capitalize">{context}</dt>
+                        <dd className="font-mono">{size}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </div>
+
+              {/* Logo Guidelines */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border border-green-500/20 bg-green-500/5">
+                  <h3 className="text-sm font-semibold mb-3 text-green-500">Do</h3>
+                  <ul className="space-y-2">
+                    {tokens.logo.guidelines.do.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+                  <h3 className="text-sm font-semibold mb-3 text-red-500">Don&apos;t</h3>
+                  <ul className="space-y-2">
+                    {tokens.logo.guidelines.dont.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <span className="text-red-500 mt-0.5">✗</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted">No logo specifications available.</p>
+          )}
+        </section>
+
         {/* Components Section */}
         <section id="components" className="mb-20">
           <SectionHeader title="Components" description="UI component specifications" />
@@ -594,6 +708,403 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
               </div>
             </>
           )}
+
+          {/* Tags (v2.1) */}
+          {tokens.components?.tag && (
+            <>
+              <h3 className="text-lg font-semibold mb-4">Tags / Badges</h3>
+              <div className="space-y-4 mb-8">
+                {/* Tag Variants */}
+                <div className="flex flex-wrap gap-3">
+                  {Object.entries(tokens.components.tag.variants).map(([variant, styles]) => (
+                    <span
+                      key={variant}
+                      className="transition-colors"
+                      style={{
+                        backgroundColor: styles.background[colorMode],
+                        color: styles.foreground[colorMode],
+                        border: `1px solid ${styles.border[colorMode]}`,
+                        padding: `${tokens.components!.tag!.sizes.md.paddingY} ${tokens.components!.tag!.sizes.md.paddingX}`,
+                        fontSize: tokens.components!.tag!.sizes.md.fontSize,
+                        fontWeight: tokens.components!.tag!.fontWeight,
+                        borderRadius: tokens.components!.tag!.borderRadius,
+                      }}
+                    >
+                      {variant}
+                    </span>
+                  ))}
+                </div>
+                {/* Tag Sizes */}
+                <div className="flex items-end gap-3">
+                  {Object.entries(tokens.components.tag.sizes).map(([size, sizeSpec]) => (
+                    <span
+                      key={size}
+                      style={{
+                        backgroundColor: tokens.components!.tag!.variants.default.background[colorMode],
+                        color: tokens.components!.tag!.variants.default.foreground[colorMode],
+                        border: `1px solid ${tokens.components!.tag!.variants.default.border[colorMode]}`,
+                        padding: `${sizeSpec.paddingY} ${sizeSpec.paddingX}`,
+                        fontSize: sizeSpec.fontSize,
+                        fontWeight: tokens.components!.tag!.fontWeight,
+                        borderRadius: tokens.components!.tag!.borderRadius,
+                      }}
+                    >
+                      {size}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Tabs (v2.1) */}
+          {tokens.components?.tabs && (
+            <>
+              <h3 className="text-lg font-semibold mb-4">Navigation Tabs</h3>
+              <div className="space-y-6 mb-8">
+                {Object.entries(tokens.components.tabs.variants).map(([variant, styles]) => (
+                  <div key={variant}>
+                    <p className="text-sm text-muted mb-2 capitalize">{variant} style</p>
+                    <div
+                      className="inline-flex"
+                      style={{ gap: tokens.components!.tabs!.gap }}
+                    >
+                      {['Active', 'Tab 2', 'Tab 3'].map((tab, i) => (
+                        <button
+                          key={tab}
+                          style={{
+                            backgroundColor: i === 0 ? styles.activeBackground[colorMode] : styles.background[colorMode],
+                            color: i === 0 ? styles.activeForeground[colorMode] : styles.foreground[colorMode],
+                            borderBottom: variant === 'underline'
+                              ? `2px solid ${i === 0 ? styles.activeBorder[colorMode] : 'transparent'}`
+                              : undefined,
+                            border: variant === 'bordered'
+                              ? `1px solid ${i === 0 ? styles.activeBorder[colorMode] : styles.border[colorMode]}`
+                              : variant === 'pill'
+                              ? 'none'
+                              : undefined,
+                            padding: tokens.components!.tabs!.padding,
+                            borderRadius: variant === 'pill' ? '9999px' : variant === 'bordered' ? '0.375rem' : '0',
+                          }}
+                        >
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Form Elements (v2.1) */}
+          {tokens.components?.form && (
+            <>
+              <h3 className="text-lg font-semibold mb-4">Form Elements</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Textarea */}
+                <div>
+                  <label className="text-sm text-muted mb-2 block">Textarea</label>
+                  <textarea
+                    placeholder="Enter text..."
+                    rows={3}
+                    className="w-full transition-colors"
+                    style={{
+                      backgroundColor: tokens.components.form.textarea.background[colorMode],
+                      border: `1px solid ${tokens.components.form.textarea.border[colorMode]}`,
+                      minHeight: tokens.components.form.textarea.minHeight,
+                      padding: tokens.components.form.textarea.padding,
+                      borderRadius: tokens.components.form.textarea.borderRadius,
+                      color: tokens.colors.foreground[colorMode],
+                    }}
+                  />
+                </div>
+
+                {/* Checkbox & Radio & Toggle */}
+                <div className="space-y-4">
+                  {/* Checkbox */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        width: tokens.components.form.checkbox.size,
+                        height: tokens.components.form.checkbox.size,
+                        borderRadius: tokens.components.form.checkbox.borderRadius,
+                        backgroundColor: tokens.components.form.checkbox.checkedBackground[colorMode],
+                        border: `2px solid ${tokens.components.form.checkbox.checkedBorder[colorMode]}`,
+                      }}
+                    >
+                      <svg viewBox="0 0 12 12" fill="none" style={{ width: '60%', height: '60%' }}>
+                        <path d="M2 6L5 9L10 3" stroke={tokens.components.form.checkbox.checkmarkColor[colorMode]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span className="text-sm">Checkbox (checked)</span>
+                  </div>
+
+                  {/* Radio */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        width: tokens.components.form.radio.size,
+                        height: tokens.components.form.radio.size,
+                        borderRadius: '50%',
+                        backgroundColor: tokens.components.form.radio.checkedBackground[colorMode],
+                        border: `2px solid ${tokens.components.form.radio.checkedBorder[colorMode]}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '40%',
+                          height: '40%',
+                          borderRadius: '50%',
+                          backgroundColor: tokens.components.form.radio.dotColor[colorMode],
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm">Radio (selected)</span>
+                  </div>
+
+                  {/* Toggle */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="relative"
+                      style={{
+                        width: tokens.components.form.toggle.width,
+                        height: tokens.components.form.toggle.height,
+                        borderRadius: tokens.components.form.toggle.borderRadius,
+                        backgroundColor: tokens.components.form.toggle.onBackground[colorMode],
+                      }}
+                    >
+                      <div
+                        className="absolute"
+                        style={{
+                          width: `calc(${tokens.components.form.toggle.height} - 4px)`,
+                          height: `calc(${tokens.components.form.toggle.height} - 4px)`,
+                          borderRadius: '50%',
+                          backgroundColor: tokens.components.form.toggle.thumbColor[colorMode],
+                          top: '2px',
+                          right: '2px',
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm">Toggle (on)</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Table Variants (v2.1) */}
+          {tokens.components?.tableVariants && (
+            <>
+              <h3 className="text-lg font-semibold mb-4">Table Variants</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {Object.entries(tokens.components.tableVariants).map(([variant, styles]) => (
+                  <div key={variant} className="overflow-hidden rounded-lg border border-[var(--card-border)]">
+                    <p className="text-sm font-medium p-2 bg-[var(--card-bg)] border-b border-[var(--card-border)] capitalize">
+                      {variant}
+                    </p>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr style={{ backgroundColor: styles.headerBackground[colorMode] }}>
+                          <th className="p-2 text-left">Header</th>
+                          <th className="p-2 text-left">Header</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[0, 1, 2].map((row) => (
+                          <tr
+                            key={row}
+                            style={{
+                              backgroundColor:
+                                variant === 'striped'
+                                  ? (row % 2 === 0 ? (styles as typeof tokens.components.tableVariants.striped).rowEven[colorMode] : (styles as typeof tokens.components.tableVariants.striped).rowOdd[colorMode])
+                                  : variant === 'comparison' && row === 1
+                                  ? (styles as typeof tokens.components.tableVariants.comparison).highlightColumn[colorMode]
+                                  : 'rowBackground' in styles
+                                  ? (styles as typeof tokens.components.tableVariants.basic).rowBackground[colorMode]
+                                  : undefined,
+                              borderBottom: `1px solid ${styles.borderColor[colorMode]}`,
+                            }}
+                          >
+                            <td className="p-2">Row {row + 1}</td>
+                            <td className="p-2">Data</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* Data Visualization Section */}
+        <section id="data-viz" className="mb-20">
+          <SectionHeader title="Data Visualization" description="Stat cards, progress bars, timelines, and code blocks" />
+
+          {tokens.dataVisualization ? (
+            (() => {
+              const dv = tokens.dataVisualization;
+              return (
+                <div className="space-y-8">
+                  {/* Stat Cards */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Stat Cards</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Default Stat Card */}
+                      <div
+                        style={{
+                          backgroundColor: dv.statCard.default.background[colorMode],
+                          border: `1px solid ${dv.statCard.default.border[colorMode]}`,
+                          padding: dv.statCard.default.padding,
+                          borderRadius: dv.statCard.default.borderRadius,
+                        }}
+                      >
+                        <p
+                          className="text-sm mb-1"
+                          style={{ color: dv.statCard.default.labelColor[colorMode] }}
+                        >
+                          Default Stat Card
+                        </p>
+                        <p
+                          className="text-3xl font-bold"
+                          style={{ color: dv.statCard.default.valueColor[colorMode] }}
+                        >
+                          2,847
+                        </p>
+                      </div>
+                      {/* Hero Stat Card */}
+                      {dv.statCard.hero && (
+                        <div
+                          style={{
+                            backgroundColor: dv.statCard.hero.background[colorMode],
+                            border: `1px solid ${dv.statCard.hero.border[colorMode]}`,
+                            padding: dv.statCard.hero.padding,
+                            borderRadius: dv.statCard.hero.borderRadius,
+                          }}
+                        >
+                          <p
+                            className="text-sm mb-1"
+                            style={{ color: dv.statCard.hero.labelColor[colorMode] }}
+                          >
+                            Hero Stat Card
+                          </p>
+                          <p
+                            className="text-4xl font-bold"
+                            style={{ color: dv.statCard.hero.valueColor[colorMode] }}
+                          >
+                            $1.2M
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Progress Bar</h3>
+                    <div className="max-w-md space-y-3">
+                      {[75, 45, 90].map((value, i) => (
+                        <div key={i}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-muted">Progress {i + 1}</span>
+                            <span>{value}%</span>
+                          </div>
+                          <div
+                            style={{
+                              backgroundColor: dv.progress.track[colorMode],
+                              height: dv.progress.height,
+                              borderRadius: dv.progress.borderRadius,
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <div
+                              style={{
+                                backgroundColor: dv.progress.fill[colorMode],
+                                height: '100%',
+                                width: `${value}%`,
+                                borderRadius: dv.progress.borderRadius,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Timeline */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Timeline</h3>
+                    <div className="relative pl-6 space-y-4">
+                      {['Event 1', 'Event 2', 'Event 3'].map((event, i, arr) => (
+                        <div key={event} className="relative">
+                          {/* Line */}
+                          {i < arr.length - 1 && (
+                            <div
+                              className="absolute"
+                              style={{
+                                left: `calc(-1.5rem + ${dv.timeline.dotSize} / 2 - ${dv.timeline.lineWidth} / 2)`,
+                                top: dv.timeline.dotSize,
+                                width: dv.timeline.lineWidth,
+                                height: 'calc(100% + 1rem)',
+                                backgroundColor: dv.timeline.lineColor[colorMode],
+                              }}
+                            />
+                          )}
+                          {/* Dot */}
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `calc(-1.5rem)`,
+                              top: '2px',
+                              width: dv.timeline.dotSize,
+                              height: dv.timeline.dotSize,
+                              borderRadius: '50%',
+                              backgroundColor: dv.timeline.dotColor[colorMode],
+                            }}
+                          />
+                          {/* Content */}
+                          <div>
+                            <p className="font-medium">{event}</p>
+                            <p className="text-sm text-muted">Description for {event.toLowerCase()}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Code Block */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Code Block</h3>
+                    <div
+                      style={{
+                        backgroundColor: dv.codeBlock.background[colorMode],
+                        border: `1px solid ${dv.codeBlock.border[colorMode]}`,
+                        color: dv.codeBlock.textColor[colorMode],
+                        padding: dv.codeBlock.padding,
+                        borderRadius: dv.codeBlock.borderRadius,
+                        fontFamily: dv.codeBlock.fontFamily,
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      <pre className="whitespace-pre-wrap">
+{`const brandSystem = {
+  colors: { ... },
+  typography: { ... },
+  components: { ... }
+};`}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          ) : (
+            <p className="text-muted">No data visualization specifications available.</p>
+          )}
         </section>
 
         {/* Motion Section */}
@@ -642,6 +1153,112 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
               </ul>
             </div>
           )}
+
+          {/* Loading States (v2.1) */}
+          {tokens.motion.loading && (() => {
+            const loading = tokens.motion.loading;
+            return (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">Loading States</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Spinner */}
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h4 className="text-sm font-medium mb-4">Spinner</h4>
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                      {(['sm', 'md', 'lg'] as const).map((size) => (
+                        <div
+                          key={size}
+                          className="animate-spin"
+                          style={{
+                            width: loading.spinner.size[size],
+                            height: loading.spinner.size[size],
+                            border: `${loading.spinner.borderWidth} solid ${loading.spinner.trackColor[colorMode]}`,
+                            borderTopColor: loading.spinner.color[colorMode],
+                            borderRadius: '50%',
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted text-center">
+                      Duration: {loading.spinner.duration}
+                    </p>
+                  </div>
+
+                  {/* Skeleton */}
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h4 className="text-sm font-medium mb-4">Skeleton</h4>
+                    <div className="space-y-2 mb-4">
+                      <div
+                        className="h-4 w-full animate-pulse"
+                        style={{
+                          backgroundColor: loading.skeleton.background[colorMode],
+                          borderRadius: loading.skeleton.borderRadius,
+                        }}
+                      />
+                      <div
+                        className="h-4 w-3/4 animate-pulse"
+                        style={{
+                          backgroundColor: loading.skeleton.background[colorMode],
+                          borderRadius: loading.skeleton.borderRadius,
+                        }}
+                      />
+                      <div
+                        className="h-4 w-1/2 animate-pulse"
+                        style={{
+                          backgroundColor: loading.skeleton.background[colorMode],
+                          borderRadius: loading.skeleton.borderRadius,
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted text-center">
+                      Duration: {loading.skeleton.duration}
+                    </p>
+                  </div>
+
+                  {/* Pulse */}
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h4 className="text-sm font-medium mb-4">Pulse</h4>
+                    <div className="flex items-center justify-center mb-4">
+                      <div
+                        className="w-12 h-12 rounded-full animate-pulse"
+                        style={{
+                          backgroundColor: loading.pulse.color[colorMode],
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted text-center">
+                      Scale: {loading.pulse.scale[0]} - {loading.pulse.scale[1]}
+                    </p>
+                  </div>
+
+                  {/* Dots */}
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h4 className="text-sm font-medium mb-4">Dots</h4>
+                    <div
+                      className="flex items-center justify-center mb-4"
+                      style={{ gap: loading.dots.gap }}
+                    >
+                      {[0, 1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className="rounded-full animate-bounce"
+                          style={{
+                            width: loading.dots.size,
+                            height: loading.dots.size,
+                            backgroundColor: loading.dots.color[colorMode],
+                            animationDelay: `${i * 150}ms`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted text-center">
+                      Duration: {loading.dots.duration}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </section>
 
         {/* Imagery Section */}

@@ -567,10 +567,8 @@ export async function POST(request: NextRequest) {
           createdAt: Date.now(),
           updatedAt: Date.now(),
         });
-
-        console.log('Generation saved to Firebase:', generationId);
-      } catch (dbError) {
-        console.error('Failed to save generation:', dbError);
+      } catch {
+        // Database save failed - non-critical, continue with response
       }
     }
 
