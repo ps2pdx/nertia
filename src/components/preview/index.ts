@@ -6,3 +6,4 @@ export { PreviewCard } from './PreviewCard';
 export { PreviewTypeScale } from './PreviewTypeScale';
 export { PreviewSpacing } from './PreviewSpacing';
 export { PreviewGrid } from './PreviewGrid';
+export { BrandPreviewMockup } from './BrandPreviewMockup';
