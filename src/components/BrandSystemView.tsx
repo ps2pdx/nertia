@@ -1,10 +1,53 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { BrandSystem, DiscoveryInputs, ColorValue } from '@/types/brand-system';
 import { ExportOptions } from './ExportOptions';
 import { tokensToCssVariables, applyCssVariables } from '@/utils/tokens-to-css';
+
+// Copy to clipboard hook
+function useCopyToClipboard() {
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const copy = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(text);
+      setTimeout(() => setCopiedText(null), 2000);
+      return true;
+    } catch {
+      setCopiedText(null);
+      return false;
+    }
+  }, []);
+
+  return { copiedText, copy };
+}
+
+// Copy button component
+function CopyButton({ value, className = '' }: { value: string; className?: string }) {
+  const { copiedText, copy } = useCopyToClipboard();
+  const isCopied = copiedText === value;
+
+  return (
+    <button
+      onClick={() => copy(value)}
+      className={`p-1 rounded transition-colors hover:bg-[var(--accent)]/10 ${className}`}
+      title={isCopied ? 'Copied!' : 'Copy to clipboard'}
+    >
+      {isCopied ? (
+        <svg className="w-3.5 h-3.5 text-[var(--success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-3.5 h-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 interface BrandSystemViewProps {
   tokens: BrandSystem;
@@ -29,13 +72,20 @@ const SECTIONS = [
 function ColorSwatch({ name, value, mode }: { name: string; value: ColorValue; mode: 'light' | 'dark' }) {
   const color = value[mode];
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col group">
       <div
-        className="w-full h-16 rounded-lg border border-[var(--card-border)]"
+        className="w-full h-16 rounded-lg border border-[var(--card-border)] relative"
         style={{ backgroundColor: color }}
-      />
+      >
+        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton value={color} />
+        </div>
+      </div>
       <p className="text-sm font-medium mt-2">{name}</p>
-      <p className="text-xs text-muted font-mono">{color}</p>
+      <div className="flex items-center gap-1">
+        <p className="text-xs text-muted font-mono">{color}</p>
+        <CopyButton value={color} className="opacity-0 group-hover:opacity-100" />
+      </div>
     </div>
   );
 }
@@ -116,7 +166,7 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                   onClick={() => setColorMode('light')}
                   className={`px-3 py-1 rounded-md transition-colors ${
                     colorMode === 'light'
-                      ? 'bg-[var(--accent)] text-white'
+                      ? 'bg-[var(--accent)] text-[var(--background)]'
                       : 'bg-[var(--card-bg)] border border-[var(--card-border)]'
                   }`}
                 >
@@ -126,7 +176,7 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                   onClick={() => setColorMode('dark')}
                   className={`px-3 py-1 rounded-md transition-colors ${
                     colorMode === 'dark'
-                      ? 'bg-[var(--accent)] text-white'
+                      ? 'bg-[var(--accent)] text-[var(--background)]'
                       : 'bg-[var(--card-bg)] border border-[var(--card-border)]'
                   }`}
                 >
@@ -281,7 +331,7 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                   style={{
                     width: `${tokens.colors.usageRatios.accent}%`,
                     backgroundColor: tokens.colors.accent[colorMode],
-                    color: '#FFFFFF',
+                    color: tokens.colors.background[colorMode],
                   }}
                 >
                   {tokens.colors.usageRatios.accent}%
@@ -304,29 +354,41 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
           <h3 className="text-lg font-semibold mb-4">Font Families</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {tokens.typography.fontFamily.display && (
-              <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
-                <p className="text-sm text-muted mb-2">Display</p>
+              <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] group">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-muted">Display</p>
+                  <CopyButton value={tokens.typography.fontFamily.display} className="opacity-0 group-hover:opacity-100" />
+                </div>
                 <p className="text-2xl" style={{ fontFamily: tokens.typography.fontFamily.display }}>
                   {tokens.typography.fontFamily.display.split(',')[0]}
                 </p>
               </div>
             )}
             {tokens.typography.fontFamily.body && (
-              <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
-                <p className="text-sm text-muted mb-2">Body</p>
+              <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] group">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-muted">Body</p>
+                  <CopyButton value={tokens.typography.fontFamily.body} className="opacity-0 group-hover:opacity-100" />
+                </div>
                 <p className="text-2xl" style={{ fontFamily: tokens.typography.fontFamily.body }}>
                   {tokens.typography.fontFamily.body.split(',')[0]}
                 </p>
               </div>
             )}
-            <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
-              <p className="text-sm text-muted mb-2">Sans</p>
+            <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] group">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted">Sans</p>
+                <CopyButton value={tokens.typography.fontFamily.sans} className="opacity-0 group-hover:opacity-100" />
+              </div>
               <p className="text-2xl" style={{ fontFamily: tokens.typography.fontFamily.sans }}>
                 {tokens.typography.fontFamily.sans.split(',')[0]}
               </p>
             </div>
-            <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
-              <p className="text-sm text-muted mb-2">Mono</p>
+            <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] group">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted">Mono</p>
+                <CopyButton value={tokens.typography.fontFamily.mono} className="opacity-0 group-hover:opacity-100" />
+              </div>
               <p className="text-2xl font-mono" style={{ fontFamily: tokens.typography.fontFamily.mono }}>
                 {tokens.typography.fontFamily.mono.split(',')[0]}
               </p>
@@ -341,7 +403,7 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                 {Object.entries(tokens.typography.scale).map(([name, spec]) => (
                   <div
                     key={name}
-                    className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-between"
+                    className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-between group"
                   >
                     <div
                       style={{
@@ -358,9 +420,12 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                     >
                       {name.toUpperCase()}
                     </div>
-                    <div className="text-xs text-muted text-right">
-                      <p>{spec.size} / {spec.weight}</p>
-                      <p>Line height: {spec.lineHeight}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="text-xs text-muted text-right">
+                        <p>{spec.size} / {spec.weight}</p>
+                        <p>Line height: {spec.lineHeight}</p>
+                      </div>
+                      <CopyButton value={spec.size} className="opacity-0 group-hover:opacity-100" />
                     </div>
                   </div>
                 ))}
@@ -439,8 +504,11 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
               .map(([name, size]) => (
                 <div
                   key={name}
-                  className="p-3 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] text-center"
+                  className="p-3 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] text-center group relative"
                 >
+                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <CopyButton value={size} />
+                  </div>
                   <div
                     className="bg-[var(--accent)] mx-auto mb-2"
                     style={{ width: size, height: size, minWidth: '4px', minHeight: '4px' }}
@@ -489,8 +557,8 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium capitalize">{name}</h4>
                         <span className={`px-2 py-0.5 text-xs rounded-full ${
-                          variant.background === 'dark' ? 'bg-gray-800 text-white' :
-                          variant.background === 'light' ? 'bg-gray-100 text-gray-800' :
+                          variant.background === 'dark' ? 'bg-[var(--foreground)] text-[var(--background)]' :
+                          variant.background === 'light' ? 'bg-[var(--muted)] text-[var(--foreground)]' :
                           'bg-[var(--card-bg)] border border-[var(--card-border)]'
                         }`}>
                           {variant.background} bg
@@ -537,23 +605,23 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
 
               {/* Logo Guidelines */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg border border-green-500/20 bg-green-500/5">
-                  <h3 className="text-sm font-semibold mb-3 text-green-500">Do</h3>
+                <div className="p-4 rounded-lg border border-[var(--success)]/20 bg-[var(--success)]/5">
+                  <h3 className="text-sm font-semibold mb-3 text-[var(--success)]">Do</h3>
                   <ul className="space-y-2">
                     {tokens.logo.guidelines.do.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span className="text-[var(--success)] mt-0.5">✓</span>
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
-                  <h3 className="text-sm font-semibold mb-3 text-red-500">Don&apos;t</h3>
+                <div className="p-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5">
+                  <h3 className="text-sm font-semibold mb-3 text-[var(--error)]">Don&apos;t</h3>
                   <ul className="space-y-2">
                     {tokens.logo.guidelines.dont.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <span className="text-red-500 mt-0.5">✗</span>
+                        <span className="text-[var(--error)] mt-0.5">✗</span>
                         {item}
                       </li>
                     ))}
@@ -1453,23 +1521,23 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
               </div>
 
               {/* Guidelines */}
-              <div className="p-4 rounded-lg border border-green-500/20 bg-green-500/5">
-                <h3 className="text-sm font-semibold mb-3 text-green-500">Do</h3>
+              <div className="p-4 rounded-lg border border-[var(--success)]/20 bg-[var(--success)]/5">
+                <h3 className="text-sm font-semibold mb-3 text-[var(--success)]">Do</h3>
                 <ul className="space-y-2">
                   {tokens.imagery.guidelines.do.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-green-500 mt-0.5">✓</span>
+                      <span className="text-[var(--success)] mt-0.5">✓</span>
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
-                <h3 className="text-sm font-semibold mb-3 text-red-500">Don&apos;t</h3>
+              <div className="p-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5">
+                <h3 className="text-sm font-semibold mb-3 text-[var(--error)]">Don&apos;t</h3>
                 <ul className="space-y-2">
                   {tokens.imagery.guidelines.dont.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-red-500 mt-0.5">✗</span>
+                      <span className="text-[var(--error)] mt-0.5">✗</span>
                       {item}
                     </li>
                   ))}
@@ -1547,23 +1615,23 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
           {/* Writing Guidelines (v2) */}
           {tokens.voiceAndTone.guidelines && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg border border-green-500/20 bg-green-500/5">
-                <h3 className="text-sm font-semibold mb-3 text-green-500">Do</h3>
+              <div className="p-4 rounded-lg border border-[var(--success)]/20 bg-[var(--success)]/5">
+                <h3 className="text-sm font-semibold mb-3 text-[var(--success)]">Do</h3>
                 <ul className="space-y-2">
                   {tokens.voiceAndTone.guidelines.do.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-green-500 mt-0.5">✓</span>
+                      <span className="text-[var(--success)] mt-0.5">✓</span>
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
-                <h3 className="text-sm font-semibold mb-3 text-red-500">Don&apos;t</h3>
+              <div className="p-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5">
+                <h3 className="text-sm font-semibold mb-3 text-[var(--error)]">Don&apos;t</h3>
                 <ul className="space-y-2">
                   {tokens.voiceAndTone.guidelines.dont.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-red-500 mt-0.5">✗</span>
+                      <span className="text-[var(--error)] mt-0.5">✗</span>
                       {item}
                     </li>
                   ))}

@@ -190,7 +190,7 @@ export function ExportOptions({ tokens }: ExportOptionsProps) {
                   onClick={() => setColorMode(mode)}
                   className={`px-2 py-1 text-xs rounded-md transition-colors ${
                     colorMode === mode
-                      ? 'bg-[var(--accent)] text-white'
+                      ? 'bg-[var(--accent)] text-[var(--background)]'
                       : 'bg-[var(--card-bg)] border border-[var(--card-border)] hover:bg-[var(--accent)]/10'
                   }`}
                 >
