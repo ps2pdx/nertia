@@ -1,6 +1,7 @@
 import { database } from '@/lib/firebase';
 import { ref, get, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
 import { DiscoveryInputs, BrandSystem } from '@/types/brand-system';
+import { deriveDesignDecisions, generateDecisionSummary } from '@/lib/decision-rules';
 
 // Enhanced color intelligence with specific guidance per industry
 interface IndustryGuidance {
@@ -290,6 +291,10 @@ export async function buildPrompt(inputs: DiscoveryInputs): Promise<string> {
   const personalityGuidance = formatPersonalityGuidance(inputs.personalityAdjectives);
   const examples = await getRelevantExamples(inputs);
 
+  // v3.0: Generate decision logic summary
+  const decisions = deriveDesignDecisions(inputs);
+  const decisionSummary = generateDecisionSummary(decisions);
+
   const existingColorLine = inputs.existingBrandColor
     ? `- Existing Brand Color: ${inputs.existingBrandColor} (incorporate this as primary or accent)`
     : '';
@@ -308,7 +313,7 @@ export async function buildPrompt(inputs: DiscoveryInputs): Promise<string> {
     neutral: 'Lean towards grays, blacks, whites, with minimal color accent',
   };
 
-  return `You are a brand systems architect. Generate a comprehensive design token system (v2.0).
+  return `You are a brand systems architect. Generate a comprehensive design token system (v3.0).
 
 BRAND INPUTS:
 - Company: ${inputs.companyName}
@@ -324,6 +329,10 @@ ${existingColorLine}
 ${industryGuidance}
 
 ${personalityGuidance}
+
+## Decision Logic Analysis (v3.0)
+
+${decisionSummary}
 
 ${examples}
 
@@ -344,7 +353,7 @@ Return ONLY valid JSON matching this exact schema:
   "metadata": {
     "name": "string",
     "generatedAt": "ISO date string",
-    "version": "2.0.0"
+    "version": "3.0.0"
   },
   "colors": {
     "background": { "light": "#hex", "dark": "#hex" },
@@ -731,6 +740,156 @@ Return ONLY valid JSON matching this exact schema:
   },
   "breakpoints": {
     "sm": "640px", "md": "768px", "lg": "1024px", "xl": "1280px", "2xl": "1536px"
+  },
+  "animation": {
+    "keyframes": {
+      "fadeIn": { "name": "fadeIn", "keyframes": { "0%": { "opacity": "0" }, "100%": { "opacity": "1" } } },
+      "fadeOut": { "name": "fadeOut", "keyframes": { "0%": { "opacity": "1" }, "100%": { "opacity": "0" } } },
+      "slideInUp": { "name": "slideInUp", "keyframes": { "0%": { "opacity": "0", "transform": "translateY(20px)" }, "100%": { "opacity": "1", "transform": "translateY(0)" } } },
+      "slideInDown": { "name": "slideInDown", "keyframes": { "0%": { "opacity": "0", "transform": "translateY(-20px)" }, "100%": { "opacity": "1", "transform": "translateY(0)" } } },
+      "slideInLeft": { "name": "slideInLeft", "keyframes": { "0%": { "opacity": "0", "transform": "translateX(-20px)" }, "100%": { "opacity": "1", "transform": "translateX(0)" } } },
+      "slideInRight": { "name": "slideInRight", "keyframes": { "0%": { "opacity": "0", "transform": "translateX(20px)" }, "100%": { "opacity": "1", "transform": "translateX(0)" } } },
+      "scaleIn": { "name": "scaleIn", "keyframes": { "0%": { "opacity": "0", "transform": "scale(0.95)" }, "100%": { "opacity": "1", "transform": "scale(1)" } } },
+      "scaleOut": { "name": "scaleOut", "keyframes": { "0%": { "opacity": "1", "transform": "scale(1)" }, "100%": { "opacity": "0", "transform": "scale(0.95)" } } },
+      "spin": { "name": "spin", "keyframes": { "0%": { "transform": "rotate(0deg)" }, "100%": { "transform": "rotate(360deg)" } } },
+      "pulse": { "name": "pulse", "keyframes": { "0%, 100%": { "opacity": "1" }, "50%": { "opacity": "0.5" } } },
+      "bounce": { "name": "bounce", "keyframes": { "0%, 100%": { "transform": "translateY(0)" }, "50%": { "transform": "translateY(-10px)" } } },
+      "shake": { "name": "shake", "keyframes": { "0%, 100%": { "transform": "translateX(0)" }, "25%": { "transform": "translateX(-5px)" }, "75%": { "transform": "translateX(5px)" } } },
+      "shimmer": { "name": "shimmer", "keyframes": { "0%": { "backgroundPosition": "-200% 0" }, "100%": { "backgroundPosition": "200% 0" } } }
+    },
+    "presets": {
+      "enter": { "name": "enter", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "fadeIn", "description": "Default entrance animation", "usage": ["Modal open", "Page load", "Content reveal"] },
+      "enterSubtle": { "name": "enterSubtle", "duration": "200ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "fadeIn", "description": "Subtle entrance for smaller elements", "usage": ["Tooltip show", "Dropdown open"] },
+      "enterFromLeft": { "name": "enterFromLeft", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "slideInLeft", "description": "Slide in from left", "usage": ["Drawer open", "Side panel"] },
+      "enterFromRight": { "name": "enterFromRight", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "slideInRight", "description": "Slide in from right", "usage": ["Notification", "Side sheet"] },
+      "enterFromTop": { "name": "enterFromTop", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "slideInDown", "description": "Slide in from top", "usage": ["Toast", "Alert banner"] },
+      "enterFromBottom": { "name": "enterFromBottom", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "slideInUp", "description": "Slide in from bottom", "usage": ["Bottom sheet", "Action bar"] },
+      "exit": { "name": "exit", "duration": "200ms", "easing": "cubic-bezier(0.4, 0, 1, 1)", "keyframe": "fadeOut", "description": "Default exit animation", "usage": ["Modal close", "Content hide"] },
+      "exitSubtle": { "name": "exitSubtle", "duration": "150ms", "easing": "cubic-bezier(0.4, 0, 1, 1)", "keyframe": "fadeOut", "description": "Quick exit for overlays", "usage": ["Tooltip hide", "Dropdown close"] },
+      "attention": { "name": "attention", "duration": "600ms", "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "keyframe": "bounce", "description": "Draw attention to element", "usage": ["Error highlight", "New feature badge"] },
+      "loading": { "name": "loading", "duration": "750ms", "easing": "linear", "keyframe": "spin", "description": "Loading spinner", "usage": ["Button loading", "Page loading"] },
+      "skeleton": { "name": "skeleton", "duration": "1.5s", "easing": "linear", "keyframe": "shimmer", "description": "Skeleton loading state", "usage": ["Content placeholder", "List loading"] }
+    },
+    "reducedMotion": {
+      "respectsUserPreference": true,
+      "fallbackDuration": "0ms",
+      "disabledAnimations": ["bounce", "shake", "spin"],
+      "alternativeEffects": {
+        "slideInUp": "Instant opacity change",
+        "slideInDown": "Instant opacity change",
+        "slideInLeft": "Instant opacity change",
+        "slideInRight": "Instant opacity change",
+        "bounce": "Static highlight",
+        "shake": "Border color change"
+      }
+    },
+    "pageTransitions": {
+      "enter": { "name": "pageEnter", "duration": "300ms", "easing": "cubic-bezier(0, 0, 0.2, 1)", "keyframe": "fadeIn", "description": "Page enter transition", "usage": ["Route change"] },
+      "exit": { "name": "pageExit", "duration": "200ms", "easing": "cubic-bezier(0.4, 0, 1, 1)", "keyframe": "fadeOut", "description": "Page exit transition", "usage": ["Route change"] },
+      "duration": "300ms"
+    },
+    "stagger": {
+      "baseDelay": "50ms",
+      "increment": "50ms",
+      "maxItems": 10
+    }
+  },
+  "typographyExtended": {
+    "pairing": {
+      "display": { "family": "Display Font", "weights": [500, 600, 700], "googleFontsUrl": "https://fonts.googleapis.com/css2?family=DisplayFont:wght@500;600;700", "fallback": "system-ui, sans-serif" },
+      "body": { "family": "Body Font", "weights": [400, 500, 600], "googleFontsUrl": "https://fonts.googleapis.com/css2?family=BodyFont:wght@400;500;600", "fallback": "system-ui, sans-serif" },
+      "mono": { "family": "Mono Font", "weights": [400, 500], "googleFontsUrl": "https://fonts.googleapis.com/css2?family=MonoFont:wght@400;500", "fallback": "ui-monospace, monospace" },
+      "reasoning": "Explain why these fonts work together for this brand"
+    },
+    "styles": {
+      "displayLarge": { "fontFamily": "Display Font", "fontSize": "4.5rem", "fontWeight": 700, "lineHeight": 1.1, "letterSpacing": "-0.02em", "usage": ["Hero headlines", "Landing page titles"], "example": "Transform Your Workflow" },
+      "displayMedium": { "fontFamily": "Display Font", "fontSize": "3.5rem", "fontWeight": 600, "lineHeight": 1.15, "letterSpacing": "-0.02em", "usage": ["Page titles", "Major sections"], "example": "Features That Matter" },
+      "displaySmall": { "fontFamily": "Display Font", "fontSize": "2.5rem", "fontWeight": 600, "lineHeight": 1.2, "letterSpacing": "-0.01em", "usage": ["Section headers", "Feature titles"], "example": "Built for Scale" },
+      "headlineLarge": { "fontFamily": "Display Font", "fontSize": "2rem", "fontWeight": 600, "lineHeight": 1.25, "letterSpacing": "-0.01em", "usage": ["H1 in content", "Modal titles"], "example": "Getting Started" },
+      "headlineMedium": { "fontFamily": "Display Font", "fontSize": "1.5rem", "fontWeight": 600, "lineHeight": 1.3, "letterSpacing": "0", "usage": ["H2 in content", "Card titles"], "example": "Key Benefits" },
+      "headlineSmall": { "fontFamily": "Body Font", "fontSize": "1.25rem", "fontWeight": 600, "lineHeight": 1.35, "letterSpacing": "0", "usage": ["H3 in content", "Subsections"], "example": "How It Works" },
+      "titleLarge": { "fontFamily": "Body Font", "fontSize": "1.125rem", "fontWeight": 600, "lineHeight": 1.4, "letterSpacing": "0", "usage": ["Card headers", "List titles"], "example": "Enterprise Plan" },
+      "titleMedium": { "fontFamily": "Body Font", "fontSize": "1rem", "fontWeight": 500, "lineHeight": 1.4, "letterSpacing": "0", "usage": ["Subsection titles", "Nav items"], "example": "Documentation" },
+      "titleSmall": { "fontFamily": "Body Font", "fontSize": "0.875rem", "fontWeight": 500, "lineHeight": 1.4, "letterSpacing": "0.01em", "usage": ["Component headers", "Table headers"], "example": "Recent Activity" },
+      "bodyLarge": { "fontFamily": "Body Font", "fontSize": "1.125rem", "fontWeight": 400, "lineHeight": 1.6, "letterSpacing": "0", "usage": ["Lead paragraphs", "Intro text"], "example": "Discover how our platform helps teams ship faster with confidence." },
+      "bodyMedium": { "fontFamily": "Body Font", "fontSize": "1rem", "fontWeight": 400, "lineHeight": 1.5, "letterSpacing": "0", "usage": ["Default body text", "Descriptions"], "example": "Our API integrates seamlessly with your existing tools." },
+      "bodySmall": { "fontFamily": "Body Font", "fontSize": "0.875rem", "fontWeight": 400, "lineHeight": 1.5, "letterSpacing": "0", "usage": ["Secondary text", "Help text"], "example": "This action cannot be undone." },
+      "labelLarge": { "fontFamily": "Body Font", "fontSize": "0.875rem", "fontWeight": 500, "lineHeight": 1.4, "letterSpacing": "0.01em", "usage": ["Button text", "Input labels"], "example": "Get Started" },
+      "labelMedium": { "fontFamily": "Body Font", "fontSize": "0.75rem", "fontWeight": 500, "lineHeight": 1.4, "letterSpacing": "0.02em", "usage": ["Tags", "Badges"], "example": "NEW" },
+      "labelSmall": { "fontFamily": "Body Font", "fontSize": "0.6875rem", "fontWeight": 500, "lineHeight": 1.4, "letterSpacing": "0.02em", "textTransform": "uppercase", "usage": ["Captions", "Timestamps"], "example": "2 MIN READ" },
+      "code": { "fontFamily": "Mono Font", "fontSize": "0.875rem", "fontWeight": 400, "lineHeight": 1.6, "letterSpacing": "0", "usage": ["Code blocks", "Technical content"], "example": "const api = new Client()" }
+    },
+    "responsiveScale": { "mobile": 0.875, "tablet": 0.9375, "desktop": 1.0 }
+  },
+  "dataVisualizationExtended": {
+    "statCard": {
+      "default": {
+        "background": { "light": "#hex", "dark": "#hex" },
+        "border": { "light": "#hex", "dark": "#hex" },
+        "labelColor": { "light": "#hex", "dark": "#hex" },
+        "valueColor": { "light": "#hex", "dark": "#hex" },
+        "padding": "1.5rem",
+        "borderRadius": "0.75rem"
+      }
+    },
+    "progress": {
+      "track": { "light": "#hex", "dark": "#hex" },
+      "fill": { "light": "#hex", "dark": "#hex" },
+      "height": "0.5rem",
+      "borderRadius": "9999px"
+    },
+    "timeline": {
+      "lineColor": { "light": "#hex", "dark": "#hex" },
+      "dotColor": { "light": "#hex", "dark": "#hex" },
+      "dotSize": "0.75rem",
+      "lineWidth": "2px"
+    },
+    "codeBlock": {
+      "background": { "light": "#hex", "dark": "#hex" },
+      "border": { "light": "#hex", "dark": "#hex" },
+      "textColor": { "light": "#hex", "dark": "#hex" },
+      "padding": "1rem",
+      "borderRadius": "0.5rem",
+      "fontFamily": "Mono Font, monospace"
+    },
+    "chartColors": {
+      "sequential": ["#color1", "#color2", "#color3", "#color4", "#color5"],
+      "categorical": ["#color1", "#color2", "#color3", "#color4", "#color5", "#color6"],
+      "diverging": {
+        "negative": ["#neg1", "#neg2", "#neg3"],
+        "neutral": "#neutral",
+        "positive": ["#pos1", "#pos2", "#pos3"]
+      },
+      "semantic": { "positive": "#green", "negative": "#red", "neutral": "#gray", "warning": "#amber" }
+    },
+    "accessibility": {
+      "colorBlindSafe": true,
+      "patterns": {
+        "primary": "url(#pattern-diagonal)",
+        "secondary": "url(#pattern-dots)",
+        "tertiary": "url(#pattern-crosshatch)"
+      },
+      "minimumContrastRatio": 4.5,
+      "recommendations": ["Use patterns in addition to colors", "Provide text labels for all data points", "Support keyboard navigation"]
+    },
+    "gridStyle": {
+      "stroke": { "light": "#hex", "dark": "#hex" },
+      "strokeWidth": "1px",
+      "strokeDasharray": "4 4"
+    },
+    "axisStyle": {
+      "stroke": { "light": "#hex", "dark": "#hex" },
+      "tickColor": { "light": "#hex", "dark": "#hex" },
+      "labelColor": { "light": "#hex", "dark": "#hex" },
+      "fontSize": "0.75rem"
+    },
+    "tooltip": {
+      "background": { "light": "#hex", "dark": "#hex" },
+      "border": { "light": "#hex", "dark": "#hex" },
+      "textColor": { "light": "#hex", "dark": "#hex" },
+      "borderRadius": "0.5rem",
+      "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+    }
   }
 }
 

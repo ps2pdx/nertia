@@ -19,6 +19,7 @@ const SECTIONS = [
   { id: 'logo', label: 'Logo' },
   { id: 'components', label: 'Components' },
   { id: 'data-viz', label: 'Data Viz' },
+  { id: 'animation', label: 'Animation' },
   { id: 'motion', label: 'Motion' },
   { id: 'imagery', label: 'Imagery' },
   { id: 'voice', label: 'Voice & Tone' },
@@ -1104,6 +1105,158 @@ export function BrandSystemView({ tokens, inputs }: BrandSystemViewProps) {
             })()
           ) : (
             <p className="text-muted">No data visualization specifications available.</p>
+          )}
+        </section>
+
+        {/* Animation Section (v3.0) */}
+        <section id="animation" className="mb-20">
+          <SectionHeader title="Animation System" description="Keyframes, animation presets, and reduced motion support" />
+
+          {tokens.animation ? (() => {
+            const anim = tokens.animation;
+            return (
+              <div className="space-y-8">
+                {/* Keyframes */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Keyframes</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {Object.entries(anim.keyframes).map(([name, keyframe]) => (
+                      <div
+                        key={name}
+                        className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-mono text-sm">{name}</span>
+                        </div>
+                        <div
+                          className="w-8 h-8 rounded bg-[var(--accent)]"
+                          style={{
+                            animation: name === 'spin' ? 'spin 1s linear infinite' :
+                                       name === 'pulse' ? 'pulse 2s ease-in-out infinite' :
+                                       name === 'bounce' ? 'bounce 1s ease-in-out infinite' :
+                                       `${name} 1s ease-in-out infinite alternate`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Animation Presets */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Animation Presets</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(anim.presets).map(([name, preset]) => (
+                      <div
+                        key={name}
+                        className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold">{preset.name}</span>
+                          <span className="text-xs text-muted font-mono">{preset.duration}</span>
+                        </div>
+                        <p className="text-sm text-muted mb-2">{preset.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {preset.usage.map((use, i) => (
+                            <span
+                              key={i}
+                              className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)]"
+                            >
+                              {use}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Reduced Motion */}
+                <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                  <h3 className="text-lg font-semibold mb-4">Reduced Motion Support</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-sm mb-2">
+                        <span className="font-medium">Respects User Preference:</span>{' '}
+                        {anim.reducedMotion.respectsUserPreference ? 'Yes' : 'No'}
+                      </p>
+                      <p className="text-sm mb-2">
+                        <span className="font-medium">Fallback Duration:</span>{' '}
+                        <code className="font-mono text-xs bg-[var(--muted)]/20 px-1 rounded">
+                          {anim.reducedMotion.fallbackDuration}
+                        </code>
+                      </p>
+                      <div className="mt-3">
+                        <p className="text-sm font-medium mb-2">Disabled Animations:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {anim.reducedMotion.disabledAnimations.map((name) => (
+                            <span
+                              key={name}
+                              className="text-xs px-2 py-0.5 rounded bg-[var(--error)]/10 text-[var(--error)] font-mono"
+                            >
+                              {name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium mb-2">Alternative Effects:</p>
+                      <dl className="space-y-1">
+                        {Object.entries(anim.reducedMotion.alternativeEffects).map(([key, value]) => (
+                          <div key={key} className="flex justify-between text-sm">
+                            <dt className="font-mono text-muted">{key}</dt>
+                            <dd className="text-right">{value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Page Transitions */}
+                {anim.pageTransitions && (
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h3 className="text-lg font-semibold mb-4">Page Transitions</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium">Enter</p>
+                        <p className="text-xs text-muted">{anim.pageTransitions.enter.description}</p>
+                        <p className="text-xs font-mono mt-1">{anim.pageTransitions.enter.duration}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Exit</p>
+                        <p className="text-xs text-muted">{anim.pageTransitions.exit.description}</p>
+                        <p className="text-xs font-mono mt-1">{anim.pageTransitions.exit.duration}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stagger */}
+                {anim.stagger && (
+                  <div className="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)]">
+                    <h3 className="text-lg font-semibold mb-4">Stagger Patterns</h3>
+                    <div className="flex gap-8">
+                      <p className="text-sm">
+                        <span className="font-medium">Base Delay:</span>{' '}
+                        <code className="font-mono">{anim.stagger.baseDelay}</code>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">Increment:</span>{' '}
+                        <code className="font-mono">{anim.stagger.increment}</code>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">Max Items:</span>{' '}
+                        <code className="font-mono">{anim.stagger.maxItems}</code>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })() : (
+            <p className="text-muted">No animation system specifications available.</p>
           )}
         </section>
 

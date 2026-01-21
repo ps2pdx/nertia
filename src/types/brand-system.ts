@@ -1,6 +1,6 @@
-// Brand System Token Schema v2.0
+// Brand System Token Schema v3.0
 // Comprehensive brand styleguide structure inspired by Vantage Compute
-// 9 sections: Colors, Typography, Grid, Icons, Components, Motion, Imagery, Voice, Utilities
+// 12 sections: Colors, Typography, Grid, Icons, Components, Motion, Imagery, Voice, Utilities, Animation, Data Viz, Logo
 
 // ============================================================================
 // Helper Types
@@ -217,6 +217,262 @@ export interface LoadingStates {
 }
 
 // ============================================================================
+// Animation System Types (v3.0)
+// ============================================================================
+
+export interface KeyframeDefinition {
+  name: string;
+  keyframes: {
+    [percentage: string]: {
+      [property: string]: string;
+    };
+  };
+}
+
+export interface AnimationPreset {
+  name: string;
+  duration: string;
+  easing: string;
+  keyframe: string;
+  description: string;
+  usage: string[];
+}
+
+export interface AnimationSystem {
+  // CSS @keyframes definitions
+  keyframes: {
+    fadeIn: KeyframeDefinition;
+    fadeOut: KeyframeDefinition;
+    slideInUp: KeyframeDefinition;
+    slideInDown: KeyframeDefinition;
+    slideInLeft: KeyframeDefinition;
+    slideInRight: KeyframeDefinition;
+    scaleIn: KeyframeDefinition;
+    scaleOut: KeyframeDefinition;
+    spin: KeyframeDefinition;
+    pulse: KeyframeDefinition;
+    bounce: KeyframeDefinition;
+    shake: KeyframeDefinition;
+    shimmer: KeyframeDefinition;
+  };
+  // Ready-to-use animation presets
+  presets: {
+    // Entrance animations
+    enter: AnimationPreset;
+    enterSubtle: AnimationPreset;
+    enterFromLeft: AnimationPreset;
+    enterFromRight: AnimationPreset;
+    enterFromTop: AnimationPreset;
+    enterFromBottom: AnimationPreset;
+    // Exit animations
+    exit: AnimationPreset;
+    exitSubtle: AnimationPreset;
+    // Attention/emphasis
+    attention: AnimationPreset;
+    // Loading states
+    loading: AnimationPreset;
+    skeleton: AnimationPreset;
+  };
+  // Reduced motion alternatives
+  reducedMotion: {
+    respectsUserPreference: boolean;
+    fallbackDuration: string;
+    disabledAnimations: string[];
+    alternativeEffects: {
+      [key: string]: string; // e.g., "fadeIn": "opacity transition only"
+    };
+  };
+  // Page transition patterns
+  pageTransitions?: {
+    enter: AnimationPreset;
+    exit: AnimationPreset;
+    duration: string;
+  };
+  // Stagger patterns for lists
+  stagger?: {
+    baseDelay: string;
+    increment: string;
+    maxItems: number;
+  };
+}
+
+// ============================================================================
+// Typography Extended Types (v3.0)
+// ============================================================================
+
+export interface TypeStyleSpec {
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: number;
+  lineHeight: number;
+  letterSpacing: string;
+  textTransform?: 'uppercase' | 'lowercase' | 'capitalize' | 'none';
+  // Usage context
+  usage: string[];
+  example: string;
+}
+
+export interface FontPairing {
+  display: {
+    family: string;
+    weights: number[];
+    googleFontsUrl?: string;
+    fallback: string;
+  };
+  body: {
+    family: string;
+    weights: number[];
+    googleFontsUrl?: string;
+    fallback: string;
+  };
+  mono: {
+    family: string;
+    weights: number[];
+    googleFontsUrl?: string;
+    fallback: string;
+  };
+  reasoning: string; // Why these fonts work together
+}
+
+export interface TypographyExtended {
+  // Font pairing with full details
+  pairing: FontPairing;
+  // Complete type styles with usage context
+  styles: {
+    displayLarge: TypeStyleSpec;  // Hero headlines
+    displayMedium: TypeStyleSpec; // Page titles
+    displaySmall: TypeStyleSpec;  // Section headers
+    headlineLarge: TypeStyleSpec; // H1
+    headlineMedium: TypeStyleSpec;// H2
+    headlineSmall: TypeStyleSpec; // H3
+    titleLarge: TypeStyleSpec;    // Card titles, feature headlines
+    titleMedium: TypeStyleSpec;   // Subsection titles
+    titleSmall: TypeStyleSpec;    // Component headers
+    bodyLarge: TypeStyleSpec;     // Lead paragraphs
+    bodyMedium: TypeStyleSpec;    // Default body text
+    bodySmall: TypeStyleSpec;     // Secondary text
+    labelLarge: TypeStyleSpec;    // Button text, input labels
+    labelMedium: TypeStyleSpec;   // Tags, badges
+    labelSmall: TypeStyleSpec;    // Captions, timestamps
+    code: TypeStyleSpec;          // Code blocks, technical content
+  };
+  // Responsive scaling
+  responsiveScale?: {
+    mobile: number;   // e.g., 0.875 (87.5% of base)
+    tablet: number;   // e.g., 0.9375
+    desktop: number;  // e.g., 1.0
+  };
+}
+
+// ============================================================================
+// Data Visualization Extended Types (v3.0)
+// ============================================================================
+
+export interface ChartColorPalette {
+  // Sequential palette for single-hue data (low to high)
+  sequential: string[];
+  // Categorical palette for distinct categories
+  categorical: string[];
+  // Diverging palette for data with a midpoint
+  diverging: {
+    negative: string[];
+    neutral: string;
+    positive: string[];
+  };
+  // Semantic colors for status
+  semantic: {
+    positive: string;
+    negative: string;
+    neutral: string;
+    warning: string;
+  };
+}
+
+export interface ChartLibraryConfig {
+  name: 'recharts' | 'chartjs' | 'd3' | 'visx';
+  colorConfig: Record<string, string>;
+  fontConfig: {
+    family: string;
+    size: number;
+    color: string;
+  };
+  gridConfig: {
+    stroke: string;
+    strokeDasharray?: string;
+  };
+}
+
+export interface DataVizAccessibility {
+  colorBlindSafe: boolean;
+  patterns: {
+    // Pattern fills as SVG for color-blind accessibility
+    primary: string;
+    secondary: string;
+    tertiary: string;
+  };
+  minimumContrastRatio: number;
+  recommendations: string[];
+}
+
+export interface DataVisualizationExtended extends DataVisualization {
+  // Chart-specific color palettes
+  chartColors: ChartColorPalette;
+  // Library-specific configurations
+  libraryConfigs?: {
+    recharts?: ChartLibraryConfig;
+    chartjs?: ChartLibraryConfig;
+  };
+  // Accessibility features
+  accessibility: DataVizAccessibility;
+  // Grid and axis styling
+  gridStyle: {
+    stroke: ColorValue;
+    strokeWidth: string;
+    strokeDasharray?: string;
+  };
+  axisStyle: {
+    stroke: ColorValue;
+    tickColor: ColorValue;
+    labelColor: ColorValue;
+    fontSize: string;
+  };
+  // Tooltip styling
+  tooltip: {
+    background: ColorValue;
+    border: ColorValue;
+    textColor: ColorValue;
+    borderRadius: string;
+    shadow: string;
+  };
+}
+
+// ============================================================================
+// Decision Logic Types (v3.0)
+// ============================================================================
+
+export interface IndustryProfile {
+  name: string;
+  colorMoodDefault: 'warm' | 'cool' | 'neutral';
+  brightnessDefault: 'vibrant' | 'muted' | 'dark';
+  typographyDefault: 'modern' | 'classic' | 'playful' | 'technical';
+  densityDefault: 'spacious' | 'balanced' | 'compact';
+  motionIntensity: 'subtle' | 'moderate' | 'energetic';
+  iconStyle: 'outline' | 'solid' | 'duotone';
+  suggestedPersonality: string[];
+}
+
+export interface PersonalityMapping {
+  trait: string;
+  designImpact: {
+    borderRadius: 'sharp' | 'subtle' | 'rounded' | 'pill';
+    spacing: 'tight' | 'balanced' | 'generous';
+    contrast: 'low' | 'medium' | 'high';
+    motion: 'minimal' | 'subtle' | 'expressive';
+    typography: 'geometric' | 'humanist' | 'transitional';
+  };
+}
+
+// ============================================================================
 // Main Brand System Interface
 // ============================================================================
 
@@ -225,7 +481,7 @@ export interface BrandSystem {
   metadata: {
     name: string;
     generatedAt: string;
-    version: string; // "2.0.0"
+    version: string; // "3.0.0"
   };
 
   // ---- 1. Colors ----
@@ -462,6 +718,15 @@ export interface BrandSystem {
 
   // ---- 6c. Logo (v2.1, optional) ----
   logo?: LogoSection;
+
+  // ---- 6d. Animation System (v3.0, optional) ----
+  animation?: AnimationSystem;
+
+  // ---- 6e. Typography Extended (v3.0, optional) ----
+  typographyExtended?: TypographyExtended;
+
+  // ---- 6f. Data Visualization Extended (v3.0, optional) ----
+  dataVisualizationExtended?: DataVisualizationExtended;
 
   // ---- 7. Borders ----
   borders: {
