@@ -13,27 +13,10 @@ export default function Header() {
   const [showHeader, setShowHeader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isHome = pathname === '/';
-
-  // Show header only after scrolling past hero section on home page
+  // Always show header on all pages
   useEffect(() => {
-    if (!isHome) {
-      setShowHeader(true);
-      return;
-    }
-
-    const handleScroll = () => {
-      const heroSection = document.getElementById('hero');
-      if (heroSection) {
-        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
-        setShowHeader(window.scrollY > heroBottom - 100);
-      }
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHome, pathname]);
+    setShowHeader(true);
+  }, [pathname]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -54,7 +37,7 @@ export default function Header() {
 
   const isActiveItem = (href: string) => pathname === href;
 
-  const shouldShowHeader = !isHome || showHeader;
+  const shouldShowHeader = showHeader;
 
   return (
     <>
