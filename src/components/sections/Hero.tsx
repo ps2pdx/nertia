@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import WebGLBackground from '@/components/WebGLBackground';
+import ButterflyRingParticles from '@/components/ButterflyRingParticles';
 import { useAuth } from '@/lib/auth-context';
 
 export default function Hero() {
@@ -10,8 +10,8 @@ export default function Hero() {
 
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* WebGL Background */}
-      <WebGLBackground />
+      {/* Butterfly Ring Particles Background */}
+      <ButterflyRingParticles />
 
       {/* Hero Content */}
       <div className="container text-center relative z-10 flex flex-col items-center pt-16">
