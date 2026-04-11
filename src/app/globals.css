@@ -10,6 +10,7 @@
   --card-border: #e5e7eb;
   --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-body: var(--font-space-mono), "Courier New", Courier, monospace;
+  --header-height: 88px;
 }
 
 @theme inline {
@@ -213,6 +214,11 @@ samp {
 /* Muted text */
 .text-muted {
   color: var(--muted);
+}
+
+/* Content padding to account for fixed header */
+.pt-header {
+  padding-top: var(--header-height);
 }
 
 /* Hide battlezone overlay on main pages */
