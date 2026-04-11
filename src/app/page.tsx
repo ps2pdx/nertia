@@ -6,8 +6,8 @@ export default function Home() {
     <main>
       <section id="hero" className="min-h-screen relative">
         <ButterflyRingParticles />
-        <div className="absolute top-6 left-6 z-10 pointer-events-none">
-          <div className="max-w-md">
+        <div className="absolute top-0 left-0 pt-header pl-6 z-10 pointer-events-none">
+          <div className="max-w-md pt-6">
             <h1 className="text-sm font-medium mb-2">Butterfly Ring</h1>
             <p className="text-xs text-muted">
               A particle visualization of a plastic butterfly ring.
