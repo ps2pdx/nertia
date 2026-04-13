@@ -15,6 +15,8 @@ It shipped tonight. **Zen Holo**: long-form 3D ambient loops, 3+ hours a pop, da
 
 Watch: [youtube.com/@zenholo12](https://www.youtube.com/channel/UC9rkFGejFF3rypgemxebUKg)
 
+![Hummingbird hologram above the main stone in Stone & Water 001](/blog/zen-holo-stone-hummingbird.png)
+
 The channel is the artifact. The pipeline is the real output.
 
 ## The stack

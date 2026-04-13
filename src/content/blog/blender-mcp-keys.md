@@ -30,6 +30,8 @@ Before MCP, Claude was a smart assistant writing code snippets I'd paste. With M
 
 A real example from this weekend: *"the hummingbird mesh is rendering as a black silhouette, figure out why."* Claude ran `get_scene_info`, read the material nodes, noticed the emission strength was animated with CONSTANT extrapolation ending at frame 60, and proposed fixing the extrapolation. Two tool calls. I never opened a node editor.
 
+![Blender viewport while iterating the Zen Holo scene with Claude over MCP](/blog/blender-mcp-viewport.png)
+
 ## What to prompt it for
 
 - **Surgical edits.** "Rotate the camera target 30° around Z." "Set the Mapping node's Y location to 0, keyframed."
