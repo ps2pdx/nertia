@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} | Nertia`,
     description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt, type: 'article', publishedTime: post.date },
+    openGraph: { title: post.title, description: post.excerpt, type: 'article', publishedTime: post.date, images: post.hero ? [{ url: post.hero }] : undefined },
+    twitter: { card: 'summary_large_image', title: post.title, description: post.excerpt, images: post.hero ? [post.hero] : undefined },
   };
 }
 
@@ -34,6 +35,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         </div>
         <h1 className="text-4xl md:text-5xl font-bold mb-8">{post.title}</h1>
+        {post.hero && (
+          <img src={post.hero} alt={post.title} className="w-full rounded-lg mb-10 border border-[var(--card-border)]" />
+        )}
         <div className="prose prose-invert max-w-none prose-headings:font-semibold prose-p:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)]">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>

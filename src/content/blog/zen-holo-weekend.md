@@ -2,6 +2,7 @@
 title: "Field notes — launching Zen Holo"
 date: "2026-04-12"
 slug: "zen-holo-weekend"
+hero: "/blog/zen-holo-weekend-hero.png"
 excerpt: "Spent the weekend building a YouTube channel that renders 3-hour ambient visual loops out of Blender. Here's where things stand."
 tags: ["zen-holo", "blender", "pipeline", "field-notes"]
 ---

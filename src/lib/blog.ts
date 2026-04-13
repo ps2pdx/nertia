@@ -10,6 +10,7 @@ export interface BlogPost {
   date: string;
   excerpt: string;
   tags: string[];
+  hero?: string;
   content: string;
 }
 
@@ -25,6 +26,7 @@ export function getAllPosts(): BlogPost[] {
       date: data.date,
       excerpt: data.excerpt || '',
       tags: data.tags || [],
+      hero: data.hero,
       content,
     };
   });

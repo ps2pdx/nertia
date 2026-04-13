@@ -16,12 +16,17 @@ export default function BlogIndex() {
         <p className="text-[var(--muted-foreground)] mb-12">Raw writing from the workbench.</p>
         <div className="flex flex-col gap-8">
           {posts.map(post => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className="group block p-6 rounded-lg border border-[var(--card-border)] hover:border-[var(--accent)] transition">
-              <div className="text-sm text-[var(--muted-foreground)] mb-2">
-                {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="group block rounded-lg border border-[var(--card-border)] hover:border-[var(--accent)] transition overflow-hidden">
+              {post.hero && (
+                <img src={post.hero} alt={post.title} className="w-full aspect-video object-cover" />
+              )}
+              <div className="p-6">
+                <div className="text-sm text-[var(--muted-foreground)] mb-2">
+                  {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+                <h2 className="text-2xl font-semibold mb-2 group-hover:text-[var(--accent)] transition">{post.title}</h2>
+                <p className="text-[var(--muted-foreground)]">{post.excerpt}</p>
               </div>
-              <h2 className="text-2xl font-semibold mb-2 group-hover:text-[var(--accent)] transition">{post.title}</h2>
-              <p className="text-[var(--muted-foreground)]">{post.excerpt}</p>
             </Link>
           ))}
           {posts.length === 0 && <p className="text-[var(--muted-foreground)]">No posts yet.</p>}
