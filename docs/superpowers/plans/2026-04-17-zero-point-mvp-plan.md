@@ -29,18 +29,23 @@ This plan takes the MVP from "one-direction vertical slice" to "full 4-direction
 
 ---
 
-## Phases
+## Phases (post-scope-cut 2026-04-17)
 
-| Phase | Name | Task range | Parallelizable with |
+| Phase | Name | Task range | MVP |
 |---|---|---|---|
-| A | Directions — complete the library | 1–6 | — |
-| B | Intake + streaming generation | 7–11 | C, E |
-| C | Landing | 12–14 | B, D, E |
-| D | Admin queue | 15–16 | C, E |
-| E | Retirement of old thesis code | 17–18 | B, C, D |
-| F | Infra + launch | 19–21 | — |
+| A | Directions — zero-point + editorial only | 1, 2, 5, 6 | ✓ |
+| A′ | Directions — brutalist, organic | 3, 4 | CUT → V1 |
+| B | Intake + streaming generation | 7, 8, 9, 10, 11 | ✓ |
+| C | Landing — Hero only | 12 | ✓ |
+| C′ | Feature sections | 13 | CUT (already removed) |
+| C″ | Voice audit regression test | 14 | ✓ |
+| D | Admin queue | 15, 16 | CUT → V1 |
+| E | Retirement of old thesis code | 17, 18 | ✓ |
+| F | Infra + launch | 19, 20, 21 | ✓ |
 
-**Critical path:** 1 → 6 → 7 → 10 → 11 → 15 → 16 → 20 → 21 (9 tasks). Everything else slots around.
+**MVP task count:** 13 tasks (was 21).
+**Critical path:** 1 → 2 → 5 → 6 → 7 → 10 → 11 → 20 → 21 (9 tasks).
+**Est MVP time:** ~40 hr (was ~60). Roughly 5 evening streams instead of 7–8.
 
 ---
 
@@ -99,7 +104,13 @@ From spec §Open Questions. All carry defaults so nothing blocks; flag inline if
 
 ---
 
-### Task 3 — Brutalist direction
+### Task 3 — Brutalist direction [CUT — deferred to V1]
+
+**Why cut:** 4 directions is more breadth than MVP needs. Ship with 2 (zero-point + editorial) to cover the two most common brief archetypes: austere/technical and warm/editorial. Add brutalist + organic post-launch when the picker and palette generation have real-user signal.
+
+---
+
+### Task 3 ORIGINAL (for reference, deferred)
 
 **Why:** covers the "raw grid, monospace accents, type-contrast-forward, unstyled-feeling" territory. Strong for agencies, devs, experimental brands, niche consumer.
 
@@ -115,7 +126,13 @@ From spec §Open Questions. All carry defaults so nothing blocks; flag inline if
 
 ---
 
-### Task 4 — Organic direction
+### Task 4 — Organic direction [CUT — deferred to V1]
+
+**Why cut:** see Task 3 reasoning. Ship MVP with zero-point + editorial; organic lands V1.
+
+---
+
+### Task 4 ORIGINAL (for reference, deferred)
 
 **Why:** covers the "warm, soft-gradient, hand-drawn accents, friendly" territory. Strong for coaches, small-biz, wellness, family/personal sites.
 
@@ -145,9 +162,13 @@ From spec §Open Questions. All carry defaults so nothing blocks; flag inline if
 
 ---
 
-### Task 6 — Direction picker (LLM classification step)
+### Task 6 — Direction picker (rules-based for MVP, LLM in V1)
 
-**Why:** step 1 of the generation pipeline — Haiku classifies the brief and picks which of the 4 directions suits best. Currently hardcoded to zero-point in the vertical slice.
+**MVP scope:** with only 2 directions (zero-point + editorial), a rules-based picker reading vibe words + favorite-site hints is trivially sufficient. No LLM call. Saves cost, saves latency, easier to debug.
+
+**V1 upgrade:** when direction count ≥3, replace with Haiku classifier. Fixture set already prepped at `src/lib/generator/__fixtures__/direction-picker-briefs.json` — tests carry over.
+
+**Why downgraded:** binary classification from form signals doesn't need an LLM. The fixture set + scoring rule stays valid; only the internals of `pickDirection.ts` change.
 
 **Files:**
 - `src/lib/generator/pickDirection.ts` — takes brief, returns `DirectionName`
@@ -340,11 +361,13 @@ The "feature sections + pricing + FAQ link" breakdown assumed a standard SaaS ma
 
 ---
 
-## Phase D — Admin queue
+## Phase D — Admin queue [CUT — deferred to V1]
 
-**Goal:** Scott can see new free-tier generations, flagged ones, and eventual upgrade requests. Replaces retired `/admin/generations`.
+**Why cut:** for MVP, Scott can inspect generations directly in the Firebase console. A dedicated admin UI is polish, not product. When generation volume justifies a dashboard, build V1.
 
-### Task 15 — `/api/admin/queue` endpoint
+---
+
+### Task 15 ORIGINAL (for reference, deferred)
 
 **Files:**
 - `src/app/api/admin/queue/route.ts` — authed (existing admin guard), returns paginated generations with brief + moderation + cost joined
@@ -361,7 +384,7 @@ The "feature sections + pricing + FAQ link" breakdown assumed a standard SaaS ma
 
 ---
 
-### Task 16 — `/admin/queue` page
+### Task 16 — `/admin/queue` page [CUT — deferred to V1]
 
 **Files:**
 - `src/app/admin/queue/page.tsx` — list view
