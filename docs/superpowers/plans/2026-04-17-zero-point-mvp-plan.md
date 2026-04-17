@@ -306,23 +306,16 @@ From spec §Open Questions. All carry defaults so nothing blocks; flag inline if
 
 ---
 
-### Task 13 — Feature sections + pricing + FAQ link
+### Task 13 — CUT (scope correction 2026-04-17)
 
-**Files:**
-- `src/app/_components/landing/HowItWorks.tsx` — 3 beats: brief → generate → live site
-- `src/app/_components/landing/DirectionSampler.tsx` — shows the 4 directions as tiles (picks up from direction registry)
-- `src/app/_components/landing/Pricing.tsx` — free tier vs. custom domain + consult tier
-- `src/app/_components/landing/FAQTeaser.tsx` — top 3 FAQs with link to `/faq`
-- `src/app/_components/landing/__tests__/*.test.tsx`
+The "feature sections + pricing + FAQ link" breakdown assumed a standard SaaS marketing site. Nertia is **just a website generator** — the landing is the product, not a pitch. Hero (Task 12) + inline or adjacent `/generate` form does the entire job.
 
-**Acceptance:**
-- DirectionSampler reads from `src/directions/index.ts` — no duplication
-- Pricing copy: no mention of Scott's hourly rate, consulting, "get in touch for a quote"
-- All sections pass voiceAudit
+**If a secondary surface is needed later:**
+- Gallery / library browser → its own page, not a landing section
+- Pricing → lives at `/pricing` or inline on the upgrade CTA inside generated sites
+- FAQ → separate `/faq` page (already exists)
 
-**Dependencies:** Task 5 (direction registry for sampler).
-
-**Est:** 4–5 hr.
+**Est:** 0. Task removed.
 
 ---
 
