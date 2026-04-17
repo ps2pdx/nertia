@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "description": "Fixture briefs for Task 6 direction-picker tests. Each maps a realistic intake to the expected direction. Used by pickDirection.test.ts to verify classification accuracy (pass threshold: ≥6 of 8 core fixtures match).",
+  "fixtures": [
+    {
+      "id": "zp-01-ai-research",
+      "expectedDirection": "zero-point",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Quanta Signal",
+        "oneSentence": "We build reasoning benchmarks for frontier AI labs.",
+        "audience": "AI safety researchers, ML engineers at labs",
+        "vibeWords": "precise, quiet, rigorous",
+        "favoriteSites": ["https://anthropic.com", "https://arxiv.org"]
+      },
+      "rationale": "Tech/AI/research with quiet-and-rigorous tone. Zero-point's core territory."
+    },
+    {
+      "id": "zp-02-developer-tool",
+      "expectedDirection": "zero-point",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Vacuum",
+        "oneSentence": "A debugger for distributed systems that shows causality, not stack traces.",
+        "audience": "senior backend engineers and SREs",
+        "vibeWords": "serious, clean, technical",
+        "favoriteSites": ["https://linear.app", "https://warp.dev"]
+      },
+      "rationale": "Dev tool, serious + clean + technical. Zero-point's typographic discipline fits."
+    },
+    {
+      "id": "zp-03-research-lab",
+      "expectedDirection": "zero-point",
+      "brief": {
+        "siteFor": "project",
+        "businessName": "Morrison Lab",
+        "oneSentence": "Computational biology research group at UCSF studying protein folding.",
+        "audience": "academic collaborators, prospective graduate students",
+        "vibeWords": "rigorous, restrained, credible",
+        "favoriteSites": ["https://www.santafe.edu", "https://arxiv.org"]
+      },
+      "rationale": "Academic research, restrained-and-credible tone. Zero-point signals seriousness."
+    },
+    {
+      "id": "ed-01-wedding-photographer",
+      "expectedDirection": "editorial",
+      "brief": {
+        "siteFor": "portfolio",
+        "businessName": "Ana Mercado",
+        "oneSentence": "Film wedding photographer based in Oaxaca, shooting on medium format.",
+        "audience": "couples planning destination weddings, art directors",
+        "vibeWords": "warm, unhurried, cinematic",
+        "favoriteSites": ["https://cereal-magazine.com", "https://kinfolk.com"]
+      },
+      "rationale": "Image-forward portfolio, unhurried tone, directly cites editorial reference sites."
+    },
+    {
+      "id": "ed-02-restaurant",
+      "expectedDirection": "editorial",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Lumen",
+        "oneSentence": "A 24-seat tasting-menu restaurant exploring fermented Pacific Northwest produce.",
+        "audience": "food-obsessed diners planning special-occasion meals",
+        "vibeWords": "considered, intimate, crafted",
+        "favoriteSites": ["https://bouleyatbotanical.com", "https://noma.dk"]
+      },
+      "rationale": "High-end restaurant, considered + intimate + crafted. Serif-forward editorial territory."
+    },
+    {
+      "id": "ed-03-writer-portfolio",
+      "expectedDirection": "editorial",
+      "brief": {
+        "siteFor": "portfolio",
+        "businessName": "Hana Okafor",
+        "oneSentence": "Essays on architecture, memory, and the cities we inherit.",
+        "audience": "editors, readers, academic invitations",
+        "vibeWords": "measured, literary, spacious",
+        "favoriteSites": ["https://craigmod.com", "https://longform.org"]
+      },
+      "rationale": "Writer portfolio, measured-literary tone. Classic editorial aesthetic."
+    },
+    {
+      "id": "br-01-design-agency",
+      "expectedDirection": "brutalist",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "HARDTYPE",
+        "oneSentence": "An independent branding studio for companies that refuse to look like everyone else.",
+        "audience": "founders who hate SaaS gradients",
+        "vibeWords": "raw, confrontational, typographic",
+        "favoriteSites": ["https://mschf.com", "https://are.na"]
+      },
+      "rationale": "Agency, raw-and-confrontational tone, typographic-first. Brutalist center of mass."
+    },
+    {
+      "id": "br-02-indie-game-studio",
+      "expectedDirection": "brutalist",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Null Rooms",
+        "oneSentence": "A two-person studio making unmarketable experimental games.",
+        "audience": "weird-game enthusiasts, press, festival jurors",
+        "vibeWords": "weird, abrasive, honest",
+        "favoriteSites": ["https://increpare.com", "https://itch.io"]
+      },
+      "rationale": "Experimental studio, weird-abrasive-honest. Brutalist allows the unfiltered voice."
+    },
+    {
+      "id": "br-03-zine-publisher",
+      "expectedDirection": "brutalist",
+      "brief": {
+        "siteFor": "project",
+        "businessName": "WIRE / SHEET",
+        "oneSentence": "A quarterly zine on typography, labor, and obsolete technology.",
+        "audience": "designers, typographers, library acquisitions",
+        "vibeWords": "industrial, plain-spoken, dense",
+        "favoriteSites": ["https://dinamo.us", "https://www.designreviewed.com"]
+      },
+      "rationale": "Zine about typography itself — brutalist is self-referential and earned here."
+    },
+    {
+      "id": "or-01-life-coach",
+      "expectedDirection": "organic",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Sora Ellis Coaching",
+        "oneSentence": "Somatic coaching for people untangling burnout and rebuilding pace.",
+        "audience": "overworked professionals, newly-diagnosed ADHD adults",
+        "vibeWords": "gentle, grounded, patient",
+        "favoriteSites": ["https://mitchyll.com", "https://holistik.co"]
+      },
+      "rationale": "Coaching, gentle-grounded tone. Organic's warmth is the right register."
+    },
+    {
+      "id": "or-02-small-bakery",
+      "expectedDirection": "organic",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Marigold Bread",
+        "oneSentence": "Sourdough and seasonal pastries from a single-oven bakery in the neighborhood.",
+        "audience": "neighbors, people who stop in Saturday mornings",
+        "vibeWords": "friendly, warm, handmade",
+        "favoriteSites": ["https://sqirlla.com", "https://tartine.com"]
+      },
+      "rationale": "Neighborhood small-biz, handmade-and-warm. Organic aesthetic fits the artisan register."
+    },
+    {
+      "id": "or-03-wellness-studio",
+      "expectedDirection": "organic",
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Field & Breath Yoga",
+        "oneSentence": "Mysore-style ashtanga in a converted greenhouse studio.",
+        "audience": "committed yoga practitioners, beginners who want mentorship",
+        "vibeWords": "warm, rooted, embodied",
+        "favoriteSites": ["https://jasminehemsley.com", "https://www.theholisticc.com"]
+      },
+      "rationale": "Wellness studio, warm-rooted-embodied. Organic's gradients + hand-drawn energy."
+    },
+    {
+      "id": "edge-01-ambiguous-creator",
+      "expectedDirection": "editorial",
+      "allowAlternatives": ["organic"],
+      "brief": {
+        "siteFor": "personal",
+        "businessName": "june watt",
+        "oneSentence": "Illustrator and picture-book author.",
+        "audience": "publishing editors, art directors, parents",
+        "vibeWords": "warm, considered, playful",
+        "favoriteSites": []
+      },
+      "rationale": "Ambiguous between editorial (book-author polish) and organic (warm + playful). Either acceptable."
+    },
+    {
+      "id": "edge-02-ambiguous-tech",
+      "expectedDirection": "zero-point",
+      "allowAlternatives": ["brutalist"],
+      "brief": {
+        "siteFor": "business",
+        "businessName": "Segfault",
+        "oneSentence": "A newsletter on systems programming for people who read kernel source for fun.",
+        "audience": "kernel devs, OS nerds, low-level engineers",
+        "vibeWords": "dry, technical, unpretentious",
+        "favoriteSites": ["https://lwn.net"]
+      },
+      "rationale": "Technical newsletter — zero-point's rigor OR brutalist's typographic honesty both defensible."
+    },
+    {
+      "id": "edge-03-sparse-brief",
+      "expectedDirection": "zero-point",
+      "brief": {
+        "siteFor": "project",
+        "businessName": "Unnamed",
+        "oneSentence": "idk yet, maybe a blog",
+        "audience": "people i guess",
+        "vibeWords": "",
+        "favoriteSites": []
+      },
+      "rationale": "Under-specified brief. Default to zero-point (flagship) rather than forcing a warmer direction without signal."
+    },
+    {
+      "id": "edge-04-conflicting-signals",
+      "expectedDirection": "editorial",
+      "allowAlternatives": ["organic", "brutalist"],
+      "brief": {
+        "siteFor": "business",
+        "businessName": "ATELIER / WARM",
+        "oneSentence": "Boutique interior studio balancing brutalist architecture and heirloom textiles.",
+        "audience": "architects, high-end residential clients",
+        "vibeWords": "considered, raw, tactile",
+        "favoriteSites": ["https://studiomcgee.com", "https://www.davidchipperfield.com"]
+      },
+      "rationale": "Conflicting: brutalist architectural refs + warm-tactile-heirloom textiles. Editorial best handles the tension; organic or brutalist also defensible."
+    }
+  ],
+  "scoring": {
+    "required": {
+      "coreMatchRate": 0.75,
+      "description": "Of the 12 non-edge fixtures (zp/ed/br/or × 3), at least 9 must match expectedDirection."
+    },
+    "tolerant": {
+      "edgeCaseMatchRate": 1.0,
+      "description": "Of the 4 edge fixtures, the picker must return either expectedDirection OR one of allowAlternatives for all."
+    }
+  }
+}
