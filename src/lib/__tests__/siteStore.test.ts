@@ -9,7 +9,7 @@ vi.mock("@/lib/firebaseAdmin", () => ({
 }));
 
 import { getSite, putSite, slugIsTaken } from "@/lib/siteStore";
-import type { SiteConfig } from "@/directions/types";
+import type { Site } from "@/templates/types";
 
 beforeEach(() => {
   mockGet.mockReset();
@@ -17,22 +17,22 @@ beforeEach(() => {
   mockRef.mockClear();
 });
 
-const fixture: SiteConfig = {
+const fixture: Site = {
   slug: "acme",
-  direction: "zero-point",
-  palette: { bg: "#0a0a0a", fg: "#ffffff", accent: "#00ffff", muted: "#888888" },
-  typography: { heading: "Inter", body: "Inter", scale: 1.25 },
-  copy: { hero: { eyebrow: "", headline: "H", sub: "S", cta: "C" }, sections: [] },
-  motionConfig: { variant: "breath", intensity: "low", accent: "#00ffff" },
-  images: {},
-  tier: "free",
+  templateId: "precedent",
+  copy: {
+    "hero.headline": "Acme builds things.",
+    "hero.sub": "Small, true, shipped fast.",
+    "hero.cta": "Get started",
+  },
 };
 
 describe("siteStore", () => {
-  it("getSite returns parsed config when found", async () => {
+  it("getSite returns parsed site when found", async () => {
     mockGet.mockResolvedValue({ exists: () => true, val: () => fixture });
     const out = await getSite("acme");
     expect(out?.slug).toBe("acme");
+    expect(out?.templateId).toBe("precedent");
     expect(mockRef).toHaveBeenCalledWith("sites/acme");
   });
 
@@ -46,7 +46,7 @@ describe("siteStore", () => {
     const out = await putSite(fixture);
     expect(mockRef).toHaveBeenCalledWith("sites/acme");
     expect(mockSet).toHaveBeenCalled();
-    const written = (mockSet.mock.calls[0] as [SiteConfig])[0];
+    const written = (mockSet.mock.calls[0] as [Site])[0];
     expect(written.createdAt).toBeTypeOf("number");
     expect(written.updatedAt).toBeTypeOf("number");
     expect(out.slug).toBe("acme");

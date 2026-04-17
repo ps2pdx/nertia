@@ -1,21 +1,21 @@
 import { getAdminDb } from "@/lib/firebaseAdmin";
-import { SiteConfigSchema, type SiteConfig } from "@/directions/types";
+import { SiteSchema, type Site } from "@/templates/types";
 
-export async function getSite(slug: string): Promise<SiteConfig | null> {
+export async function getSite(slug: string): Promise<Site | null> {
   const snap = await getAdminDb().ref(`sites/${slug}`).get();
   if (!snap.exists()) return null;
   const raw = snap.val();
-  return SiteConfigSchema.parse(raw);
+  return SiteSchema.parse(raw);
 }
 
-export async function putSite(config: SiteConfig): Promise<SiteConfig> {
+export async function putSite(site: Site): Promise<Site> {
   const now = Date.now();
-  const next: SiteConfig = {
-    ...config,
-    createdAt: config.createdAt ?? now,
+  const next: Site = {
+    ...site,
+    createdAt: site.createdAt ?? now,
     updatedAt: now,
   };
-  SiteConfigSchema.parse(next);
+  SiteSchema.parse(next);
   await getAdminDb().ref(`sites/${next.slug}`).set(next);
   return next;
 }
