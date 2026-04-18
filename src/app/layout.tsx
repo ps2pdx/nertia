@@ -16,31 +16,20 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nertia — Real Next.js. Real Vercel. Deployed in seconds.",
-  description:
-    "A wrapper around the modern web stack. Pick an open-source template, we assemble it with your copy and ship it live. Next.js · React · Tailwind · Vercel — nothing proprietary, nothing to configure.",
-  keywords: [
-    "next.js deployment",
-    "vercel templates",
-    "react website",
-    "open source templates",
-    "instant deploy",
-    "zero-point",
-    "nertia",
-  ],
+  title: "Nertia — A zero-point website generator",
+  description: "Brief in, website out. Free, hosted, live in under a minute.",
+  keywords: ["ai website generator", "website builder", "zero-point", "free website", "instant website"],
   openGraph: {
-    title: "Nertia — Real Next.js. Real Vercel. Deployed in seconds.",
-    description:
-      "A wrapper around the modern web stack. Pick a template, ship it live. Nothing proprietary, nothing to configure.",
+    title: "Nertia — A zero-point website generator",
+    description: "Brief in, website out. Free, hosted, live in under a minute.",
     url: "https://nertia.ai",
     siteName: "Nertia",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nertia — Real Next.js. Real Vercel. Deployed in seconds.",
-    description:
-      "A wrapper around the modern web stack. Pick a template, ship it live. Nothing proprietary, nothing to configure.",
+    title: "Nertia — A zero-point website generator",
+    description: "Brief in, website out. Free, hosted, live in under a minute.",
   },
 };
 

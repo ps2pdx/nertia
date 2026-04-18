@@ -35,13 +35,13 @@ export function Gallery() {
           >
             templates
           </p>
-          <h1 className="text-4xl md:text-6xl tracking-tight">Pick a template. Ship it live.</h1>
+          <h1 className="text-4xl md:text-6xl tracking-tight">Pick a starting point.</h1>
           <p
             className="mt-4 max-w-xl text-base md:text-lg"
             style={{ color: "var(--muted, #9ca3af)" }}
           >
-            Open-source Next.js templates from the Vercel ecosystem. We wrap them with your copy
-            and deploy automatically — real React, real Vercel, no proprietary layer in between.
+            Each template is sourced from Vercel's open-source library. Pick one, fill in your
+            copy, ship.
           </p>
         </header>
         <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">

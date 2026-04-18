@@ -31,9 +31,9 @@ function Attribution({ template }: { template: Template }) {
         borderTop: "1px solid var(--attribution-border, #1f1f1f)",
       }}
     >
-      Next.js · Vercel · {template.sourceAttribution} ·{" "}
+      {template.sourceAttribution} ·{" "}
       <a href="https://nertia.ai" style={{ color: "inherit" }}>
-        deployed by nertia
+        built on nertia
       </a>
     </footer>
   );
