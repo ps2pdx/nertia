@@ -1,4 +1,5 @@
 import type { Template } from "./types";
+import { precedent } from "./precedent/template";
 
 /**
  * Template registry. Each template is a Vercel-sourced layout with declared copy slots.
@@ -8,7 +9,7 @@ import type { Template } from "./types";
  * then import + add to `templates` below.
  */
 export const templates: Record<string, Template> = {
-  // populated as templates are added
+  [precedent.id]: precedent,
 };
 
 export function getTemplate(id: string): Template | null {
