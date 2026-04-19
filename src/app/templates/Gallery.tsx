@@ -40,7 +40,7 @@ export function Gallery() {
             className="mt-4 max-w-xl text-base md:text-lg"
             style={{ color: "var(--muted, #9ca3af)" }}
           >
-            Each template is sourced from Vercel's open-source library. Pick one, fill in your
+            Each template is sourced from Vercel&apos;s open-source library. Pick one, fill in your
             copy, ship.
           </p>
         </header>
