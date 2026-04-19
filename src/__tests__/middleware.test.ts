@@ -27,18 +27,18 @@ describe("middleware", () => {
     expect(nextSpy).toHaveBeenCalled();
   });
 
-  it("rewrites subdomain to /_sites/[slug]", () => {
+  it("rewrites subdomain to /hosted/[slug]", () => {
     middleware(req("acme.nertia.ai", "/"));
     expect(rewriteSpy).toHaveBeenCalled();
     const url = rewriteSpy.mock.calls[0]![0] as URL;
-    expect(url.pathname).toBe("/_sites/acme");
+    expect(url.pathname).toBe("/hosted/acme");
   });
 
   it("rewrites subdomain preserving path", () => {
     rewriteSpy.mockClear();
     middleware(req("acme.nertia.ai", "/about"));
     const url = rewriteSpy.mock.calls[0]![0] as URL;
-    expect(url.pathname).toBe("/_sites/acme/about");
+    expect(url.pathname).toBe("/hosted/acme/about");
   });
 
   it("ignores www subdomain", () => {

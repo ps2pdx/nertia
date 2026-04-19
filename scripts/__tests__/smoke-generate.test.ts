@@ -49,8 +49,8 @@ describe("runSmoke", () => {
     expect(posted.templateId).toBe("precedent");
     expect(posted.copy["hero.headline"]).toBe(SMOKE_HEADLINE);
 
-    // Hits the local _sites path (not the wildcard host) until DNS ships
-    expect(fetchImpl.calls[1].url).toBe("http://localhost:3000/_sites/smoke-abc");
+    // Hits the local hosted path (not the wildcard host) until DNS ships
+    expect(fetchImpl.calls[1].url).toBe("http://localhost:3000/hosted/smoke-abc");
   });
 
   it("fails when the create call returns non-2xx", async () => {
@@ -108,6 +108,6 @@ describe("runSmoke", () => {
     ]);
     await runSmoke({ baseUrl: "http://localhost:3000/", fetchImpl });
     expect(fetchImpl.calls[0].url).toBe("http://localhost:3000/api/sites");
-    expect(fetchImpl.calls[1].url).toBe("http://localhost:3000/_sites/s");
+    expect(fetchImpl.calls[1].url).toBe("http://localhost:3000/hosted/s");
   });
 });

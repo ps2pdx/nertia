@@ -2,7 +2,7 @@
  * Smoke test for the site-creation flow.
  *
  *   POST {baseUrl}/api/sites  → { slug, url }
- *   GET  {baseUrl}/_sites/{slug}  → 200 + contains the seeded headline
+ *   GET  {baseUrl}/hosted/{slug}  → 200 + contains the seeded headline
  *
  * Until wildcard DNS ships, the GET hits the local rewritten path
  * instead of the production {slug}.nertia.ai URL.
@@ -68,7 +68,7 @@ export async function runSmoke(opts: SmokeOptions = {}): Promise<SmokeResult> {
     return { ok: false, reason: "create response missing slug" };
   }
 
-  const renderRes = await fetchImpl(`${baseUrl}/_sites/${created.slug}`);
+  const renderRes = await fetchImpl(`${baseUrl}/hosted/${created.slug}`);
   if (!renderRes.ok) {
     return { ok: false, reason: `render ${renderRes.status}` };
   }

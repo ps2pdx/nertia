@@ -80,7 +80,7 @@ render() {
       echo "  $(dim '○') $label $(dim "→ $path")"
     fi
   }
-  check_file "site renderer"       "src/app/_sites/[slug]/page.tsx"
+  check_file "site renderer"       "src/app/hosted/[slug]/page.tsx"
   check_file "intake form"         "src/app/generate/page.tsx"
   check_file "generator API"       "src/app/api/generate/route.ts"
   check_file "subdomain middleware" "middleware.ts"
