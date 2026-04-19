@@ -3,6 +3,7 @@ import { precedent } from "./precedent/template";
 import { portfolio } from "./portfolio/template";
 import { linkfree } from "./linkfree/template";
 import { shadcnLandingPage } from "./shadcn-landing-page/template";
+import { tailwindBlog } from "./tailwind-blog/template";
 
 /**
  * Template registry. Each template is a Vercel-sourced layout with declared copy slots.
@@ -16,6 +17,7 @@ export const templates: Record<string, Template> = {
   [portfolio.id]: portfolio,
   [shadcnLandingPage.id]: shadcnLandingPage,
   [linkfree.id]: linkfree,
+  [tailwindBlog.id]: tailwindBlog,
 };
 
 export function getTemplate(id: string): Template | null {
