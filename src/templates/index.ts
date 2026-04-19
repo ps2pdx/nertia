@@ -1,6 +1,7 @@
 import type { Template } from "./types";
 import { precedent } from "./precedent/template";
 import { portfolio } from "./portfolio/template";
+import { linkfree } from "./linkfree/template";
 import { shadcnLandingPage } from "./shadcn-landing-page/template";
 
 /**
@@ -14,6 +15,7 @@ export const templates: Record<string, Template> = {
   [precedent.id]: precedent,
   [portfolio.id]: portfolio,
   [shadcnLandingPage.id]: shadcnLandingPage,
+  [linkfree.id]: linkfree,
 };
 
 export function getTemplate(id: string): Template | null {
