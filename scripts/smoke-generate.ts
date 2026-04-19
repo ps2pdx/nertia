@@ -24,10 +24,12 @@ const PRECEDENT_COPY = {
 };
 
 const PORTFOLIO_COPY = {
-  "hero.headline": SMOKE_HEADLINE,
-  "hero.sub": "Smoke run.",
-  "hero.primaryCtaLabel": "Go",
-  "hero.primaryCtaHref": "https://example.com",
+  "hero.greeting": "Hi, I'm",
+  "hero.name": SMOKE_HEADLINE,
+  "hero.description": "Smoke-test portfolio run.",
+  "hero.avatarInitials": "ST",
+  "about.heading": "About",
+  "about.body": "Smoke-test about section content.",
 };
 
 const COPY_FIXTURES: Record<string, Record<string, string>> = {
