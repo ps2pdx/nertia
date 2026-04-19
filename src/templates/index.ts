@@ -3,6 +3,7 @@ import { precedent } from "./precedent/template";
 import { portfolio } from "./portfolio/template";
 import { linkfree } from "./linkfree/template";
 import { shadcnLandingPage } from "./shadcn-landing-page/template";
+import { samuelKraft } from "./samuel-kraft/template";
 import { tailwindBlog } from "./tailwind-blog/template";
 
 /**
@@ -18,6 +19,7 @@ export const templates: Record<string, Template> = {
   [shadcnLandingPage.id]: shadcnLandingPage,
   [linkfree.id]: linkfree,
   [tailwindBlog.id]: tailwindBlog,
+  [samuelKraft.id]: samuelKraft,
 };
 
 export function getTemplate(id: string): Template | null {
