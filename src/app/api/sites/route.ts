@@ -53,7 +53,16 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const site: Site = { slug, templateId, copy };
-  await putSite(site);
+  try {
+    await putSite(site);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[/api/sites] putSite failed:", message);
+    return NextResponse.json(
+      { error: "write failed", detail: message },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({
     slug,
