@@ -4,6 +4,30 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { CopySchemaField } from "@/templates/types";
 
+/**
+ * Fallback sample text when a field's copySchema has no placeholder.
+ * Keyed by common slot names so most templates get reasonable defaults.
+ */
+function sampleForField(key: string): string {
+  const map: Record<string, string> = {
+    "hero.headline": "A website emerges from your brief.",
+    "hero.sub": "Free. Hosted. Live in under a minute.",
+    "hero.pill": "Early access",
+    "hero.primaryCtaLabel": "Start",
+    "hero.primaryCtaHref": "https://nertia.ai",
+    "hero.secondaryCtaLabel": "Learn more",
+    "hero.secondaryCtaHref": "https://nertia.ai/about",
+    "hero.name": "Ana Mercado",
+    "hero.greeting": "Hi, I'm",
+    "hero.description": "Designer and developer based in Portland.",
+    "hero.avatarInitials": "AM",
+    "about.heading": "About",
+    "about.body":
+      "I build things that feel good — websites, brand identities, and the occasional animated loop. Currently based in Portland, available from next month.",
+  };
+  return map[key] ?? `Sample ${key}`;
+}
+
 interface IntakeFormProps {
   templateId: string;
   templateName: string;
@@ -18,6 +42,14 @@ export function IntakeForm({ templateId, templateName, copySchema }: IntakeFormP
 
   const setField = (key: string, value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
+
+  const fillSample = () => {
+    const sample: Record<string, string> = {};
+    for (const field of copySchema) {
+      sample[field.key] = field.placeholder ?? sampleForField(field.key);
+    }
+    setValues(sample);
+  };
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,19 +83,34 @@ export function IntakeForm({ templateId, templateName, copySchema }: IntakeFormP
     >
       <div className="max-w-2xl mx-auto">
         <header className="mb-10">
-          <p
-            className="text-xs uppercase tracking-[0.3em] mb-3"
-            style={{ color: "var(--accent, #00d4ff)" }}
-          >
-            {templateName}
-          </p>
-          <h1 className="text-3xl md:text-5xl tracking-tight">Fill in your copy.</h1>
-          <p
-            className="mt-3 text-sm md:text-base"
-            style={{ color: "var(--muted, #9ca3af)" }}
-          >
-            Everything you type ships into your live site. You can edit later.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p
+                className="text-xs uppercase tracking-[0.3em] mb-3"
+                style={{ color: "var(--accent, #00d4ff)" }}
+              >
+                {templateName}
+              </p>
+              <h1 className="text-3xl md:text-5xl tracking-tight">Fill in your copy.</h1>
+              <p
+                className="mt-3 text-sm md:text-base"
+                style={{ color: "var(--muted, #9ca3af)" }}
+              >
+                Everything you type ships into your live site. You can edit later.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={fillSample}
+              className="shrink-0 text-[10px] uppercase tracking-[0.2em] border px-3 py-1.5 transition-colors hover:bg-white/5"
+              style={{
+                borderColor: "var(--border, #1f1f1f)",
+                color: "var(--muted, #9ca3af)",
+              }}
+            >
+              try sample ↯
+            </button>
+          </div>
         </header>
 
         <form
