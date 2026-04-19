@@ -17,6 +17,20 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: Request): Promise<Response> {
+  try {
+    return await handlePost(req);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack?.split("\n").slice(0, 3).join(" | ") : undefined;
+    console.error("[/api/sites] unhandled:", message, stack);
+    return NextResponse.json(
+      { error: "server error", detail: message, stack },
+      { status: 500 },
+    );
+  }
+}
+
+async function handlePost(req: Request): Promise<Response> {
   let json: unknown;
   try {
     json = await req.json();
