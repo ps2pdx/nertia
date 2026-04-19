@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Space_Mono } from "next/font/google";
 import Script from "next/script";
-import Header from "@/components/Header";
 import Providers from "@/components/Providers";
 import "./globals.css";
 
@@ -17,21 +16,20 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nertia | Brand Systems Studio",
-  description: "Technical product marketing and brand systems. Strategy, design, and code—built by Scott Campbell.",
-  keywords: ["brand systems", "technical marketing", "web development", "product marketing", "AI infrastructure"],
-  authors: [{ name: "Scott Campbell" }],
+  title: "Nertia — A zero-point website generator",
+  description: "Brief in, website out. Free, hosted, live in under a minute.",
+  keywords: ["ai website generator", "website builder", "zero-point", "free website", "instant website"],
   openGraph: {
-    title: "Nertia — Brand Systems Studio",
-    description: "Positioning, identity systems, and production code for companies that refuse to stand still.",
+    title: "Nertia — A zero-point website generator",
+    description: "Brief in, website out. Free, hosted, live in under a minute.",
     url: "https://nertia.ai",
     siteName: "Nertia",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nertia — Brand Systems Studio",
-    description: "Positioning, identity systems, and production code for companies that refuse to stand still.",
+    title: "Nertia — A zero-point website generator",
+    description: "Brief in, website out. Free, hosted, live in under a minute.",
   },
 };
 
@@ -56,11 +54,8 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body
-        className={`${geistSans.variable} ${spaceMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${spaceMono.variable} antialiased`}>
         <Providers>
-          <Header />
           {children}
         </Providers>
       </body>

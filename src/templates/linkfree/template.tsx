@@ -1,0 +1,65 @@
+import type { Template } from "@/templates/types";
+import { Layout } from "./Layout";
+
+export const linkfree: Template = {
+  id: "linkfree",
+  displayName: "Linkfree",
+  description:
+    "Single-page link-in-bio: avatar, name, tagline, optional bio, and a stack of pill-button links. Dark, centered, mobile-first.",
+  sourceUrl: "https://github.com/EddieJaoudeCommunity/LinkFree",
+  sourceAttribution: "template sourced from vercel · linkfree",
+  license: "MIT",
+  tags: ["bio", "links", "creator", "personal", "mobile"],
+  Layout,
+  copySchema: [
+    {
+      key: "profile.name",
+      label: "Display name",
+      type: "text",
+      placeholder: "Sam Rivera",
+      required: true,
+      maxLength: 40,
+    },
+    {
+      key: "profile.tagline",
+      label: "Tagline",
+      type: "text",
+      placeholder: "designer / dev",
+      required: true,
+      maxLength: 60,
+    },
+    {
+      key: "profile.avatarInitials",
+      label: "Avatar initials",
+      type: "text",
+      placeholder: "SR",
+      required: true,
+      maxLength: 3,
+    },
+    {
+      key: "profile.bio",
+      label: "Bio (optional, 1–2 sentences)",
+      type: "textarea",
+      placeholder:
+        "Independent designer and engineer building small useful things.",
+      required: false,
+      maxLength: 280,
+    },
+    { key: "link.1.label", label: "Link 1 label", type: "text", placeholder: "Personal site", maxLength: 40 },
+    { key: "link.1.href", label: "Link 1 URL", type: "text", placeholder: "https://example.com" },
+    { key: "link.2.label", label: "Link 2 label", type: "text", placeholder: "Newsletter", maxLength: 40 },
+    { key: "link.2.href", label: "Link 2 URL", type: "text", placeholder: "https://example.com/newsletter" },
+    { key: "link.3.label", label: "Link 3 label", type: "text", placeholder: "GitHub", maxLength: 40 },
+    { key: "link.3.href", label: "Link 3 URL", type: "text", placeholder: "https://github.com/you" },
+    { key: "link.4.label", label: "Link 4 label (optional)", type: "text", maxLength: 40 },
+    { key: "link.4.href", label: "Link 4 URL (optional)", type: "text" },
+    { key: "link.5.label", label: "Link 5 label (optional)", type: "text", maxLength: 40 },
+    { key: "link.5.href", label: "Link 5 URL (optional)", type: "text" },
+    { key: "link.6.label", label: "Link 6 label (optional)", type: "text", maxLength: 40 },
+    { key: "link.6.href", label: "Link 6 URL (optional)", type: "text" },
+    { key: "link.7.label", label: "Link 7 label (optional)", type: "text", maxLength: 40 },
+    { key: "link.7.href", label: "Link 7 URL (optional)", type: "text" },
+    { key: "link.8.label", label: "Link 8 label (optional)", type: "text", maxLength: 40 },
+    { key: "link.8.href", label: "Link 8 URL (optional)", type: "text" },
+  ],
+};
