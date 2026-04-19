@@ -24,7 +24,7 @@ export function middleware(req: NextRequest | Request) {
 
     const url = new URL((req as NextRequest).url ?? `https://${host}/`);
     const rewriteUrl = new URL(url.toString());
-    rewriteUrl.pathname = `/_sites/${slug}${url.pathname === "/" ? "" : url.pathname}`;
+    rewriteUrl.pathname = `/hosted/${slug}${url.pathname === "/" ? "" : url.pathname}`;
     return NextResponse.rewrite(rewriteUrl);
   }
 
