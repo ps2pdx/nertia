@@ -14,10 +14,18 @@ function initAdmin(): App {
     throw new Error("NEXT_PUBLIC_FIREBASE_DATABASE_URL is required for firebase-admin");
   }
 
+  // Prefer base64 on Vercel (avoids env-var newline mangling in private_key)
+  const credB64 = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
   const credJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (credJson) {
+  let credObject: Record<string, unknown> | null = null;
+  if (credB64) {
+    credObject = JSON.parse(Buffer.from(credB64, "base64").toString("utf-8"));
+  } else if (credJson) {
+    credObject = JSON.parse(credJson);
+  }
+  if (credObject) {
     app = initializeApp({
-      credential: cert(JSON.parse(credJson)),
+      credential: cert(credObject as Parameters<typeof cert>[0]),
       databaseURL,
     });
   } else {
