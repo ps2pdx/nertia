@@ -38,6 +38,31 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
     setStep("q2");
   }
 
+  async function imagineBrand() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/intake/imagine", { method: "POST" });
+      if (!res.ok) throw new Error("imagination failed");
+      const data = (await res.json()) as { brandContext: BrandContext };
+      setCtx(data.brandContext);
+      // skip straight to emerge round 1 with the imagined context
+      const emergeRes = await fetch("/api/intake/emerge", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ brandContext: data.brandContext, round: 1 }),
+      });
+      if (!emergeRes.ok) throw new Error("failed to load variants");
+      const emergeData = (await emergeRes.json()) as { variants: ThemeVariant[] };
+      setRound1Variants(emergeData.variants);
+      setStep("emerge1");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleQ2(value: string) {
     setCtx((p) => ({ ...p, audience: value }));
     setStep("q3");
@@ -185,13 +210,31 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
         )}
 
         {step === "q1" && (
-          <QuestionCard
-            eyebrow="Q1 · PURPOSE"
-            question="What's this website for, in one sentence?"
-            onSubmit={handleQ1}
-            placeholder="e.g. A film-wedding photographer's portfolio."
-            multiline
-          />
+          <>
+            <QuestionCard
+              eyebrow="Q1 · PURPOSE"
+              question="What's this website for, in one sentence?"
+              onSubmit={handleQ1}
+              placeholder="e.g. A film-wedding photographer's portfolio."
+              multiline
+              busy={busy}
+            />
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={imagineBrand}
+                disabled={busy}
+                className="text-xs uppercase tracking-[0.2em] border-b transition-colors hover:opacity-80 disabled:opacity-40"
+                style={{
+                  color: "#9ca3af",
+                  borderColor: "#1f1f1f",
+                  paddingBottom: 2,
+                }}
+              >
+                {busy ? "imagining…" : "or ↯ imagine a brand to try"}
+              </button>
+            </div>
+          </>
         )}
 
         {step === "q2" && (
