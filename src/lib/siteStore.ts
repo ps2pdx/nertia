@@ -49,3 +49,18 @@ export async function slugIsTaken(slug: string): Promise<boolean> {
   const snap = await getAdminDb().ref(`sites/${slug}`).get();
   return snap.exists();
 }
+
+/**
+ * Persist the brand context + theme variant alongside a site under
+ * `siteBrands/{slug}`. Used by the Emerge intake to keep the derived
+ * BrandSystem retrievable after site creation.
+ */
+export async function putSiteBrand(
+  slug: string,
+  data: unknown,
+): Promise<void> {
+  const now = Date.now();
+  await getAdminDb()
+    .ref(`siteBrands/${slug}`)
+    .set({ ...(data as object), createdAt: now, updatedAt: now });
+}

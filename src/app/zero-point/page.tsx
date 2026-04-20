@@ -7,8 +7,8 @@ export default function Home() {
         eyebrow="ZERO-POINT"
         headline="A website emerges from your brief."
         sub="Free. Hosted. Live in under a minute."
-        ctaLabel="Pick a template"
-        ctaHref="/templates"
+        ctaLabel="Begin"
+        ctaHref="/intake/zero-point"
       />
     </main>
   );
