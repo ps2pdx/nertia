@@ -104,6 +104,30 @@ function AdminZeroPointInner() {
                 </div>
             )}
 
+            <section className="mb-12">
+                <h2 className="text-xs tracking-[0.2em] uppercase text-muted mb-4">Quick links</h2>
+                <ul className="text-sm flex flex-wrap gap-x-6 gap-y-2">
+                    <li>
+                        <Link href="/intake/zero-point" className="text-[var(--accent)] hover:underline">
+                            /intake/zero-point
+                        </Link>
+                        <span className="text-muted"> — walk the generator flow</span>
+                    </li>
+                    <li>
+                        <Link href="/zero-point" className="text-[var(--accent)] hover:underline">
+                            /zero-point
+                        </Link>
+                        <span className="text-muted"> — public early-access landing</span>
+                    </li>
+                    <li>
+                        <Link href="/design-system" className="text-[var(--accent)] hover:underline">
+                            /design-system
+                        </Link>
+                        <span className="text-muted"> — component catalogue</span>
+                    </li>
+                </ul>
+            </section>
+
             {data === null ? (
                 <p className="text-muted text-sm">Loading…</p>
             ) : (
@@ -208,38 +232,6 @@ function AdminZeroPointInner() {
                         )}
                     </section>
 
-                    <section>
-                        <h2 className="text-xl font-bold mb-4">Quick links</h2>
-                        <ul className="text-sm space-y-2">
-                            <li>
-                                <Link
-                                    href="/intake/zero-point"
-                                    className="text-[var(--accent)] hover:underline"
-                                >
-                                    /intake/zero-point
-                                </Link>
-                                <span className="text-muted"> — walk the generator flow</span>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/zero-point"
-                                    className="text-[var(--accent)] hover:underline"
-                                >
-                                    /zero-point
-                                </Link>
-                                <span className="text-muted"> — public early-access landing</span>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/design-system"
-                                    className="text-[var(--accent)] hover:underline"
-                                >
-                                    /design-system
-                                </Link>
-                                <span className="text-muted"> — component catalogue</span>
-                            </li>
-                        </ul>
-                    </section>
                 </div>
             )}
         </main>
