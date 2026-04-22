@@ -120,8 +120,45 @@ USE_DEMO_MODE              # bypasses real generation, useful in tests
 
 Run `/zp-init` to load current project state, check the active branch, and surface what's in flight. Define in `.claude/commands/zp-init.md` — keep it up to date as the project evolves.
 
+## Branching + PR policy (binds agents)
+
+**Agents never commit to `main` directly.** Every unit of work — a feature, a fix, a refactor, a docs change — lands on its own branch and ships via a pull request that Scott reviews and merges.
+
+This matters because `main` deploys to Vercel automatically, multiple agent sessions may run concurrently in different tabs, and direct-to-main pushes have caused regressions + merge conflicts during this project's history. Branches + PRs keep agents out of each other's way and give Scott an approval gate.
+
+**At session start, verify your branch:**
+```
+git rev-parse --abbrev-ref HEAD
+```
+If it reports `main`, branch immediately before any commit:
+```
+git checkout -b <type>/<kebab-topic>
+```
+
+**Branch naming** (lowercase, hyphenated):
+- `feature/<topic>` — new capability
+- `fix/<topic>` — bug or regression
+- `refactor/<topic>` — internal change, no user-visible behavior delta
+- `docs/<topic>` — docs-only (spec, plan, CLAUDE.md)
+- `chore/<topic>` — dependency bumps, cleanup, tooling
+- `spec/<topic>` + `plan/<topic>` — when the only artifact is a `docs/superpowers/specs/...` or `docs/superpowers/plans/...` file
+
+**Multi-phase plans stay on one branch.** If an implementation plan has 5 phases, all 5 land as commits on the same branch, then one PR for the whole thing. Don't open a PR per phase.
+
+**PRs open via `gh pr create`** using the format in this file's commit-message guidance. The body explains what changed and why; the title is scoped-prefix + one-line summary. Do not merge your own PRs — Scott merges.
+
+**Concurrent agent sessions** (e.g. zero-point intake in one tab, notepad publishing in another): each session owns its own branch. Before editing a file, check `git log -1 --pretty=format:'%h %s' -- <path>` to see if the other session touched it recently; if so, either coordinate via Scott or rebase your branch onto main after their PR merges.
+
+**Exceptions — agents may push to `main` only when:**
+- Scott explicitly says "push to main" or "skip the PR" for this task
+- A prior PR merged, and the agent is pulling main into its own workspace (not committing to main)
+- A merge conflict fix on an already-open PR requires a force-push to the PR branch (not main)
+
+**Scott's own terminal commits to main remain his call** — this policy binds agents, not humans.
+
 ## Things to never do
 
+- **Commit to `main` as an agent.** Always branch + PR (see Branching + PR policy above).
 - Introduce Supabase (we use Firebase).
 - Recycle zen-holo / particles / blender assets into nertia templates.
 - Ship raw free React templates from the reference library as-is.
