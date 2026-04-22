@@ -1,11 +1,10 @@
 /**
  * Curated library of BrandContext presets. Powers the "↯ imagine a brand to try"
- * button on the intake — the user can skip Q1-Q5 and drop into emerge with a
+ * button on the intake — the user can skip the form and drop into emerge with a
  * fully-populated example.
  *
  * No LLM, no randomness state that would make this non-deterministic across
- * restarts. The route picks one via Math.random per-request, which is fine:
- * the library itself is deterministic and curated.
+ * restarts. The route picks one via Math.random per-request.
  */
 import type { BrandContext } from "./brandContext";
 
@@ -13,173 +12,172 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A film-wedding photographer's portfolio — book weddings in Oaxaca, Portugal, and Kyoto.",
-        audience:
-            "Couples planning intimate destination weddings, art directors scouting for editorial features.",
-        vibeWords: ["warm", "unhurried", "cinematic"],
-        adaptive: [
+        vibes: ["warm", "cinematic"],
+        handles: [
             {
-                question: "Name three brands whose websites you respect.",
-                answer:
-                    "Kinfolk for the generous whitespace, Cereal for editorial trust, Craig Mod for the writing-forward quiet.",
+                platform: "instagram",
+                handle: "sofiafilmwedding",
+                url: "https://instagram.com/sofiafilmwedding",
             },
             {
-                question: "If a visitor leaves your site remembering one feeling, what should it be?",
-                answer: "That time slows down when they look at the images.",
+                platform: "site",
+                handle: "sofiafilm.com",
+                url: "https://sofiafilm.com",
             },
         ],
     },
     {
         purpose:
             "An indie dev tool — a debugger that shows causality, not stack traces, for distributed systems.",
-        audience:
-            "Senior backend engineers and SREs tired of grepping observability dashboards.",
-        vibeWords: ["technical", "quiet", "rigorous"],
-        adaptive: [
+        vibes: ["technical", "quiet"],
+        handles: [
             {
-                question: "Name three products whose surface you respect.",
-                answer:
-                    "Linear for keyboard density, Warp for showing not telling, TigerBeetle docs for owning the deep end.",
+                platform: "github",
+                handle: "causalproj",
+                url: "https://github.com/causalproj",
             },
             {
-                question: "What word should a reader use to describe you after the homepage?",
-                answer: "Credible.",
+                platform: "twitter",
+                handle: "causalproj",
+                url: "https://twitter.com/causalproj",
             },
         ],
     },
     {
         purpose:
             "A solo coach's landing page — somatic coaching for people rebuilding pace after burnout.",
-        audience:
-            "Newly-diagnosed ADHD adults, quietly spiraling managers, people tired of optimizing themselves.",
-        vibeWords: ["warm", "grounded", "honest"],
-        adaptive: [
+        vibes: ["warm", "grounded"],
+        handles: [
             {
-                question: "A brand whose voice you'd borrow a spoonful of.",
-                answer: "Mitchyll — warm, personal, not trying to optimize you.",
+                platform: "instagram",
+                handle: "restedcoach",
+                url: "https://instagram.com/restedcoach",
             },
             {
-                question: "Someone lands here at 2am. What should they feel?",
-                answer: "That they're allowed to put the phone down.",
+                platform: "substack",
+                handle: "restedcoach",
+                url: "https://restedcoach.substack.com",
             },
         ],
     },
     {
         purpose:
             "A 24-seat tasting-menu restaurant in Portland focused on fermented Pacific Northwest produce.",
-        audience:
-            "Food-obsessed diners, couples planning anniversary meals, food writers at Bon Appétit and Eater.",
-        vibeWords: ["considered", "intimate", "crafted"],
-        adaptive: [
+        vibes: ["editorial", "minimal"],
+        handles: [
             {
-                question: "A restaurant whose website made you book a flight.",
-                answer: "Noma — the typography alone made it feel like a museum visit.",
-            },
-            {
-                question: "What should someone feel after reading the homepage?",
-                answer: "That there will be a thought behind every plate.",
+                platform: "instagram",
+                handle: "feralferments",
+                url: "https://instagram.com/feralferments",
             },
         ],
     },
     {
         purpose:
             "A two-person experimental game studio making deliberately unmarketable short games.",
-        audience:
-            "Weird-game enthusiasts, itch.io scroll-browsers, festival jurors, IGF voters.",
-        vibeWords: ["playful", "honest", "abrasive"],
-        adaptive: [
+        vibes: ["playful", "weird"],
+        handles: [
             {
-                question: "Three studios whose sites feel right.",
-                answer: "MSCHF for audacity, increpare for zero-frills, itch.io for refusing to be a store.",
+                platform: "twitter",
+                handle: "antgames",
+                url: "https://twitter.com/antgames",
             },
             {
-                question: "What should someone feel after five seconds?",
-                answer: "Slightly suspicious — in a good way.",
+                platform: "site",
+                handle: "antgames.itch.io",
+                url: "https://antgames.itch.io",
             },
         ],
     },
     {
         purpose: "Field notes from a one-person newsletter about product craft and technical writing.",
-        audience:
-            "Staff engineers, PMs who write, indie makers who care about how things read.",
-        vibeWords: ["editorial", "warm", "slow"],
-        adaptive: [
+        vibes: ["editorial", "quiet"],
+        handles: [
             {
-                question: "Three writers whose sites feel like the writing.",
-                answer: "Craig Mod for the column widths, Anna Havron for pacing, Robin Rendle for atmosphere.",
+                platform: "substack",
+                handle: "fieldnotes",
+                url: "https://fieldnotes.substack.com",
             },
             {
-                question: "What should a reader feel after one post?",
-                answer: "Like they'd read the next one too.",
+                platform: "twitter",
+                handle: "fieldnoteswrite",
+                url: "https://twitter.com/fieldnoteswrite",
             },
         ],
     },
     {
         purpose: "Link-in-bio for an electronic musician about to drop a first EP.",
-        audience: "Fans, bookers, labels, curious new listeners from TikTok.",
-        vibeWords: ["moody", "atmospheric", "dark"],
-        adaptive: [
+        vibes: ["moody", "bold"],
+        handles: [
             {
-                question: "Three artist sites whose design felt right.",
-                answer: "Arca for tension, Jlin for restraint, Jon Hopkins for the quiet authority.",
+                platform: "instagram",
+                handle: "orbit.sounds",
+                url: "https://instagram.com/orbit.sounds",
             },
             {
-                question: "What should the page feel like at first glance?",
-                answer: "Like walking into a room after the show has started.",
+                platform: "tiktok",
+                handle: "orbit.sounds",
+                url: "https://tiktok.com/@orbit.sounds",
+            },
+            {
+                platform: "youtube",
+                handle: "orbitsounds",
+                url: "https://youtube.com/@orbitsounds",
+            },
+            {
+                platform: "link",
+                handle: "open.spotify.com/artist/orbit",
+                url: "https://open.spotify.com/artist/orbit",
             },
         ],
     },
     {
         purpose:
             "A small open-source sustainability API — measure embedded carbon from supply-chain metadata.",
-        audience:
-            "Climate-software engineers, sustainability leads at mid-size companies, open-source contributors.",
-        vibeWords: ["technical", "earthy", "open-source"],
-        adaptive: [
+        vibes: ["technical", "grounded"],
+        handles: [
             {
-                question: "Three docs sites you trust.",
-                answer: "Stripe for clarity, Cloudflare for depth, Rust's book for pedagogical pace.",
+                platform: "github",
+                handle: "carbonapi",
+                url: "https://github.com/carbonapi",
             },
             {
-                question: "What should a developer feel after the hero?",
-                answer: "This is real infra, not marketing.",
+                platform: "site",
+                handle: "carbonapi.dev",
+                url: "https://carbonapi.dev",
             },
         ],
     },
     {
         purpose: "Portfolio for a technical product marketing consultant and brand systems designer.",
-        audience: "Founders of design-forward engineering teams who need messaging + identity together.",
-        vibeWords: ["technical", "warm", "considered"],
-        adaptive: [
+        vibes: ["technical", "warm"],
+        handles: [
             {
-                question: "Who's doing this kind of work well?",
-                answer: "Mule for the positioning rigor, Ueno for the craft, Figma's brand team for the voice.",
+                platform: "twitter",
+                handle: "scottsuper",
+                url: "https://twitter.com/scottsuper",
             },
             {
-                question: "What should a founder feel after reading the site?",
-                answer: "That I'd understand their product quickly and not waste their time.",
+                platform: "linkedin",
+                handle: "scottsuper",
+                url: "https://www.linkedin.com/in/scottsuper",
             },
         ],
     },
     {
         purpose:
             "An architecture studio's portfolio — residential interiors in the Pacific Northwest.",
-        audience:
-            "Homeowners planning remodels, architects looking for a collaborator, design editors.",
-        vibeWords: ["minimal", "neutral", "architect"],
-        adaptive: [
+        vibes: ["minimal", "clean"],
+        handles: [
             {
-                question: "Three studio sites that feel like the work.",
-                answer: "Herbert Lewis Kruse Blunck for restraint, Murcutt for quiet confidence, Dezeen's featured editorial.",
-            },
-            {
-                question: "What should a homeowner feel visiting?",
-                answer: "That the studio listens before drawing.",
+                platform: "instagram",
+                handle: "stoneandgrain",
+                url: "https://instagram.com/stoneandgrain",
             },
         ],
     },
 ];
 
-/** Pseudo-random preset for the "imagine" button. */
 export function randomPreset(): BrandContext {
     return presetBrands[Math.floor(Math.random() * presetBrands.length)];
 }
