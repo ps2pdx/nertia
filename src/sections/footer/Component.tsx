@@ -3,6 +3,9 @@ import type { SectionProps } from "../types";
 export function Component({ copy }: SectionProps) {
     const wordmark = copy.wordmark ?? "";
     const tagline = copy.tagline ?? "";
+    const links = [1, 2, 3]
+        .map((i) => ({ label: copy[`link${i}Label`], href: copy[`link${i}Href`] }))
+        .filter((l) => l.label && l.href);
 
     return (
         <section
@@ -33,6 +36,24 @@ export function Component({ copy }: SectionProps) {
                     </p>
                 )}
             </div>
+            {links.length > 0 && (
+                <div
+                    className="max-w-3xl mx-auto mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm"
+                    style={{ fontFamily: "var(--token-font-body)" }}
+                >
+                    {links.map((l, i) => (
+                        <a
+                            key={i}
+                            href={l.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "var(--token-accent)" }}
+                        >
+                            {l.label} ↗
+                        </a>
+                    ))}
+                </div>
+            )}
         </section>
     );
 }
