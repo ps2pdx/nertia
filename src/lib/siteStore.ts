@@ -1,10 +1,15 @@
 import { getAdminDb } from "@/lib/firebaseAdmin";
-import { SiteSchema, type Site } from "@/templates/types";
+import {
+  CompositionSiteSchema,
+  LegacySiteSchema,
+  isCompositionSite,
+  type AnySite,
+} from "@/lib/siteShapes";
 
 /**
  * Firebase Realtime DB forbids `.`, `#`, `$`, `/`, `[`, `]` in keys.
- * Our copy-slot keys use dots (e.g. "hero.headline") so we transform
- * at the storage boundary only.
+ * Our copy-slot keys use dots (e.g. "hero.headline" or "hero-1.headline")
+ * so we transform at the storage boundary only.
  */
 const DOT_ESCAPE = "__";
 
@@ -24,22 +29,37 @@ function decodeCopyKeys(copy: Record<string, string>): Record<string, string> {
   return out;
 }
 
-export async function getSite(slug: string): Promise<Site | null> {
+/**
+ * Returns either a legacy template-keyed site or a composition-keyed site.
+ * Callers should type-narrow with isCompositionSite / isLegacySite from
+ * siteShapes.
+ */
+export async function getSite(slug: string): Promise<AnySite | null> {
   const snap = await getAdminDb().ref(`sites/${slug}`).get();
   if (!snap.exists()) return null;
-  const raw = snap.val() as Site;
-  const decoded: Site = { ...raw, copy: decodeCopyKeys(raw.copy ?? {}) };
-  return SiteSchema.parse(decoded);
+  const raw = snap.val() as Record<string, unknown>;
+  const rawCopy = (raw.copy as Record<string, string> | undefined) ?? {};
+  const decoded = { ...raw, copy: decodeCopyKeys(rawCopy) };
+
+  // Discriminate by presence of composition vs templateId
+  if ("composition" in decoded && decoded.composition) {
+    return CompositionSiteSchema.parse(decoded);
+  }
+  return LegacySiteSchema.parse(decoded);
 }
 
-export async function putSite(site: Site): Promise<Site> {
+export async function putSite(site: AnySite): Promise<AnySite> {
   const now = Date.now();
-  const next: Site = {
+  const next: AnySite = {
     ...site,
     createdAt: site.createdAt ?? now,
     updatedAt: now,
   };
-  SiteSchema.parse(next);
+  if (isCompositionSite(next)) {
+    CompositionSiteSchema.parse(next);
+  } else {
+    LegacySiteSchema.parse(next);
+  }
   const storable = { ...next, copy: encodeCopyKeys(next.copy) };
   await getAdminDb().ref(`sites/${next.slug}`).set(storable);
   return next;
