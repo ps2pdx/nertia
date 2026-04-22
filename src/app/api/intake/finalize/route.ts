@@ -12,13 +12,16 @@ export const dynamic = "force-dynamic";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_NERTIA_DOMAIN ?? "nertia.ai";
 
+const HandleSchema = z.object({
+    platform: z.string(),
+    handle: z.string(),
+    url: z.string(),
+});
+
 const BrandContextSchema = z.object({
     purpose: z.string().optional(),
-    audience: z.string().optional(),
-    vibeWords: z.array(z.string()).optional(),
-    adaptive: z.array(
-        z.object({ question: z.string(), answer: z.string() }),
-    ),
+    vibes: z.array(z.string()).optional(),
+    handles: z.array(HandleSchema).optional(),
 });
 
 const BodySchema = z.object({

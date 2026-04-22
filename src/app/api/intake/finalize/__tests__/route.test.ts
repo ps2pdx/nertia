@@ -42,9 +42,14 @@ const sampleVariant = {
 
 const sampleBrandContext = {
     purpose: "A landing page for a SaaS product.",
-    audience: "Founders",
-    vibeWords: ["technical", "clean"],
-    adaptive: [{ question: "voice?", answer: "direct" }],
+    vibes: ["technical", "clean"],
+    handles: [
+        {
+            platform: "twitter",
+            handle: "saasco",
+            url: "https://twitter.com/saasco",
+        },
+    ],
 };
 
 describe("/api/intake/finalize", () => {

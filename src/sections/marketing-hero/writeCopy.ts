@@ -4,11 +4,12 @@ import { firstSentence } from "../copyHelpers";
 
 export const writeCopy: SectionWriteCopy = (ctx) => {
     const purpose = ctx.purpose ?? "";
+    const vibes = ctx.vibes ?? [];
     return {
         headline: purpose
             ? humanize(firstSentence(purpose))
             : "Something worth your attention.",
-        sub: ctx.audience ? `For ${ctx.audience}.` : "",
+        sub: vibes.length > 0 ? vibes.join(" · ") : "",
         ctaLabel: "Begin",
         ctaHref: "#",
     };
