@@ -2,13 +2,15 @@ import Link from 'next/link';
 import { getAllPosts } from '@/lib/blog';
 import PageTemplate from '@/components/PageTemplate';
 
+export const revalidate = 60;
+
 export const metadata = {
   title: 'Blog | Nertia',
   description: 'Field notes and writing from Scott Campbell at Nertia.',
 };
 
-export default function BlogIndex() {
-  const posts = getAllPosts();
+export default async function BlogIndex() {
+  const posts = await getAllPosts();
   return (
     <PageTemplate>
       <div className="max-w-3xl mx-auto px-6 py-24">
@@ -18,6 +20,7 @@ export default function BlogIndex() {
           {posts.map(post => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="group block rounded-lg border border-[var(--card-border)] hover:border-[var(--accent)] transition overflow-hidden">
               {post.hero && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={post.hero} alt={post.title} className="w-full aspect-video object-cover" />
               )}
               <div className="p-6">

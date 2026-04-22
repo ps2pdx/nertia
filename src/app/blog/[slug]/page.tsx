@@ -2,16 +2,18 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { getAllPosts, getPostBySlug } from '@/lib/blog';
+import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import PageTemplate from '@/components/PageTemplate';
 
-export async function generateStaticParams() {
-  return getAllPosts().map(post => ({ slug: post.slug }));
+export const revalidate = 60;
+
+interface Props {
+  params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return { title: 'Not Found' };
   return {
     title: `${post.title} | Nertia`,
@@ -21,9 +23,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateStaticParams() {
+  try {
+    const posts = await getAllPosts();
+    return posts.map(post => ({ slug: post.slug }));
+  } catch {
+    return [];
+  }
+}
+
+export default async function BlogPost({ params }: Props) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
   return (
     <PageTemplate>
@@ -36,6 +47,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </div>
         <h1 className="text-4xl md:text-5xl font-bold mb-8">{post.title}</h1>
         {post.hero && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={post.hero} alt={post.title} className="w-full rounded-lg mb-10 border border-[var(--card-border)]" />
         )}
         <div className="prose prose-invert max-w-none prose-headings:font-semibold prose-p:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)]">
