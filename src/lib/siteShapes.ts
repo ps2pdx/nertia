@@ -8,31 +8,6 @@
 import { z } from "zod";
 import { SiteSchema, type Site as LegacySiteType } from "@/templates/types";
 
-/** 6-color palette. Matches the ThemePalette shape used in the emerge flow. */
-export const PaletteSchema = z.object({
-    bg: z.string(),
-    fg: z.string(),
-    muted: z.string(),
-    accent: z.string(),
-    headingStart: z.string(),
-    headingEnd: z.string(),
-});
-export type Palette = z.infer<typeof PaletteSchema>;
-
-/** Heading + body font-family strings, CSS-ready. */
-export const FontPairSchema = z.object({
-    heading: z.string(),
-    body: z.string(),
-});
-export type FontPair = z.infer<typeof FontPairSchema>;
-
-/** Design tokens carried alongside a site. */
-export const TokensSchema = z.object({
-    palette: PaletteSchema,
-    fontPair: FontPairSchema,
-});
-export type Tokens = z.infer<typeof TokensSchema>;
-
 /**
  * One section rendered inside a composition.
  * `id` references the sections registry; `instanceId` is unique per
@@ -62,11 +37,15 @@ export type LegacySite = LegacySiteType;
 /**
  * New composition-keyed site. `copy` is keyed by `{instanceId}.{slotKey}`
  * so slot keys can collide across section instances (e.g. two "hero" sections).
+ *
+ * `brandColor` is the user's single aesthetic input — injected at the hosted
+ * site wrapper as `--accent`. Dark/light mode and all other design tokens
+ * cascade from nertia's globals.css.
  */
 export const CompositionSiteSchema = z.object({
     slug: z.string().min(1),
     composition: CompositionInstanceSchema,
-    tokens: TokensSchema,
+    brandColor: z.string(),
     copy: z.record(z.string(), z.string()),
     createdAt: z.number().optional(),
     updatedAt: z.number().optional(),

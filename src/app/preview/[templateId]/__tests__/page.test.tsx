@@ -111,47 +111,4 @@ describe("/preview/[templateId]", () => {
     expect(site.slug).toMatch(/preview/i);
   });
 
-  it("injects CSS variables into a style tag when ?v= is a valid theme token", async () => {
-    const { encodeTheme } = await import("@/lib/brandContext");
-    const variant = {
-      id: "test-1",
-      label: "test",
-      palette: {
-        bg: "#111111",
-        fg: "#eeeeee",
-        muted: "#888888",
-        accent: "#00ffaa",
-        headingStart: "#ffffff",
-        headingEnd: "#aaaaaa",
-      },
-      fontPair: { heading: "'Fraunces', serif", body: "'Inter', sans-serif" },
-    };
-    const v = encodeTheme(variant);
-    mockGetTemplate.mockReturnValue(
-      makeTemplate([{ key: "hero.headline", label: "Headline", type: "text", placeholder: "x" }]),
-    );
-    const ui = await PreviewPage({
-      params: Promise.resolve({ templateId: "fake" }),
-      searchParams: Promise.resolve({ v }),
-    });
-    const { container } = render(ui);
-    const style = container.querySelector("style");
-    expect(style).not.toBeNull();
-    const css = style?.textContent ?? "";
-    expect(css).toContain("--hero-bg:#111111");
-    expect(css).toContain("--hero-accent:#00ffaa");
-    expect(css).toContain("--hero-font-heading:'Fraunces', serif");
-  });
-
-  it("ignores invalid ?v= tokens and renders defaults without a style tag", async () => {
-    mockGetTemplate.mockReturnValue(
-      makeTemplate([{ key: "hero.headline", label: "Headline", type: "text", placeholder: "x" }]),
-    );
-    const ui = await PreviewPage({
-      params: Promise.resolve({ templateId: "fake" }),
-      searchParams: Promise.resolve({ v: "not-a-real-token!!!" }),
-    });
-    const { container } = render(ui);
-    expect(container.querySelector("style")).toBeNull();
-  });
 });

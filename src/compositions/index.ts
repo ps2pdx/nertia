@@ -55,4 +55,23 @@ export function pickComposition(ctx: BrandContext): CompositionDef {
     return best;
 }
 
+/**
+ * Returns up to n top-scoring compositions for emerge round. Used to let
+ * users pick structure (marketing vs portfolio vs blog vs linkinbio vs docs).
+ * First item is the same as pickComposition(ctx).
+ */
+export function pickTopCompositions(ctx: BrandContext, n = 3): CompositionDef[] {
+    const handles = ctx.handles ?? [];
+    const hasSite = handles.some((h) => h.platform === "site");
+    if (handles.length >= 3 && !hasSite) {
+        const others = listCompositions().filter((c) => c.id !== linkinbio.id);
+        return [linkinbio, ...others].slice(0, n);
+    }
+    const tokens = ctxTokens(ctx);
+    const scored = listCompositions()
+        .map((c) => ({ c, score: scoreTags(c.tags, tokens) }))
+        .sort((a, b) => b.score - a.score);
+    return scored.slice(0, n).map((s) => s.c);
+}
+
 export type { CompositionDef } from "./types";

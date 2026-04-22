@@ -12,7 +12,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A film-wedding photographer's portfolio — book weddings in Oaxaca, Portugal, and Kyoto.",
-        vibes: ["warm", "cinematic"],
+        brandColor: "#f97316",
         handles: [
             {
                 platform: "instagram",
@@ -29,7 +29,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "An indie dev tool — a debugger that shows causality, not stack traces, for distributed systems.",
-        vibes: ["technical", "quiet"],
+        brandColor: "#3b82f6",
         handles: [
             {
                 platform: "github",
@@ -46,7 +46,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A solo coach's landing page — somatic coaching for people rebuilding pace after burnout.",
-        vibes: ["warm", "grounded"],
+        brandColor: "#16a34a",
         handles: [
             {
                 platform: "instagram",
@@ -63,7 +63,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A 24-seat tasting-menu restaurant in Portland focused on fermented Pacific Northwest produce.",
-        vibes: ["editorial", "minimal"],
+        brandColor: "#b04a2e",
         handles: [
             {
                 platform: "instagram",
@@ -75,7 +75,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A two-person experimental game studio making deliberately unmarketable short games.",
-        vibes: ["playful", "weird"],
+        brandColor: "#d946ef",
         handles: [
             {
                 platform: "twitter",
@@ -91,7 +91,7 @@ export const presetBrands: BrandContext[] = [
     },
     {
         purpose: "Field notes from a one-person newsletter about product craft and technical writing.",
-        vibes: ["editorial", "quiet"],
+        brandColor: "#c2410c",
         handles: [
             {
                 platform: "substack",
@@ -107,7 +107,7 @@ export const presetBrands: BrandContext[] = [
     },
     {
         purpose: "Link-in-bio for an electronic musician about to drop a first EP.",
-        vibes: ["moody", "bold"],
+        brandColor: "#a855f7",
         handles: [
             {
                 platform: "instagram",
@@ -134,7 +134,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "A small open-source sustainability API — measure embedded carbon from supply-chain metadata.",
-        vibes: ["technical", "grounded"],
+        brandColor: "#10b981",
         handles: [
             {
                 platform: "github",
@@ -150,7 +150,7 @@ export const presetBrands: BrandContext[] = [
     },
     {
         purpose: "Portfolio for a technical product marketing consultant and brand systems designer.",
-        vibes: ["technical", "warm"],
+        brandColor: "#22c55e",
         handles: [
             {
                 platform: "twitter",
@@ -167,7 +167,7 @@ export const presetBrands: BrandContext[] = [
     {
         purpose:
             "An architecture studio's portfolio — residential interiors in the Pacific Northwest.",
-        vibes: ["minimal", "clean"],
+        brandColor: "#18181b",
         handles: [
             {
                 platform: "instagram",

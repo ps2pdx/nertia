@@ -17,10 +17,9 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 };
 
 export const writeCopy: SectionWriteCopy = (ctx) => {
-    const firstVibe = (ctx.vibes ?? [])[0] ?? "";
     const out: Record<string, string> = {
         wordmark: firstWord(ctx.purpose ?? ""),
-        tagline: firstVibe,
+        tagline: "",
     };
     (ctx.handles ?? []).slice(0, 3).forEach((h, i) => {
         out[`link${i + 1}Label`] = PLATFORM_LABELS[h.platform] ?? "Link";

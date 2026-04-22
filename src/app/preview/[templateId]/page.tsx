@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTemplate } from "@/templates";
 import type { CopySchemaField, Site, Template } from "@/templates/types";
-import { decodeTheme, themeToCssVars } from "@/lib/brandContext";
 
 function fallbackFor(field: CopySchemaField): string {
   if (field.placeholder) return field.placeholder;
@@ -20,14 +19,8 @@ function syntheticSite(template: Template): Site {
   };
 }
 
-function readVParam(value: string | string[] | undefined): string | undefined {
-  if (Array.isArray(value)) return value[0];
-  return value;
-}
-
 export default async function PreviewPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ templateId: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -36,16 +29,10 @@ export default async function PreviewPage({
   const template = getTemplate(templateId);
   if (!template) notFound();
 
-  const resolvedSearchParams = await searchParams;
-  const vToken = readVParam(resolvedSearchParams.v);
-  const variant = vToken ? decodeTheme(vToken) : null;
-  const cssVars = variant ? themeToCssVars(variant) : "";
-
   const site = syntheticSite(template);
   const { Layout } = template;
   return (
     <>
-      {cssVars && <style>{`:root{${cssVars}}`}</style>}
       <Layout site={site} />
       <Attribution template={template} />
     </>

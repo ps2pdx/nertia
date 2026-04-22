@@ -1,23 +1,22 @@
 /**
  * High-level deterministic composer.
  *
- * Takes a BrandContext, returns everything needed to build a CompositionSite
- * except the copy (writeCopy handles that in phase 5). No LLM calls.
+ * Takes a BrandContext, returns the composition + brand color needed to
+ * build a CompositionSite. No LLM calls. Copy comes from writeCopy;
+ * dark/light mode + everything else cascades from globals.css.
  *
- *   compose(ctx) → { composition, tokens }
- *
- * Callers glue in copy via writeCopy and persist via putSite.
+ *   compose(ctx) → { composition, brandColor }
  */
 import type { BrandContext } from "./brandContext";
-import type { CompositionInstance, Tokens } from "./siteShapes";
+import type { CompositionInstance } from "./siteShapes";
 import { pickComposition } from "@/compositions";
-import { pickPalette } from "./palette";
-import { pickFontPair } from "./fontPair";
 
 export interface ComposedSite {
     composition: CompositionInstance;
-    tokens: Tokens;
+    brandColor: string;
 }
+
+const DEFAULT_BRAND_COLOR = "#22c55e"; // nertia green
 
 export function compose(ctx: BrandContext): ComposedSite {
     const compDef = pickComposition(ctx);
@@ -29,9 +28,6 @@ export function compose(ctx: BrandContext): ComposedSite {
                 instanceId: s.instanceId,
             })),
         },
-        tokens: {
-            palette: pickPalette(ctx),
-            fontPair: pickFontPair(ctx),
-        },
+        brandColor: ctx.brandColor ?? DEFAULT_BRAND_COLOR,
     };
 }

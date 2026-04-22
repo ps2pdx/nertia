@@ -32,7 +32,11 @@ describe("siteStore", () => {
     mockGet.mockResolvedValue({ exists: () => true, val: () => fixture });
     const out = await getSite("acme");
     expect(out?.slug).toBe("acme");
-    expect(out?.templateId).toBe("precedent");
+    if (out && "templateId" in out) {
+      expect(out.templateId).toBe("precedent");
+    } else {
+      throw new Error("expected legacy site");
+    }
     expect(mockRef).toHaveBeenCalledWith("sites/acme");
   });
 

@@ -31,8 +31,9 @@ export interface SectionMeta {
 /**
  * Props every section component receives. `copy` already has the instance
  * prefix stripped — slots are keyed by their schema key.
- * Tokens are injected via CSS custom properties on a wrapper element by
- * the CompositionRenderer, so sections can style with `var(--token-*)`.
+ * Sections style using nertia's design-system CSS vars (var(--foreground),
+ * var(--background), var(--accent), etc.) — the hosted site wrapper injects
+ * the user's brand color as --accent; dark/light mode cascades from globals.
  */
 export interface SectionProps {
     copy: Record<string, string>;

@@ -25,7 +25,7 @@ export const writeCopy: SectionWriteCopy = (ctx) => {
 
     const out: Record<string, string> = {
         name,
-        tagline: (ctx.vibes ?? [])[0] ?? "",
+        tagline: "",
         bio: truncate(ctx.purpose ?? "", 200),
         avatarInitials: initials(name),
     };
