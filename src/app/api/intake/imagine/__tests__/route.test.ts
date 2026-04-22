@@ -8,15 +8,15 @@ describe("/api/intake/imagine", () => {
         const body = (await res.json()) as {
             brandContext: {
                 purpose?: string;
-                vibes?: string[];
+                brandColor?: string;
                 handles?: Array<{ platform: string; handle: string; url: string }>;
             };
         };
         const ctx = body.brandContext;
         expect(typeof ctx.purpose).toBe("string");
         expect((ctx.purpose ?? "").length).toBeGreaterThan(10);
-        expect(Array.isArray(ctx.vibes)).toBe(true);
-        expect((ctx.vibes ?? []).length).toBeGreaterThan(0);
+        expect(typeof ctx.brandColor).toBe("string");
+        expect(ctx.brandColor).toMatch(/^#[0-9a-fA-F]{6}$/);
         expect(Array.isArray(ctx.handles)).toBe(true);
         expect((ctx.handles ?? []).length).toBeGreaterThan(0);
         for (const h of ctx.handles ?? []) {

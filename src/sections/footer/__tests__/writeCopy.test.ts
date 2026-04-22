@@ -9,13 +9,11 @@ const h = (platform: Handle["platform"], handle: string, url: string): Handle =>
 });
 
 describe("footer writeCopy", () => {
-    it("populates wordmark + tagline from purpose/vibes", () => {
+    it("populates wordmark from purpose", () => {
         const copy = writeCopy({
             purpose: "Acme photography studio",
-            vibes: ["warm", "editorial"],
         });
         expect(copy.wordmark).toBe("Acme");
-        expect(copy.tagline).toBe("warm");
     });
 
     it("renders first 3 handles as link1..link3", () => {

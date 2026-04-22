@@ -5,16 +5,12 @@ import { compose } from "@/lib/compose";
 
 const blogCtx: BrandContext = {
     purpose: "My writing and essays on product craft.",
-    audience: "Curious readers and builders",
-    vibeWords: ["warm", "editorial"],
-    adaptive: [{ question: "what's the feel", answer: "slow and considered" }],
+    brandColor: "#c2410c",
 };
 
 const portfolioCtx: BrandContext = {
     purpose: "Scott Campbell's portfolio and resume.",
-    audience: "Founders considering hiring me",
-    vibeWords: ["technical", "warm"],
-    adaptive: [],
+    brandColor: "#22c55e",
 };
 
 describe("writeCopy", () => {
@@ -52,12 +48,7 @@ describe("writeCopy", () => {
         expect(copy[descKey!]).toBe(blogCtx.purpose);
     });
     it("skips empty-string slot values", () => {
-        const ctx: BrandContext = {
-            purpose: "",
-            audience: "",
-            vibeWords: [],
-            adaptive: [],
-        };
+        const ctx: BrandContext = { purpose: "" };
         const { composition } = compose(ctx);
         const copy = writeCopy(ctx, composition);
         for (const v of Object.values(copy)) {

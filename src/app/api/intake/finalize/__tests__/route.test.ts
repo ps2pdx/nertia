@@ -21,28 +21,17 @@ beforeEach(() => {
 });
 
 const sampleVariant = {
-    id: "r2-marketing-0",
-    label: "Marketing · refinement 1",
-    palette: {
-        bg: "#0a0a0a",
-        fg: "#f5f5f5",
-        muted: "#9ca3af",
-        accent: "#00d4ff",
-        headingStart: "#ffffff",
-        headingEnd: "#7dd3fc",
-    },
-    fontPair: {
-        heading: "'Helvetica Neue', sans-serif",
-        body: "'JetBrains Mono', monospace",
-    },
+    id: "emerge-marketing-0",
+    label: "Marketing",
     compositionId: "marketing",
     compositionLabel: "Marketing",
+    brandColor: "#22c55e",
     previewHeadline: "A landing page.",
 };
 
 const sampleBrandContext = {
     purpose: "A landing page for a SaaS product.",
-    vibes: ["technical", "clean"],
+    brandColor: "#22c55e",
     handles: [
         {
             platform: "twitter",
@@ -74,8 +63,7 @@ describe("/api/intake/finalize", () => {
         expect(siteArg.slug).toBe("test-finalize");
         expect(siteArg.composition.id).toBe("marketing");
         expect(siteArg.composition.sections.length).toBeGreaterThan(0);
-        expect(siteArg.tokens.palette.bg).toBe(sampleVariant.palette.bg);
-        expect(siteArg.tokens.fontPair.heading).toBe(sampleVariant.fontPair.heading);
+        expect(siteArg.brandColor).toBe("#22c55e");
         const headlineKeys = Object.keys(siteArg.copy).filter((k) =>
             k.endsWith(".headline"),
         );
