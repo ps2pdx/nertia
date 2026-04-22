@@ -42,3 +42,23 @@ export function canTransition(from: Status, to: Status): boolean {
   };
   return graph[from]?.includes(to) ?? false;
 }
+
+export function concatCompose(sources: Array<{ title: string; body: string }>): string {
+  if (sources.length === 0) return "";
+  return sources.map((s) => `## ${s.title}\n\n${s.body}`).join("\n\n");
+}
+
+export function mergeTags(sources: Array<{ tags: string[] }>): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of sources) {
+    for (const tag of s.tags) {
+      const lower = tag.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        out.push(tag);
+      }
+    }
+  }
+  return out;
+}

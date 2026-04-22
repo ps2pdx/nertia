@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PostSchema, STATUSES, canTransition, type Post } from "@/lib/notepad";
+import { PostSchema, STATUSES, canTransition, concatCompose, mergeTags, type Post } from "@/lib/notepad";
 
 describe("PostSchema", () => {
   it("accepts a minimal valid draft", () => {
@@ -49,5 +49,26 @@ describe("canTransition", () => {
   it("blocks merged → anything but archived", () => {
     expect(canTransition("merged", "draft")).toBe(false);
     expect(canTransition("merged", "archived")).toBe(true);
+  });
+});
+
+describe("concatCompose", () => {
+  it("joins bodies with h2 subheadings from source titles", () => {
+    const sources = [
+      { title: "First", body: "A body" },
+      { title: "Second", body: "B body" },
+    ];
+    const out = concatCompose(sources);
+    expect(out).toBe("## First\n\nA body\n\n## Second\n\nB body");
+  });
+  it("returns empty string for empty input", () => {
+    expect(concatCompose([])).toBe("");
+  });
+});
+
+describe("mergeTags", () => {
+  it("dedupes case-insensitively, preserves first-seen casing", () => {
+    const sources = [{ tags: ["Nertia", "product"] }, { tags: ["nertia", "gtm"] }];
+    expect(mergeTags(sources)).toEqual(["Nertia", "product", "gtm"]);
   });
 });
