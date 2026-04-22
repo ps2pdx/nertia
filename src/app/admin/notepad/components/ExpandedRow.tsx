@@ -17,8 +17,10 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   const [body, setBody] = useState(post.body);
   const [tags, setTags] = useState(post.tags.join(", "));
   const [project, setProject] = useState(projectOf(post));
+  const [slug, setSlug] = useState(post.slug ?? slugify(post.title));
   const [polishSuggestion, setPolishSuggestion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   async function savePatch(patch: Partial<Post>) {
     if (!token) return;
@@ -31,17 +33,26 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   }
 
   async function publish() {
-    const slug = window.prompt("Slug:", post.slug ?? slugify(post.title));
-    if (!slug || !token) return;
+    if (!token) return;
+    const finalSlug = slug.trim() || slugify(title || post.title);
+    if (!finalSlug) {
+      setPublishError("Slug required");
+      return;
+    }
     setBusy(true);
+    setPublishError(null);
     try {
       const res = await fetch(`/api/admin/notepad/${post.id}/publish`, {
         method: "POST",
         headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-        body: JSON.stringify({ slug }),
+        body: JSON.stringify({ slug: finalSlug }),
       });
-      if (res.ok) onUpdate({ ...post, status: "published", slug, published_at: Date.now() });
-      else alert(`Publish failed: ${(await res.json()).error}`);
+      if (res.ok) {
+        setSlug(finalSlug);
+        onUpdate({ ...post, status: "published", slug: finalSlug, published_at: Date.now() });
+      } else {
+        setPublishError((await res.json()).error ?? `HTTP ${res.status}`);
+      }
     } finally {
       setBusy(false);
     }
@@ -137,6 +148,29 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
         </div>
       </Field>
 
+      <Field label="Slug">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted whitespace-nowrap">nertia.ai/blog/</span>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              onBlur={() => {
+                const trimmed = slug.trim();
+                if (trimmed && trimmed !== post.slug) savePatch({ slug: trimmed });
+              }}
+              placeholder={slugify(title || post.title)}
+              className="flex-1 bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
+            />
+          </div>
+          {post.status === "published" && (
+            <span className="text-[10px] text-amber-400/80">
+              Published — changing the slug will break the live URL.
+            </span>
+          )}
+        </div>
+      </Field>
+
       <Field label="Hero">
         <HeroUpload post={post} onUpdate={(url) => { savePatch({ hero: url }); onUpdate({ ...post, hero: url }); }} />
       </Field>
@@ -165,13 +199,19 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
         )}
       </Field>
 
+      {publishError && (
+        <div className="text-xs text-red-400 border border-red-500/40 bg-red-500/5 rounded px-3 py-2">
+          Publish failed: {publishError}
+        </div>
+      )}
+
       <div className="flex gap-2 flex-wrap pt-1">
         <button
           onClick={publish}
           disabled={busy}
           className="px-3 py-1.5 bg-[var(--accent)] text-black rounded text-sm font-semibold disabled:opacity-50"
         >
-          Publish
+          {post.status === "published" ? "Republish" : "Publish"}
         </button>
         <button
           onClick={requestPolish}
