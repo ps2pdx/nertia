@@ -15,17 +15,17 @@ export function Component({ copy }: SectionProps) {
 
     return (
         <section
-            className="min-h-[80svh] px-6 py-16 flex flex-col items-center bg-[var(--token-bg)] text-[var(--token-fg)]"
-            style={{ fontFamily: "var(--token-font-body)" }}
+            className="min-h-[80svh] px-6 py-16 flex flex-col items-center bg-[var(--background)] text-[var(--foreground)]"
+            style={{ fontFamily: "var(--font-body)" }}
         >
             <div className="w-full max-w-md flex flex-col items-center text-center">
                 {initials && (
                     <div
                         className="w-20 h-20 rounded-full border-2 flex items-center justify-center text-xl mb-6"
                         style={{
-                            borderColor: "var(--token-accent)",
-                            color: "var(--token-accent)",
-                            fontFamily: "var(--token-font-heading)",
+                            borderColor: "var(--accent)",
+                            color: "var(--accent)",
+                            fontFamily: "var(--font-heading)",
                         }}
                     >
                         {initials}
@@ -33,19 +33,19 @@ export function Component({ copy }: SectionProps) {
                 )}
                 <h1
                     className="text-2xl font-bold mb-1"
-                    style={{ fontFamily: "var(--token-font-heading)" }}
+                    style={{ fontFamily: "var(--font-heading)" }}
                 >
                     {name}
                 </h1>
                 {tagline && (
-                    <p className="text-sm mb-2" style={{ color: "var(--token-muted)" }}>
+                    <p className="text-sm mb-2" style={{ color: "var(--muted)" }}>
                         {tagline}
                     </p>
                 )}
                 {bio && (
                     <p
                         className="text-sm mb-8 max-w-sm leading-relaxed"
-                        style={{ color: "var(--token-fg)" }}
+                        style={{ color: "var(--foreground)" }}
                     >
                         {bio}
                     </p>
@@ -59,8 +59,8 @@ export function Component({ copy }: SectionProps) {
                             rel="noopener noreferrer"
                             className="w-full px-4 py-3 border rounded-full text-sm text-center transition-colors hover:opacity-80"
                             style={{
-                                borderColor: "var(--token-accent)",
-                                color: "var(--token-accent)",
+                                borderColor: "var(--accent)",
+                                color: "var(--accent)",
                             }}
                         >
                             {l.label}

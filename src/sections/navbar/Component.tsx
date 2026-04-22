@@ -13,15 +13,15 @@ export function Component({ copy }: SectionProps) {
         <nav
             className="flex items-center justify-between px-6 lg:px-12 py-5 border-b"
             style={{
-                backgroundColor: "var(--token-bg)",
-                borderColor: "var(--token-muted)",
-                color: "var(--token-fg)",
+                backgroundColor: "var(--background)",
+                borderColor: "var(--card-border)",
+                color: "var(--foreground)",
             }}
         >
             <Link
                 href="/"
                 className="text-sm tracking-wide"
-                style={{ fontFamily: "var(--token-font-heading)" }}
+                style={{ fontFamily: "var(--font-heading)" }}
             >
                 {wordmark}
             </Link>
@@ -29,8 +29,8 @@ export function Component({ copy }: SectionProps) {
                 <div
                     className="flex items-center gap-6 text-sm"
                     style={{
-                        fontFamily: "var(--token-font-body)",
-                        color: "var(--token-muted)",
+                        fontFamily: "var(--font-body)",
+                        color: "var(--muted)",
                     }}
                 >
                     {links.map((l, i) => (

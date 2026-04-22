@@ -5,19 +5,19 @@ export function Component({ copy }: SectionProps) {
     const body = copy.body ?? "";
 
     return (
-        <section className="px-6 py-24 bg-[var(--token-bg)] text-[var(--token-fg)]">
+        <section className="px-6 py-24 bg-[var(--background)] text-[var(--foreground)]">
             <div className="max-w-3xl mx-auto">
                 <p
                     className="text-xs uppercase tracking-[0.3em] mb-6"
-                    style={{ color: "var(--token-accent)", fontFamily: "var(--token-font-body)" }}
+                    style={{ color: "var(--accent)", fontFamily: "var(--font-body)" }}
                 >
                     {heading}
                 </p>
                 <p
                     className="text-xl md:text-2xl leading-relaxed"
                     style={{
-                        fontFamily: "var(--token-font-body)",
-                        color: "var(--token-fg)",
+                        fontFamily: "var(--font-body)",
+                        color: "var(--foreground)",
                     }}
                 >
                     {body}

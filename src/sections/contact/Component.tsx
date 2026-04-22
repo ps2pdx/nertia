@@ -9,20 +9,20 @@ export function Component({ copy }: SectionProps) {
 
     return (
         <section
-            className="px-6 py-24 bg-[var(--token-bg)] text-[var(--token-fg)]"
-            style={{ fontFamily: "var(--token-font-body)" }}
+            className="px-6 py-24 bg-[var(--background)] text-[var(--foreground)]"
+            style={{ fontFamily: "var(--font-body)" }}
         >
             <div className="max-w-3xl mx-auto text-center">
                 <h2
                     className="text-3xl sm:text-4xl font-bold mb-6"
-                    style={{ fontFamily: "var(--token-font-heading)" }}
+                    style={{ fontFamily: "var(--font-heading)" }}
                 >
                     {heading}
                 </h2>
                 {body && (
                     <p
                         className="text-base max-w-xl mx-auto mb-8"
-                        style={{ color: "var(--token-muted)" }}
+                        style={{ color: "var(--muted)" }}
                     >
                         {body}
                     </p>
@@ -32,8 +32,8 @@ export function Component({ copy }: SectionProps) {
                         href={ctaHref}
                         className="inline-flex items-center border px-6 py-3 text-sm uppercase tracking-widest transition-colors hover:opacity-80"
                         style={{
-                            borderColor: "var(--token-accent)",
-                            color: "var(--token-accent)",
+                            borderColor: "var(--accent)",
+                            color: "var(--accent)",
                         }}
                     >
                         {ctaLabel}
