@@ -37,6 +37,11 @@ export function listCompositions(): CompositionDef[] {
  * back to marketing when nothing matches.
  */
 export function pickComposition(ctx: BrandContext): CompositionDef {
+    const handles = ctx.handles ?? [];
+    const hasSite = handles.some((h) => h.platform === "site");
+    if (handles.length >= 3 && !hasSite) {
+        return linkinbio;
+    }
     const tokens = ctxTokens(ctx);
     let best = marketing;
     let bestScore = -1;
