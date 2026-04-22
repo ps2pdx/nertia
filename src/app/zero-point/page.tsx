@@ -10,29 +10,17 @@ export default function ZeroPointPage() {
   return (
     <PageTemplate>
       <section className="min-h-[calc(100svh-var(--header-height)-120px)] flex flex-col items-center justify-center px-6 text-center py-16">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent)] mb-6">
-          Zero-Point · Coming Soon
+        <p className="text-xs tracking-[0.2em] uppercase text-muted mb-6">
+          Zero-point · Coming soon
         </p>
-        <h1
-          className="text-5xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight max-w-4xl"
-          style={{ fontFamily: "var(--font-heading)", letterSpacing: "-0.02em" }}
-        >
-          Your website, emerged from a brief.
-        </h1>
-        <p
-          className="mt-6 text-2xl md:text-3xl tracking-tight text-muted max-w-3xl"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
+        <h1 className="text-4xl sm:text-5xl font-bold max-w-3xl">
           Free. Hosted. A minute away.
-        </p>
-        <p className="mt-10 max-w-xl text-base md:text-lg text-muted">
-          A few questions, a visual funnel, a live site on nertia.ai. Shipping soon — drop your email for early access.
-        </p>
+        </h1>
         <div className="mt-10 w-full max-w-2xl">
           <EarlyAccessForm source="zero-point" />
         </div>
-        <p className="mt-4 text-xs text-muted">
-          Your email is only used for launch. No spam.
+        <p className="mt-4 text-sm text-muted">
+          Email for launch only.
         </p>
       </section>
     </PageTemplate>
