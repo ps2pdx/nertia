@@ -51,6 +51,20 @@ export function projectOf(p: { project?: string | null; cwd?: string | null }): 
   return derived && derived.length > 0 ? derived : "unknown";
 }
 
+// Project categories grouped by Scott's ~/code folders.
+// nertia is the main project (current repo). Everything unmatched → misc.
+export const PROJECT_CATEGORIES = ["nertia", "ableton", "vantage", "zen-holo", "misc"] as const;
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+
+export function categoryOf(project: string): ProjectCategory {
+  const p = project.toLowerCase();
+  if (p.includes("nertia")) return "nertia";
+  if (p.includes("ableton")) return "ableton";
+  if (p.includes("vantage") || p === "2026") return "vantage";
+  if (p.includes("zen-holo") || p === "holo") return "zen-holo";
+  return "misc";
+}
+
 export function concatCompose(sources: Array<{ title: string; body: string }>): string {
   if (sources.length === 0) return "";
   return sources.map((s) => `## ${s.title}\n\n${s.body}`).join("\n\n");
