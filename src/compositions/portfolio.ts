@@ -7,8 +7,8 @@ export const portfolio: CompositionDef = {
     sections: [
         { id: "navbar", instanceId: "nav-1" },
         { id: "marketing-hero", instanceId: "hero-1" },
+        { id: "projects-grid", instanceId: "projects-1" },
         { id: "about", instanceId: "about-1" },
-        { id: "contact", instanceId: "contact-1" },
         { id: "footer", instanceId: "footer-1" },
     ],
 };

@@ -6,6 +6,9 @@ import { navbar } from "./navbar";
 import { linkStack } from "./link-stack";
 import { postList } from "./post-list";
 import { contact } from "./contact";
+import { pricing } from "./pricing";
+import { projectsGrid } from "./projects-grid";
+import { docsSidebar } from "./docs-sidebar";
 
 /**
  * Section registry. Each entry is a reusable page section — a React
@@ -24,6 +27,9 @@ export const sections: Record<string, Section> = {
     [linkStack.meta.id]: linkStack,
     [postList.meta.id]: postList,
     [contact.meta.id]: contact,
+    [pricing.meta.id]: pricing,
+    [projectsGrid.meta.id]: projectsGrid,
+    [docsSidebar.meta.id]: docsSidebar,
 };
 
 export function getSection(id: string): Section | null {
