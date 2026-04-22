@@ -2,8 +2,9 @@ import type { SectionWriteCopy } from "../types";
 import { firstWord } from "../copyHelpers";
 
 export const writeCopy: SectionWriteCopy = (ctx) => {
+    const fromPurpose = firstWord(ctx.purpose ?? "");
+    const fromHandle = ctx.handles?.[0]?.handle ?? "";
     return {
-        wordmark: firstWord(ctx.purpose ?? "site") || "site",
-        // link slots left empty — users add them later via the editor (future)
+        wordmark: fromPurpose || fromHandle || "site",
     };
 };
