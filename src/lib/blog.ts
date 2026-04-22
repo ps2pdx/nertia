@@ -1,8 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-
-const BLOG_DIR = path.join(process.cwd(), 'src/content/blog');
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { PostSchema } from "@/lib/notepad";
 
 export interface BlogPost {
   slug: string;
@@ -14,26 +11,31 @@ export interface BlogPost {
   content: string;
 }
 
-export function getAllPosts(): BlogPost[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
-  const files = fs.readdirSync(BLOG_DIR).filter(f => f.endsWith('.md'));
-  const posts = files.map(file => {
-    const raw = fs.readFileSync(path.join(BLOG_DIR, file), 'utf-8');
-    const { data, content } = matter(raw);
-    return {
-      slug: data.slug || file.replace(/\.md$/, ''),
-      title: data.title,
-      date: data.date,
-      excerpt: data.excerpt || '',
-      tags: data.tags || [],
-      hero: data.hero,
-      content,
-    };
-  });
-  return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
+export async function getAllPosts(): Promise<BlogPost[]> {
+  const snap = await getAdminDb().ref("notepad/posts").get();
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, unknown>;
+  const posts: BlogPost[] = [];
+  for (const value of Object.values(raw)) {
+    const parsed = PostSchema.safeParse(value);
+    if (!parsed.success) continue;
+    const p = parsed.data;
+    if (p.status !== "published" || !p.slug) continue;
+    posts.push({
+      slug: p.slug,
+      title: p.title,
+      date: p.date,
+      excerpt: p.excerpt,
+      tags: p.tags,
+      hero: p.hero ?? undefined,
+      content: p.body,
+    });
+  }
+  posts.sort((a, b) => (a.date < b.date ? 1 : -1));
+  return posts;
 }
 
-export function getPostBySlug(slug: string): BlogPost | null {
-  const posts = getAllPosts();
-  return posts.find(p => p.slug === slug) || null;
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const all = await getAllPosts();
+  return all.find((p) => p.slug === slug) ?? null;
 }
