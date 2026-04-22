@@ -373,6 +373,7 @@ function TB({
       type="button"
       aria-label={label}
       title={label}
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={`text-xs uppercase tracking-wide border border-transparent text-muted hover:text-[var(--foreground)] hover:border-[var(--card-border)] px-2 py-1 ${className}`}
     >
