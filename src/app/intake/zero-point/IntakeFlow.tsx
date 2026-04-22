@@ -188,22 +188,14 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
   // ───────── render ─────────
 
   return (
-    <main
-      className="min-h-screen"
-      style={{
-        backgroundColor: "#0a0a0a",
-        color: "#f5f5f5",
-        fontFamily: "var(--font-geist-sans), Inter, ui-sans-serif, system-ui",
-      }}
-    >
+    <div className="min-h-[calc(100svh-var(--header-height))]">
       <ProgressDots step={step} />
 
       <div className="max-w-3xl mx-auto px-6 py-12 md:py-20">
         {error && (
           <div
             role="alert"
-            className="mb-8 text-sm border px-4 py-3"
-            style={{ borderColor: "#ef4444", color: "#fecaca" }}
+            className="mb-8 text-sm border px-4 py-3 border-red-500 text-red-600 dark:text-red-300"
           >
             {error}
           </div>
@@ -226,8 +218,8 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
                 disabled={busy}
                 className="text-xs uppercase tracking-[0.2em] border-b transition-colors hover:opacity-80 disabled:opacity-40"
                 style={{
-                  color: "#9ca3af",
-                  borderColor: "#1f1f1f",
+                  color: "var(--muted)",
+                  borderColor: "var(--card-border)",
                   paddingBottom: 2,
                 }}
               >
@@ -311,7 +303,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
           <div className="py-24 text-center">
             <div
               className="inline-block text-xs uppercase tracking-[0.3em]"
-              style={{ color: "#00d4ff", animation: "pulse 1.4s ease-in-out infinite" }}
+              style={{ color: "var(--accent)", animation: "pulse 1.4s ease-in-out infinite" }}
             >
               deploying your site…
             </div>
@@ -324,7 +316,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -335,7 +327,7 @@ function ProgressDots({ step }: { step: Step }) {
   return (
     <div
       className="pt-6 pb-2 flex items-center justify-center gap-2"
-      style={{ color: "#6b6b6b" }}
+      style={{ color: "var(--muted)" }}
     >
       {STEPS.map((s, i) => {
         const isEmerge = s === "emerge1" || s === "emerge2";
@@ -347,8 +339,8 @@ function ProgressDots({ step }: { step: Step }) {
               width: isEmerge ? 12 : 8,
               height: isEmerge ? 12 : 8,
               borderRadius: "50%",
-              backgroundColor: active ? "#00d4ff" : "#1f1f1f",
-              boxShadow: active ? "0 0 10px #00d4ff" : "none",
+              backgroundColor: active ? "var(--accent)" : "var(--card-border)",
+              boxShadow: active ? "0 0 10px var(--accent)" : "none",
               transition: "all 400ms ease-out",
             }}
           />
@@ -387,15 +379,14 @@ function QuestionCard({
       <div>
         <p
           className="text-xs uppercase tracking-[0.3em] mb-6"
-          style={{ color: "#00d4ff" }}
+          style={{ color: "var(--accent)" }}
         >
           {eyebrow}
         </p>
         <h1
           className="text-3xl md:text-5xl tracking-tight max-w-2xl"
           style={{
-            fontFamily:
-              "var(--font-geist-sans), Inter, ui-sans-serif, system-ui",
+            fontFamily: "var(--font-heading)",
             fontWeight: 500,
             letterSpacing: "-0.015em",
             lineHeight: 1.15,
@@ -413,7 +404,7 @@ function QuestionCard({
           rows={3}
           autoFocus
           className="w-full bg-transparent border px-4 py-3 text-base focus:outline-none"
-          style={{ borderColor: "#1f1f1f", color: "#f5f5f5" }}
+          style={{ borderColor: "var(--card-border)", color: "var(--foreground)" }}
         />
       ) : (
         <input
@@ -423,7 +414,7 @@ function QuestionCard({
           placeholder={placeholder}
           autoFocus
           className="w-full bg-transparent border px-4 py-3 text-base focus:outline-none"
-          style={{ borderColor: "#1f1f1f", color: "#f5f5f5" }}
+          style={{ borderColor: "var(--card-border)", color: "var(--foreground)" }}
         />
       )}
 
@@ -431,10 +422,10 @@ function QuestionCard({
         <button
           type="submit"
           disabled={!value.trim() || busy}
-          className="inline-flex items-center border px-6 py-3 text-sm uppercase tracking-widest transition-colors hover:bg-white/5 disabled:opacity-40"
+          className="inline-flex items-center border px-6 py-3 text-sm uppercase tracking-widest transition-colors hover:bg-[var(--accent)]/10 disabled:opacity-40"
           style={{
-            borderColor: "#00d4ff",
-            color: "#00d4ff",
+            borderColor: "var(--accent)",
+            color: "var(--accent)",
           }}
         >
           {busy ? "thinking…" : "continue →"}
@@ -466,13 +457,14 @@ function EmergeChoice({
       <div>
         <p
           className="text-xs uppercase tracking-[0.3em] mb-4"
-          style={{ color: "#00d4ff" }}
+          style={{ color: "var(--accent)" }}
         >
           {eyebrow}
         </p>
         <h1
           className="text-3xl md:text-5xl tracking-tight max-w-2xl"
           style={{
+            fontFamily: "var(--font-heading)",
             fontWeight: 500,
             letterSpacing: "-0.015em",
             lineHeight: 1.15,
@@ -481,7 +473,7 @@ function EmergeChoice({
           {question}
         </h1>
         {subNote && (
-          <p className="mt-2 text-sm" style={{ color: "#6b6b6b" }}>
+          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
             {subNote}
           </p>
         )}
@@ -494,14 +486,14 @@ function EmergeChoice({
             type="button"
             onClick={() => !busy && onPick(v)}
             disabled={busy}
-            className="group flex flex-col gap-3 border text-left transition-colors hover:bg-white/[0.02] disabled:opacity-50"
-            style={{ borderColor: "#1f1f1f" }}
+            className="group flex flex-col gap-3 border text-left transition-colors hover:border-[var(--accent)] disabled:opacity-50"
+            style={{ borderColor: "var(--card-border)" }}
           >
             <div
               className="relative w-full overflow-hidden"
               style={{
                 aspectRatio: "4 / 5",
-                borderBottom: "1px solid #1f1f1f",
+                borderBottom: "1px solid var(--card-border)",
                 backgroundColor: v.palette.bg,
               }}
             >
@@ -522,11 +514,11 @@ function EmergeChoice({
             <div className="px-4 pb-4 pt-1">
               <p
                 className="text-[10px] uppercase tracking-[0.2em]"
-                style={{ color: "#6b6b6b" }}
+                style={{ color: "var(--muted)" }}
               >
                 option {v.id.slice(0, 10)}
               </p>
-              <p className="text-sm mt-1" style={{ color: "#f5f5f5" }}>
+              <p className="text-sm mt-1" style={{ color: "var(--foreground)" }}>
                 {v.label}
               </p>
               <div className="mt-3 flex gap-1">
@@ -537,7 +529,7 @@ function EmergeChoice({
                       width: 12,
                       height: 12,
                       backgroundColor: c,
-                      border: "1px solid #1f1f1f",
+                      border: "1px solid var(--card-border)",
                     }}
                   />
                 ))}
@@ -550,7 +542,7 @@ function EmergeChoice({
       {busy && (
         <p
           className="text-xs uppercase tracking-[0.2em]"
-          style={{ color: "#00d4ff" }}
+          style={{ color: "var(--accent)" }}
         >
           emerging…
         </p>

@@ -1,8 +1,11 @@
 import { Hero } from "@/app/_components/landing/Hero";
+import PageTemplate from "@/components/PageTemplate";
+import ComingSoonBanner from "@/components/sections/ComingSoonBanner";
 
 export default function Home() {
   return (
-    <main>
+    <PageTemplate>
+      <ComingSoonBanner />
       <Hero
         eyebrow="ZERO-POINT"
         headline="A website emerges from your brief."
@@ -10,6 +13,6 @@ export default function Home() {
         ctaLabel="Begin"
         ctaHref="/intake/zero-point"
       />
-    </main>
+    </PageTemplate>
   );
 }

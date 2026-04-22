@@ -31,8 +31,9 @@ src/
     _sites/[slug]/        subdomain site renderer (to be built)
     generate/             intake questionnaire (to be built)
     blog/, about/, faq/   keep as-is
+    design-system/        keep — site's component catalogue (see Design-system components)
     generator/, admin/generations/, admin/golden-examples/,
-    brand-system/, butterfly-test/, design-system/
+    brand-system/, butterfly-test/
                           OLD THESIS — retire / delete during pivot
   components/             shared React
   content/blog/           file-based blog posts (gray-matter)
@@ -80,6 +81,16 @@ Directions live in `src/directions/{name}/`. Each direction is a React component
 **Reference library:** `~/code/nertia-template-reference/` contains ~50 MIT-licensed Vercel templates for inspiration. `INDEX.md` there groups them by category. Use as reference only — nothing ships as-is.
 
 **Cadence:** Scott builds 1–2 directions per day. MVP launches with 4 directions (zero-point flagship + 3 others).
+
+## Design-system components
+
+`/design-system` (`src/app/design-system/page.tsx`) is this site's canonical component catalogue — colors, typography, icons, buttons, cards, tags, alerts, banners, form elements, tables, motion, data viz, logo/grid/voice. It renders live instances of everything reusable.
+
+**When building or polishing any page**, reach for components from `/design-system` first — don't rebuild UI primitives ad-hoc. If a page is introducing styling that mirrors something already in the catalogue, refactor to use the catalogued component.
+
+**When introducing a new reusable component**, add a rendered instance to `/design-system` in the appropriate section so it stays discoverable. If a section doesn't exist for what you're adding, create one (and register it in the sidebar `sections` array at the top of the page).
+
+This keeps the site's visual language coherent, prevents drift between pages, and gives anyone auditing the design language a single place to look.
 
 ## Blog convention
 

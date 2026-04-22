@@ -47,15 +47,30 @@ export default function ButterflyRingParticles() {
                 returnSpeed: 0.04,
             };
 
-            // Spring green color from reference image
-            const GREEN_COLOR = new THREE.Color(0x7CC82A);
+            // Mode-aware visuals. Additive blending works against dark backgrounds
+            // but washes out on white — use normal blending + a darker green for light mode.
+            const themeFor = (dark: boolean) => (dark
+                ? {
+                    bg: 0x0a0a0a,
+                    particleColor: 0x7CC82A, // spring green from reference image
+                    particleOpacity: 0.85,
+                    glowOpacity: 0.1,
+                    blending: THREE.AdditiveBlending,
+                }
+                : {
+                    bg: 0xffffff,
+                    particleColor: 0x16a34a, // matches --accent-hover
+                    particleOpacity: 0.95,
+                    glowOpacity: 0.05,
+                    blending: THREE.NormalBlending,
+                });
+
+            const mql = window.matchMedia('(prefers-color-scheme: dark)');
+            let theme = themeFor(mql.matches);
 
             // Scene setup
             const scene = new THREE.Scene();
-
-            // Detect color scheme for background
-            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            scene.background = new THREE.Color(isDark ? 0x0a0a0a : 0xffffff);
+            scene.background = new THREE.Color(theme.bg);
 
             // Camera - perpendicular angle (tilted view)
             const camera = new THREE.PerspectiveCamera(
@@ -95,12 +110,12 @@ export default function ButterflyRingParticles() {
 
             // Particle material - translucent green with glow effect
             const material = new THREE.PointsMaterial({
-                color: GREEN_COLOR,
+                color: theme.particleColor,
                 size: 0.08,
                 transparent: true,
-                opacity: 0.85,
+                opacity: theme.particleOpacity,
                 sizeAttenuation: true,
-                blending: THREE.AdditiveBlending,
+                blending: theme.blending,
             });
 
             // Create particle system
@@ -111,12 +126,12 @@ export default function ButterflyRingParticles() {
             glowGeometry.setAttribute('position', new THREE.BufferAttribute(positions.slice(), 3));
 
             const glowMaterial = new THREE.PointsMaterial({
-                color: GREEN_COLOR,
+                color: theme.particleColor,
                 size: 0.18,
                 transparent: true,
-                opacity: 0.1,
+                opacity: theme.glowOpacity,
                 sizeAttenuation: true,
-                blending: THREE.AdditiveBlending,
+                blending: theme.blending,
             });
 
             const glowParticles = new THREE.Points(glowGeometry, glowMaterial);
@@ -309,11 +324,25 @@ export default function ButterflyRingParticles() {
                 zoom.target = Math.max(5, Math.min(40, zoom.target));
             };
 
+            const onThemeChange = (e: MediaQueryListEvent) => {
+                theme = themeFor(e.matches);
+                scene.background = new THREE.Color(theme.bg);
+                material.color.setHex(theme.particleColor);
+                material.opacity = theme.particleOpacity;
+                material.blending = theme.blending;
+                material.needsUpdate = true;
+                glowMaterial.color.setHex(theme.particleColor);
+                glowMaterial.opacity = theme.glowOpacity;
+                glowMaterial.blending = theme.blending;
+                glowMaterial.needsUpdate = true;
+            };
+
             window.addEventListener('resize', onResize);
             window.addEventListener('mousemove', onMouseMove);
             window.addEventListener('mousedown', onMouseDown);
             window.addEventListener('mouseup', onMouseUp);
             renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+            mql.addEventListener('change', onThemeChange);
 
             animate();
 
@@ -323,6 +352,7 @@ export default function ButterflyRingParticles() {
                 window.removeEventListener('mousedown', onMouseDown);
                 window.removeEventListener('mouseup', onMouseUp);
                 renderer.domElement.removeEventListener('wheel', onWheel);
+                mql.removeEventListener('change', onThemeChange);
             };
         };
 

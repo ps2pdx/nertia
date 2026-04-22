@@ -10,6 +10,7 @@ import TableSystem from '@/components/design-system/TableSystem';
 import DataVizSystem from '@/components/design-system/DataVizSystem';
 import IconSystem from '@/components/design-system/IconSystem';
 import Alert from '@/components/ui/Alert';
+import ComingSoonBanner from '@/components/sections/ComingSoonBanner';
 
 const sections: SidebarSection[] = [
     { id: 'colors', label: 'Colors' },
@@ -273,6 +274,17 @@ export default function DesignSystemPage() {
                             </div>
                             <p className="text-sm text-muted">
                                 <code>{'<Alert variant="accent" title="Title">Content</Alert>'}</code>
+                            </p>
+                        </div>
+
+                        {/* Banners */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-6">Banners</h3>
+                            <div className="space-y-4 mb-4 border border-[var(--card-border)]">
+                                <ComingSoonBanner />
+                            </div>
+                            <p className="text-sm text-muted">
+                                <code>{'<ComingSoonBanner label="..." message="..." />'}</code>
                             </p>
                         </div>
 
