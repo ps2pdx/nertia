@@ -1,10 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
-import { getApps, initializeApp } from "firebase-admin/app";
 import { isAdminEmail } from "@/lib/admin";
-
-function ensureApp() {
-  if (getApps().length === 0) initializeApp();
-}
+import { initAdmin } from "@/lib/firebaseAdmin";
 
 export type VerifyResult =
   | { ok: true; email: string }
@@ -16,9 +12,9 @@ export async function verifyAdminToken(req: Request): Promise<VerifyResult> {
     return { ok: false, status: 401, message: "missing bearer token" };
   }
   const token = header.slice("Bearer ".length);
-  ensureApp();
+  const app = initAdmin();
   try {
-    const decoded = await getAuth().verifyIdToken(token);
+    const decoded = await getAuth(app).verifyIdToken(token);
     const email = decoded.email ?? "";
     if (!isAdminEmail(email)) {
       return { ok: false, status: 403, message: "not an admin" };

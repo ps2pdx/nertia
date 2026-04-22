@@ -3,7 +3,7 @@ import { getDatabase, type Database } from "firebase-admin/database";
 
 let app: App | null = null;
 
-function initAdmin(): App {
+export function initAdmin(): App {
   if (app) return app;
   if (getApps().length > 0) {
     app = getApps()[0]!;
@@ -13,6 +13,7 @@ function initAdmin(): App {
   if (!databaseURL) {
     throw new Error("NEXT_PUBLIC_FIREBASE_DATABASE_URL is required for firebase-admin");
   }
+  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
 
   // Prefer base64 on Vercel (avoids env-var newline mangling in private_key)
   const credB64 = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
@@ -23,14 +24,10 @@ function initAdmin(): App {
   } else if (credJson) {
     credObject = JSON.parse(credJson);
   }
-  if (credObject) {
-    app = initializeApp({
-      credential: cert(credObject as Parameters<typeof cert>[0]),
-      databaseURL,
-    });
-  } else {
-    app = initializeApp({ credential: applicationDefault(), databaseURL });
-  }
+  const credential = credObject
+    ? cert(credObject as Parameters<typeof cert>[0])
+    : applicationDefault();
+  app = initializeApp({ credential, databaseURL, storageBucket });
   return app;
 }
 

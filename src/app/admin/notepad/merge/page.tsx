@@ -21,7 +21,7 @@ function Inner() {
   const token = useAdminToken();
   const ids = (params.get("ids") ?? "").split(",").filter(Boolean);
   const [sources, setSources] = useState<Post[]>([]);
-  const [method, setMethod] = useState<"ai" | "concat">("ai");
+  const [method, setMethod] = useState<"ai" | "concat" | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +40,7 @@ function Inner() {
   }, [token, idsKey]);
 
   async function createMerged() {
-    if (!token) return;
+    if (!token || !method) return;
     setBusy(true);
     setError(null);
     try {
@@ -69,35 +69,61 @@ function Inner() {
       </header>
 
       <section>
-        <div className="text-[10px] uppercase tracking-wide text-muted mb-2">Sources</div>
-        <ul className="space-y-1 text-sm">
-          {sources.map((s) => (
-            <li key={s.id} className="flex gap-2">
-              <span className="text-muted">·</span>
-              <span>{s.title}</span>
-              <span className="ml-auto text-xs text-muted">{s.date}</span>
-            </li>
-          ))}
+        <div className="text-[10px] uppercase tracking-wide text-muted mb-2">Sources ({sources.length})</div>
+        <ul className="space-y-2">
+          {sources.map((s) => {
+            const wordCount = (s.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+            const snippet = (s.body ?? "").trim().slice(0, 240);
+            return (
+              <li
+                key={s.id}
+                className="border border-[var(--card-border)] rounded p-3 bg-[var(--card-bg)] space-y-1"
+              >
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm font-medium">{s.title || "(untitled)"}</span>
+                  <span className="ml-auto text-[10px] uppercase tracking-wide text-muted whitespace-nowrap">
+                    {wordCount} words · {s.date}
+                  </span>
+                </div>
+                {snippet && (
+                  <p className="text-xs text-muted line-clamp-3 whitespace-pre-wrap">{snippet}</p>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
 
-      <section className="flex gap-2">
-        <button
-          onClick={() => setMethod("ai")}
-          className={`flex-1 px-3 py-2 rounded border text-sm ${
-            method === "ai" ? "bg-purple-500/10 border-purple-500 text-purple-300" : "border-[var(--card-border)] text-muted"
-          }`}
-        >
-          ✨ Claude-compose
-        </button>
-        <button
-          onClick={() => setMethod("concat")}
-          className={`flex-1 px-3 py-2 rounded border text-sm ${
-            method === "concat" ? "bg-[var(--accent)]/10 border-[var(--accent)] text-[var(--accent)]" : "border-[var(--card-border)] text-muted"
-          }`}
-        >
-          Concatenate
-        </button>
+      <section>
+        <div className="text-[10px] uppercase tracking-wide text-muted mb-2">Compose method</div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setMethod("ai")}
+            className={`text-left px-3 py-2 rounded border ${
+              method === "ai"
+                ? "bg-purple-500/10 border-purple-500"
+                : "border-[var(--card-border)] hover:border-[var(--foreground)]"
+            }`}
+          >
+            <div className={`text-sm ${method === "ai" ? "text-purple-300" : ""}`}>✨ Claude-compose</div>
+            <div className="text-[11px] text-muted mt-0.5">
+              Rewrite into one coherent post
+            </div>
+          </button>
+          <button
+            onClick={() => setMethod("concat")}
+            className={`text-left px-3 py-2 rounded border ${
+              method === "concat"
+                ? "bg-[var(--accent)]/10 border-[var(--accent)]"
+                : "border-[var(--card-border)] hover:border-[var(--foreground)]"
+            }`}
+          >
+            <div className={`text-sm ${method === "concat" ? "text-[var(--accent)]" : ""}`}>Concatenate</div>
+            <div className="text-[11px] text-muted mt-0.5">
+              Stitch bodies together as-is
+            </div>
+          </button>
+        </div>
       </section>
 
       {error && <div className="text-sm text-red-500">{error}</div>}
@@ -108,8 +134,12 @@ function Inner() {
         </button>
         <button
           onClick={createMerged}
-          disabled={busy || sources.length < 2}
-          className="flex-1 bg-[var(--accent)] text-black rounded py-2 text-sm font-semibold disabled:opacity-50"
+          disabled={busy || sources.length < 2 || !method}
+          className={
+            method
+              ? "flex-1 bg-[var(--accent)] text-black rounded py-2 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+              : "flex-1 rounded py-2 text-sm font-semibold border border-[var(--accent)] text-[var(--accent)] cursor-not-allowed"
+          }
         >
           {busy ? "Creating…" : "Create draft"}
         </button>

@@ -18,6 +18,7 @@ const PatchSchema = z
     slug: z.string().nullable().optional(),
     status: z.enum(STATUSES).optional(),
     date: z.string().optional(),
+    project: z.string().nullable().optional(),
   })
   .strict();
 

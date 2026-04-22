@@ -1,20 +1,22 @@
 "use client";
 import { useState } from "react";
-import type { Post } from "@/lib/notepad";
+import { projectOf, type Post } from "@/lib/notepad";
 import { useAdminToken } from "@/hooks/useAdminToken";
 import { PolishDiff } from "./PolishDiff";
 import { HeroUpload } from "./HeroUpload";
 
 interface Props {
   post: Post;
+  knownProjects: string[];
   onUpdate: (post: Post) => void;
 }
 
-export function ExpandedRow({ post, onUpdate }: Props) {
+export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   const token = useAdminToken();
   const [title, setTitle] = useState(post.title);
   const [body, setBody] = useState(post.body);
   const [tags, setTags] = useState(post.tags.join(", "));
+  const [project, setProject] = useState(projectOf(post));
   const [polishSuggestion, setPolishSuggestion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -72,6 +74,27 @@ export function ExpandedRow({ post, onUpdate }: Props) {
           onBlur={() => title !== post.title && savePatch({ title })}
           className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
         />
+      </Field>
+
+      <Field label="Project">
+        <input
+          value={project}
+          onChange={(e) => setProject(e.target.value)}
+          onBlur={() => {
+            const trimmed = project.trim();
+            if (trimmed !== projectOf(post)) {
+              savePatch({ project: trimmed || null });
+            }
+          }}
+          list={`projects-${post.id}`}
+          placeholder="project name"
+          className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
+        />
+        <datalist id={`projects-${post.id}`}>
+          {knownProjects.map((p) => (
+            <option key={p} value={p} />
+          ))}
+        </datalist>
       </Field>
 
       <Field label="Tags">
