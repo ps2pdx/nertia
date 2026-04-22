@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { projectOf, type Post } from "@/lib/notepad";
@@ -24,6 +24,58 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   const [busy, setBusy] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [bodyMode, setBodyMode] = useState<"edit" | "preview">("edit");
+  const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function applyWrap(before: string, after: string = before) {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = body.slice(start, end);
+    const replaced = before + selected + after;
+    const next = body.slice(0, start) + replaced + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      const caret = start + before.length;
+      ta.setSelectionRange(caret, caret + selected.length);
+    });
+  }
+
+  function applyLinePrefix(prefix: string) {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const lineStart = body.lastIndexOf("\n", start - 1) + 1;
+    const block = body.slice(lineStart, end);
+    const prefixed = block
+      .split("\n")
+      .map((line) => (line.startsWith(prefix) ? line : prefix + line))
+      .join("\n");
+    const next = body.slice(0, lineStart) + prefixed + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      ta.setSelectionRange(lineStart + prefix.length, lineStart + prefixed.length);
+    });
+  }
+
+  function applyLink() {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = body.slice(start, end) || "text";
+    const replaced = `[${selected}](url)`;
+    const next = body.slice(0, start) + replaced + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      const urlStart = start + selected.length + 3;
+      ta.setSelectionRange(urlStart, urlStart + 3);
+    });
+  }
 
   async function savePatch(patch: Partial<Post>) {
     if (!token) return;
@@ -218,13 +270,28 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
               </button>
             </div>
             {bodyMode === "edit" ? (
-              <textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                onBlur={() => body !== post.body && savePatch({ body })}
-                rows={14}
-                className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-3 py-2 text-base leading-relaxed"
-              />
+              <div className="flex flex-col">
+                <div className="flex flex-wrap gap-1 border border-[var(--card-border)] border-b-0 rounded-t bg-[var(--card-bg)] p-1">
+                  <TB label="Bold" onClick={() => applyWrap("**")} className="font-bold">B</TB>
+                  <TB label="Italic" onClick={() => applyWrap("*")} className="italic">I</TB>
+                  <TB label="Inline code" onClick={() => applyWrap("`")} className="font-mono">{"`"}</TB>
+                  <span className="w-px bg-[var(--card-border)] mx-1 my-0.5" />
+                  <TB label="Heading 2" onClick={() => applyLinePrefix("## ")}>H2</TB>
+                  <TB label="Heading 3" onClick={() => applyLinePrefix("### ")}>H3</TB>
+                  <span className="w-px bg-[var(--card-border)] mx-1 my-0.5" />
+                  <TB label="List" onClick={() => applyLinePrefix("- ")}>List</TB>
+                  <TB label="Quote" onClick={() => applyLinePrefix("> ")}>Quote</TB>
+                  <TB label="Link" onClick={applyLink}>Link</TB>
+                </div>
+                <textarea
+                  ref={bodyRef}
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  onBlur={() => body !== post.body && savePatch({ body })}
+                  rows={14}
+                  className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded-b px-3 py-2 text-base leading-relaxed"
+                />
+              </div>
             ) : (
               <div className="border border-[var(--card-border)] rounded px-4 py-3 min-h-[200px] prose prose-invert max-w-none prose-headings:font-semibold prose-p:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)]">
                 {body.trim() ? (
@@ -288,4 +355,28 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+}
+
+function TB({
+  children,
+  label,
+  onClick,
+  className = "",
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className={`text-xs uppercase tracking-wide border border-transparent text-muted hover:text-[var(--foreground)] hover:border-[var(--card-border)] px-2 py-1 ${className}`}
+    >
+      {children}
+    </button>
+  );
 }
