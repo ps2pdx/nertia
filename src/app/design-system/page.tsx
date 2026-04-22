@@ -11,6 +11,7 @@ import DataVizSystem from '@/components/design-system/DataVizSystem';
 import IconSystem from '@/components/design-system/IconSystem';
 import Alert from '@/components/ui/Alert';
 import ComingSoonBanner from '@/components/sections/ComingSoonBanner';
+import EarlyAccessForm from '@/components/sections/EarlyAccessForm';
 
 const sections: SidebarSection[] = [
     { id: 'colors', label: 'Colors' },
@@ -285,6 +286,17 @@ export default function DesignSystemPage() {
                             </div>
                             <p className="text-sm text-muted">
                                 <code>{'<ComingSoonBanner label="..." message="..." />'}</code>
+                            </p>
+                        </div>
+
+                        {/* Early access form */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-6">Early access form</h3>
+                            <div className="p-8 border border-[var(--card-border)] mb-4">
+                                <EarlyAccessForm source="design-system" />
+                            </div>
+                            <p className="text-sm text-muted">
+                                <code>{'<EarlyAccessForm source="..." />'}</code> · POSTs to <code>/api/waitlist</code>
                             </p>
                         </div>
 
