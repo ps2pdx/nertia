@@ -15,6 +15,23 @@ import { getDatabase } from "firebase-admin/database";
 
 const DRY = process.argv.includes("--dry-run");
 
+/**
+ * Parse a markdown file's frontmatter. Returns null if the YAML is malformed
+ * so the caller can skip the file and continue the migration — one bad draft
+ * shouldn't abort all N others.
+ */
+function safeParseMatter(filepath: string): { data: Record<string, unknown>; content: string } | null {
+    const raw = fs.readFileSync(filepath, "utf-8");
+    try {
+        const parsed = matter(raw);
+        return { data: parsed.data as Record<string, unknown>, content: parsed.content };
+    } catch (err) {
+        const msg = err instanceof Error ? err.message.split("\n")[0] : String(err);
+        console.warn(`[skip] malformed frontmatter in ${filepath}: ${msg}`);
+        return null;
+    }
+}
+
 function initAdmin() {
   if (getApps().length > 0) return;
   const databaseURL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL;
@@ -47,8 +64,9 @@ async function migrateBlog() {
   const { bySlug } = await getExistingBySessionOrSlug();
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
   for (const file of files) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf-8");
-    const { data, content } = matter(raw);
+    const parsed = safeParseMatter(path.join(dir, file));
+    if (!parsed) continue;
+    const { data, content } = parsed;
     const slug = (data.slug as string) || file.replace(/\.md$/, "");
     if (bySlug.has(slug)) {
       console.log(`skip published (slug exists): ${slug}`);
@@ -87,8 +105,9 @@ async function migrateDrafts() {
   const { bySession } = await getExistingBySessionOrSlug();
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
   for (const file of files) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf-8");
-    const { data, content } = matter(raw);
+    const parsed = safeParseMatter(path.join(dir, file));
+    if (!parsed) continue;
+    const { data, content } = parsed;
     const sessionId = (data.session_id as string) ?? file.replace(/\.md$/, "");
     if (bySession.has(sessionId)) {
       console.log(`skip draft (session exists): ${sessionId}`);
