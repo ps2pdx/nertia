@@ -1,5 +1,9 @@
 import type { CompositionDef } from "./types";
 import { marketing } from "./marketing";
+import { portfolio } from "./portfolio";
+import { linkinbio } from "./linkinbio";
+import { blog } from "./blog";
+import { docs } from "./docs";
 
 /**
  * Composition registry. Each entry is a named, tagged recipe that
@@ -11,6 +15,10 @@ import { marketing } from "./marketing";
  */
 export const compositions: Record<string, CompositionDef> = {
     [marketing.id]: marketing,
+    [portfolio.id]: portfolio,
+    [linkinbio.id]: linkinbio,
+    [blog.id]: blog,
+    [docs.id]: docs,
 };
 
 export function getComposition(id: string): CompositionDef | null {
