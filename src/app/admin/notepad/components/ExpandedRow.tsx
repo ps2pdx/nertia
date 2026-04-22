@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { projectOf, type Post } from "@/lib/notepad";
 import { useAdminToken } from "@/hooks/useAdminToken";
 import { PolishDiff } from "./PolishDiff";
@@ -32,6 +33,36 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
     const selected = body.slice(start, end);
+
+    // Toggle: if the selection (or the chars just outside it) is already
+    // wrapped in `before`/`after`, strip the wrapping instead of re-adding.
+    const innerMatch =
+      selected.startsWith(before) && selected.endsWith(after) &&
+      selected.length >= before.length + after.length;
+    const outerMatch =
+      body.slice(Math.max(0, start - before.length), start) === before &&
+      body.slice(end, end + after.length) === after;
+
+    if (innerMatch) {
+      const unwrapped = selected.slice(before.length, selected.length - after.length);
+      const next = body.slice(0, start) + unwrapped + body.slice(end);
+      setBody(next);
+      queueMicrotask(() => {
+        ta.focus();
+        ta.setSelectionRange(start, start + unwrapped.length);
+      });
+      return;
+    }
+    if (outerMatch) {
+      const next = body.slice(0, start - before.length) + selected + body.slice(end + after.length);
+      setBody(next);
+      queueMicrotask(() => {
+        ta.focus();
+        ta.setSelectionRange(start - before.length, start - before.length + selected.length);
+      });
+      return;
+    }
+
     const replaced = before + selected + after;
     const next = body.slice(0, start) + replaced + body.slice(end);
     setBody(next);
@@ -49,15 +80,17 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
     const end = ta.selectionEnd;
     const lineStart = body.lastIndexOf("\n", start - 1) + 1;
     const block = body.slice(lineStart, end);
-    const prefixed = block
-      .split("\n")
-      .map((line) => (line.startsWith(prefix) ? line : prefix + line))
-      .join("\n");
+    const lines = block.split("\n");
+    const allPrefixed = lines.every((l) => l.startsWith(prefix));
+    const next_lines = allPrefixed
+      ? lines.map((l) => l.slice(prefix.length))
+      : lines.map((l) => (l.startsWith(prefix) ? l : prefix + l));
+    const prefixed = next_lines.join("\n");
     const next = body.slice(0, lineStart) + prefixed + body.slice(end);
     setBody(next);
     queueMicrotask(() => {
       ta.focus();
-      ta.setSelectionRange(lineStart + prefix.length, lineStart + prefixed.length);
+      ta.setSelectionRange(lineStart, lineStart + prefixed.length);
     });
   }
 
@@ -345,9 +378,25 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
                 />
               </div>
             ) : (
-              <div className="border border-[var(--card-border)] rounded px-4 py-3 min-h-[200px] prose prose-invert max-w-none prose-headings:font-semibold prose-p:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)]">
+              <div
+                className="border border-[var(--card-border)] rounded px-4 py-3 min-h-[200px] text-base leading-relaxed
+                  [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2
+                  [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2
+                  [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1
+                  [&_p]:my-3
+                  [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
+                  [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-3
+                  [&_li]:my-1
+                  [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-muted [&_blockquote]:my-3
+                  [&_code]:bg-[var(--card-bg)] [&_code]:text-[var(--accent)] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[0.9em]
+                  [&_pre]:bg-[var(--card-bg)] [&_pre]:border [&_pre]:border-[var(--card-border)] [&_pre]:rounded [&_pre]:p-3 [&_pre]:my-3 [&_pre]:overflow-x-auto
+                  [&_pre_code]:bg-transparent [&_pre_code]:px-0 [&_pre_code]:text-[var(--foreground)]
+                  [&_a]:text-[var(--accent)] [&_a]:underline
+                  [&_strong]:font-semibold [&_strong]:text-[var(--foreground)]
+                  [&_hr]:border-[var(--card-border)] [&_hr]:my-4"
+              >
                 {body.trim() ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{body}</ReactMarkdown>
                 ) : (
                   <p className="text-muted italic">Empty body.</p>
                 )}
