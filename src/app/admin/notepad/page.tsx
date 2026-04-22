@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { useAuth } from "@/lib/auth-context";
 import { isAdminEmail } from "@/lib/admin";
@@ -7,7 +8,6 @@ import { useAdminToken } from "@/hooks/useAdminToken";
 import type { Post } from "@/lib/notepad";
 import { ChipFilter, type FilterState } from "./components/ChipFilter";
 import { DraftRow } from "./components/DraftRow";
-import { MergeBar } from "./components/MergeBar";
 
 export default function AdminNotepadPage() {
   return (
@@ -18,6 +18,7 @@ export default function AdminNotepadPage() {
 }
 
 function Inner() {
+  const router = useRouter();
   const { user } = useAuth();
   const token = useAdminToken();
   const [posts, setPosts] = useState<Post[] | null>(null);
@@ -67,18 +68,35 @@ function Inner() {
     setExpanded((prev) => (prev === id ? null : id));
   }
 
+  function goMerge() {
+    const ids = Array.from(selected);
+    const params = new URLSearchParams({ ids: ids.join(",") });
+    router.push(`/admin/notepad/merge?${params}`);
+  }
+
   return (
     <main className="min-h-screen max-w-4xl mx-auto">
       <header className="px-4 py-3 border-b border-[var(--card-border)] flex items-center gap-3 sticky top-0 bg-[var(--background)] z-10">
         <h1 className="text-base font-semibold">Notepad</h1>
-        <span className="text-xs text-muted">{visible.length} / {posts?.length ?? 0}</span>
+        <span className="text-xs text-muted">
+          {mergeMode ? `${selected.size} selected` : `${visible.length} / ${posts?.length ?? 0}`}
+        </span>
         {mergeMode ? (
-          <button
-            onClick={exitMergeMode}
-            className="ml-auto text-xs uppercase tracking-wide text-muted hover:text-[var(--foreground)]"
-          >
-            Cancel
-          </button>
+          <div className="ml-auto flex items-center gap-3">
+            <button
+              onClick={exitMergeMode}
+              className="text-xs uppercase tracking-wide text-muted hover:text-[var(--foreground)]"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={goMerge}
+              disabled={selected.size < 2}
+              className="text-xs uppercase tracking-wide border border-[var(--card-border)] px-3 py-1 hover:border-[var(--foreground)] disabled:opacity-40 disabled:hover:border-[var(--card-border)]"
+            >
+              Merge{selected.size >= 2 ? ` ${selected.size} →` : " →"}
+            </button>
+          </div>
         ) : (
           <button
             onClick={() => setMergeMode(true)}
@@ -116,13 +134,6 @@ function Inner() {
         </ul>
       )}
 
-      {mergeMode && selected.size >= 2 && (
-        <MergeBar
-          count={selected.size}
-          sourceIds={Array.from(selected)}
-          onCancel={exitMergeMode}
-        />
-      )}
     </main>
   );
 }

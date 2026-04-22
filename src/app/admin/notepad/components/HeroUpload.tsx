@@ -36,12 +36,37 @@ export function HeroUpload({ post, onUpdate }: Props) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {post.hero ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={post.hero} alt="hero" className="w-full max-h-40 object-cover rounded border border-[var(--card-border)]" />
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.hero}
+            alt="hero"
+            className="w-full max-h-40 object-cover rounded border border-[var(--card-border)]"
+          />
+          <div className="flex items-center gap-3 text-xs">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={busy}
+              className="uppercase tracking-wide text-muted hover:text-[var(--foreground)] disabled:opacity-50"
+            >
+              {busy ? "Uploading…" : "Replace"}
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdate("")}
+              disabled={busy}
+              className="uppercase tracking-wide text-red-500 hover:text-red-400 disabled:opacity-50"
+            >
+              Remove
+            </button>
+          </div>
+        </>
       ) : (
         <button
+          type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
           className="w-full h-20 border border-dashed border-[var(--card-border)] rounded flex items-center justify-center text-xs text-muted disabled:opacity-50"
@@ -53,7 +78,11 @@ export function HeroUpload({ post, onUpdate }: Props) {
         ref={inputRef}
         type="file"
         accept="image/*"
-        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+          e.target.value = "";
+        }}
         className="hidden"
       />
     </div>
