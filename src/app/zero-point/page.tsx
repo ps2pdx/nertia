@@ -11,7 +11,7 @@ export default function ZeroPointPage() {
     <PageTemplate>
       <section className="min-h-[calc(100svh-var(--header-height)-120px)] flex flex-col items-center justify-center px-6 text-center py-16">
         <p className="text-xs tracking-[0.2em] uppercase text-muted mb-6">
-          Zero-point · Coming soon
+          Zero-point · Websites · Coming soon
         </p>
         <h1 className="text-4xl sm:text-5xl font-bold max-w-3xl">
           Free. Hosted. A minute away.
