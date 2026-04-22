@@ -4,6 +4,8 @@ import { portfolio } from "./portfolio";
 import { linkinbio } from "./linkinbio";
 import { blog } from "./blog";
 import { docs } from "./docs";
+import type { BrandContext } from "@/lib/brandContext";
+import { ctxTokens, scoreTags } from "@/lib/brandContext";
 
 /**
  * Composition registry. Each entry is a named, tagged recipe that
@@ -27,6 +29,25 @@ export function getComposition(id: string): CompositionDef | null {
 
 export function listCompositions(): CompositionDef[] {
     return Object.values(compositions);
+}
+
+/**
+ * Deterministically pick a composition from BrandContext. Returns the
+ * first composition whose tags overlap most with the ctx tokens. Falls
+ * back to marketing when nothing matches.
+ */
+export function pickComposition(ctx: BrandContext): CompositionDef {
+    const tokens = ctxTokens(ctx);
+    let best = marketing;
+    let bestScore = -1;
+    for (const entry of listCompositions()) {
+        const score = scoreTags(entry.tags, tokens);
+        if (score > bestScore) {
+            bestScore = score;
+            best = entry;
+        }
+    }
+    return best;
 }
 
 export type { CompositionDef } from "./types";

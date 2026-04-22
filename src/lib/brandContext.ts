@@ -16,6 +16,37 @@ export interface BrandContext {
   adaptive: Array<{ question: string; answer: string }>;
 }
 
+/**
+ * Tokenize a BrandContext into a lowercase set of keywords. Used by the
+ * deterministic pickers (palette, font pair, composition) to score their
+ * library entries against the user's input. Hyphenated words stay intact
+ * ("link-in-bio" is one token).
+ */
+export function ctxTokens(ctx: BrandContext): Set<string> {
+  const blob = [
+    ctx.purpose ?? "",
+    ctx.audience ?? "",
+    ...(ctx.vibeWords ?? []),
+    ...ctx.adaptive.map((a) => `${a.question} ${a.answer}`),
+  ]
+    .join(" ")
+    .toLowerCase();
+  const tokens = blob.match(/[a-z][a-z-]{1,}/g) ?? [];
+  return new Set(tokens);
+}
+
+/**
+ * Score a library entry's tags against a ctx token set. Simple overlap count.
+ * Ties broken by whichever entry appears first in the library.
+ */
+export function scoreTags(tags: string[], tokens: Set<string>): number {
+  let score = 0;
+  for (const t of tags) {
+    if (tokens.has(t.toLowerCase())) score += 1;
+  }
+  return score;
+}
+
 export interface ThemePalette {
   bg: string;
   fg: string;
