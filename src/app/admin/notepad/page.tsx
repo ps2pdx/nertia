@@ -25,6 +25,12 @@ function Inner() {
   const [filter, setFilter] = useState<FilterState>({ statuses: ["ready"], projects: [], search: "" });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [mergeMode, setMergeMode] = useState(false);
+
+  function exitMergeMode() {
+    setMergeMode(false);
+    setSelected(new Set());
+  }
 
   useEffect(() => {
     if (!token) return;
@@ -66,6 +72,21 @@ function Inner() {
       <header className="px-4 py-3 border-b border-[var(--card-border)] flex items-center gap-3 sticky top-0 bg-[var(--background)] z-10">
         <h1 className="text-base font-semibold">Notepad</h1>
         <span className="text-xs text-muted">{visible.length} / {posts?.length ?? 0}</span>
+        {mergeMode ? (
+          <button
+            onClick={exitMergeMode}
+            className="ml-auto text-xs uppercase tracking-wide text-muted hover:text-[var(--foreground)]"
+          >
+            Cancel
+          </button>
+        ) : (
+          <button
+            onClick={() => setMergeMode(true)}
+            className="ml-auto text-xs uppercase tracking-wide border border-[var(--card-border)] px-3 py-1 hover:border-[var(--foreground)]"
+          >
+            Merge
+          </button>
+        )}
       </header>
 
       <ChipFilter filter={filter} onChange={setFilter} allPosts={posts ?? []} />
@@ -84,6 +105,7 @@ function Inner() {
               post={p}
               selected={selected.has(p.id)}
               expanded={expanded === p.id}
+              showCheckbox={mergeMode}
               onToggleSelect={() => toggleSelect(p.id)}
               onToggleExpand={() => toggleExpand(p.id)}
               onUpdate={(updated) =>
@@ -94,11 +116,11 @@ function Inner() {
         </ul>
       )}
 
-      {selected.size >= 2 && (
+      {mergeMode && selected.size >= 2 && (
         <MergeBar
           count={selected.size}
           sourceIds={Array.from(selected)}
-          onCancel={() => setSelected(new Set())}
+          onCancel={exitMergeMode}
         />
       )}
     </main>

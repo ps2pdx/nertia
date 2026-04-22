@@ -6,6 +6,7 @@ interface Props {
   post: Post;
   selected: boolean;
   expanded: boolean;
+  showCheckbox: boolean;
   onToggleSelect: () => void;
   onToggleExpand: () => void;
   onUpdate: (post: Post) => void;
@@ -19,17 +20,19 @@ const DOT: Record<string, string> = {
   archived: "#444",
 };
 
-export function DraftRow({ post, selected, expanded, onToggleSelect, onToggleExpand, onUpdate }: Props) {
+export function DraftRow({ post, selected, expanded, showCheckbox, onToggleSelect, onToggleExpand, onUpdate }: Props) {
   return (
     <li className={`border-b border-[var(--card-border)] ${expanded ? "bg-[var(--card-bg)]" : ""}`}>
       <div className="flex items-center gap-3 px-4 py-3">
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={onToggleSelect}
-          onClick={(e) => e.stopPropagation()}
-          className="w-4 h-4"
-        />
+        {showCheckbox && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            onClick={(e) => e.stopPropagation()}
+            className="w-4 h-4"
+          />
+        )}
         <span
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ background: DOT[post.status] }}
