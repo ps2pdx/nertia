@@ -40,9 +40,25 @@ export function DraftRow({ post, selected, expanded, showCheckbox, onToggleSelec
         />
         <button
           onClick={onToggleExpand}
-          className="flex-1 text-left text-sm truncate"
+          className="flex-1 text-left text-sm truncate flex items-center gap-2"
         >
-          {post.title || "(untitled)"}
+          <span className="truncate">{post.title || "(untitled)"}</span>
+          {post.merged_from && post.merged_from.length > 0 && (
+            <span
+              className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded border border-purple-500/60 text-purple-300 flex-shrink-0"
+              title={`Merged from ${post.merged_from.length} drafts`}
+            >
+              merged ·{post.merged_from.length}
+            </span>
+          )}
+          {post.status === "merged" && post.merged_into && (
+            <span
+              className="text-[9px] uppercase tracking-wide text-muted flex-shrink-0"
+              title="This draft was merged into another draft"
+            >
+              → merged
+            </span>
+          )}
         </button>
         <span className="text-xs text-muted">{post.date}</span>
       </div>
