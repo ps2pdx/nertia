@@ -8,33 +8,20 @@ import { detectPlatform } from "@/lib/detectPlatform";
 
 type Step = "form" | "emerge" | "submitting";
 
-const VIBE_CHOICES = [
-    "warm",
-    "technical",
-    "editorial",
-    "minimal",
-    "moody",
-    "playful",
-    "cinematic",
-    "clean",
-    "grounded",
-    "bold",
-    "quiet",
-    "weird",
-] as const;
-
 type HandleRow = { raw: string; detected: Handle | null };
 
 function emptyRow(): HandleRow {
     return { raw: "", detected: null };
 }
 
+const DEFAULT_BRAND_COLOR = "#22c55e";
+
 export function IntakeFlow() {
     const router = useRouter();
     const [step, setStep] = useState<Step>("form");
     const [handleRows, setHandleRows] = useState<HandleRow[]>([emptyRow(), emptyRow()]);
     const [purpose, setPurpose] = useState("");
-    const [vibes, setVibes] = useState<Set<string>>(new Set());
+    const [brandColor, setBrandColor] = useState<string>(DEFAULT_BRAND_COLOR);
     const [variants, setVariants] = useState<EmergeVariant[] | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -45,7 +32,7 @@ export function IntakeFlow() {
             .filter((h): h is Handle => h !== null);
         return {
             purpose: purpose.trim() || undefined,
-            vibes: Array.from(vibes),
+            brandColor,
             handles: handles.length > 0 ? handles : undefined,
         };
     }
@@ -64,18 +51,6 @@ export function IntakeFlow() {
 
     function removeHandleRow(idx: number) {
         setHandleRows((prev) => prev.filter((_, i) => i !== idx));
-    }
-
-    function toggleVibe(v: string) {
-        setVibes((prev) => {
-            const next = new Set(prev);
-            if (next.has(v)) {
-                next.delete(v);
-            } else if (next.size < 3) {
-                next.add(v);
-            }
-            return next;
-        });
     }
 
     async function submitForm(e: FormEvent) {
@@ -112,7 +87,7 @@ export function IntakeFlow() {
             const data = (await res.json()) as { brandContext: BrandContext };
             const ctx = data.brandContext;
             setPurpose(ctx.purpose ?? "");
-            setVibes(new Set(ctx.vibes ?? []));
+            setBrandColor(ctx.brandColor ?? DEFAULT_BRAND_COLOR);
             setHandleRows(
                 (ctx.handles ?? []).length > 0
                     ? (ctx.handles ?? []).map((h) => ({ raw: h.url, detected: h }))
@@ -175,7 +150,7 @@ export function IntakeFlow() {
 
                         <PurposeField value={purpose} onChange={setPurpose} />
 
-                        <VibeChips selected={vibes} onToggle={toggleVibe} />
+                        <BrandColorField value={brandColor} onChange={setBrandColor} />
 
                         <div className="flex items-center gap-4 flex-wrap">
                             <button
@@ -225,12 +200,7 @@ export function IntakeFlow() {
                         >
                             deploying your site…
                         </div>
-                        <style>{`
-                            @keyframes pulse {
-                                0%,100% { opacity: 0.5; }
-                                50% { opacity: 1; }
-                            }
-                        `}</style>
+                        <style>{`@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }`}</style>
                     </div>
                 )}
             </div>
@@ -270,9 +240,7 @@ function HandleRepeater({
                     <span
                         className="text-xs tracking-wide uppercase min-w-[80px]"
                         style={{
-                            color: row.detected
-                                ? "var(--accent)"
-                                : "var(--muted)",
+                            color: row.detected ? "var(--accent)" : "var(--muted)",
                         }}
                     >
                         {row.detected ? `✓ ${row.detected.platform}` : ""}
@@ -300,13 +268,7 @@ function HandleRepeater({
     );
 }
 
-function PurposeField({
-    value,
-    onChange,
-}: {
-    value: string;
-    onChange: (v: string) => void;
-}) {
+function PurposeField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     return (
         <section className="flex flex-col gap-3">
             <label className="text-xs uppercase tracking-[0.3em] text-muted">
@@ -327,43 +289,36 @@ function PurposeField({
     );
 }
 
-function VibeChips({
-    selected,
-    onToggle,
-}: {
-    selected: Set<string>;
-    onToggle: (v: string) => void;
-}) {
+function BrandColorField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     return (
         <section className="flex flex-col gap-3">
             <label className="text-xs uppercase tracking-[0.3em] text-muted">
-                How should it feel? <span className="opacity-60">(pick 1–3)</span>
+                Brand color
             </label>
-            <div className="flex flex-wrap gap-2">
-                {VIBE_CHOICES.map((v) => {
-                    const isActive = selected.has(v);
-                    return (
-                        <button
-                            key={v}
-                            type="button"
-                            onClick={() => onToggle(v)}
-                            className="text-sm px-4 py-2 border rounded-full transition-colors"
-                            style={{
-                                borderColor: isActive
-                                    ? "var(--accent)"
-                                    : "var(--card-border)",
-                                color: isActive
-                                    ? "var(--accent)"
-                                    : "var(--muted)",
-                                backgroundColor: isActive
-                                    ? "var(--accent)/10"
-                                    : "transparent",
-                            }}
-                        >
-                            {v}
-                        </button>
-                    );
-                })}
+            <div className="flex items-center gap-4">
+                <input
+                    type="color"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-16 h-12 border cursor-pointer"
+                    style={{ borderColor: "var(--card-border)" }}
+                    aria-label="Pick brand color"
+                />
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder="#22c55e"
+                    className="flex-1 bg-transparent border px-4 py-3 text-base focus:outline-none font-mono"
+                    style={{
+                        borderColor: "var(--card-border)",
+                        color: "var(--foreground)",
+                    }}
+                />
+                <span
+                    className="w-12 h-12 border"
+                    style={{ backgroundColor: value, borderColor: "var(--card-border)" }}
+                />
             </div>
         </section>
     );
@@ -385,18 +340,10 @@ function EmergeChoice({
                     className="text-xs uppercase tracking-[0.3em] mb-4"
                     style={{ color: "var(--accent)" }}
                 >
-                    Pick a direction
+                    Pick a structure
                 </p>
-                <h1
-                    className="text-3xl md:text-5xl tracking-tight max-w-2xl"
-                    style={{
-                        fontFamily: "var(--font-heading)",
-                        fontWeight: 500,
-                        letterSpacing: "-0.015em",
-                        lineHeight: 1.15,
-                    }}
-                >
-                    Which feels right?
+                <h1 className="text-3xl md:text-5xl tracking-tight max-w-2xl font-bold">
+                    Which layout feels right?
                 </h1>
             </div>
 
@@ -407,62 +354,40 @@ function EmergeChoice({
                         type="button"
                         onClick={() => !busy && onPick(v)}
                         disabled={busy}
-                        className="group flex flex-col text-left transition-colors disabled:opacity-50"
-                        style={{
-                            backgroundColor: v.palette.bg,
-                            color: v.palette.fg,
-                            border: "1px solid var(--card-border)",
-                        }}
+                        className="group flex flex-col text-left transition-colors bg-[var(--card-bg)] border hover:border-[var(--accent)] disabled:opacity-50"
+                        style={{ borderColor: "var(--card-border)" }}
                     >
-                        <div
-                            className="p-6 pb-4 min-h-[160px] flex items-end"
-                            style={{
-                                backgroundColor: v.palette.bg,
-                                color: v.palette.fg,
-                            }}
-                        >
+                        <div className="p-6 pb-4 min-h-[160px] flex flex-col gap-3">
                             <p
-                                className="text-lg leading-tight"
-                                style={{
-                                    fontFamily: v.fontPair.heading,
-                                    color: v.palette.headingStart,
-                                    fontWeight: 600,
-                                    letterSpacing: "-0.01em",
-                                }}
+                                className="text-[10px] uppercase tracking-[0.3em]"
+                                style={{ color: v.brandColor }}
+                            >
+                                {v.compositionLabel}
+                            </p>
+                            <p
+                                className="text-lg leading-tight font-semibold"
+                                style={{ color: "var(--foreground)" }}
                             >
                                 {v.previewHeadline || v.compositionLabel}
                             </p>
                         </div>
                         <div
-                            className="px-6 py-4 border-t flex items-center justify-between"
-                            style={{
-                                borderColor: v.palette.muted,
-                                backgroundColor: v.palette.bg,
-                            }}
+                            className="px-6 py-4 border-t flex items-center gap-3"
+                            style={{ borderColor: "var(--card-border)" }}
                         >
-                            <p
-                                className="text-[10px] uppercase tracking-[0.2em]"
+                            <span
+                                className="w-5 h-5"
                                 style={{
-                                    color: v.palette.muted,
-                                    fontFamily: v.fontPair.body,
+                                    backgroundColor: v.brandColor,
+                                    border: "1px solid var(--card-border)",
                                 }}
+                            />
+                            <span
+                                className="text-xs uppercase tracking-wide"
+                                style={{ color: "var(--muted)" }}
                             >
-                                {v.compositionLabel}
-                            </p>
-                            <div className="flex gap-1">
-                                {[v.palette.bg, v.palette.accent, v.palette.headingEnd].map(
-                                    (c, i) => (
-                                        <span
-                                            key={i}
-                                            className="w-3 h-3"
-                                            style={{
-                                                backgroundColor: c,
-                                                border: `1px solid ${v.palette.muted}`,
-                                            }}
-                                        />
-                                    ),
-                                )}
-                            </div>
+                                {v.compositionId}
+                            </span>
                         </div>
                     </button>
                 ))}
