@@ -98,16 +98,43 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
       </Field>
 
       <Field label="Tags">
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          onBlur={() => {
-            const arr = tags.split(",").map((t) => t.trim()).filter(Boolean);
-            savePatch({ tags: arr });
-          }}
-          className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
-          placeholder="comma, separated"
-        />
+        <div className="flex flex-col gap-2">
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((t) => (
+                <span
+                  key={t}
+                  className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted inline-flex items-center gap-2"
+                >
+                  {t}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = post.tags.filter((x) => x !== t);
+                      setTags(next.join(", "));
+                      savePatch({ tags: next });
+                    }}
+                    className="text-muted hover:text-red-400 leading-none text-sm"
+                    aria-label={`remove tag ${t}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <input
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            onBlur={() => {
+              const arr = tags.split(",").map((t) => t.trim()).filter(Boolean);
+              const sameAsPost = arr.length === post.tags.length && arr.every((t, i) => t === post.tags[i]);
+              if (!sameAsPost) savePatch({ tags: arr });
+            }}
+            className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
+            placeholder="comma, separated"
+          />
+        </div>
       </Field>
 
       <Field label="Hero">

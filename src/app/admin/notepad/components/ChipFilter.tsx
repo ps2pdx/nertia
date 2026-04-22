@@ -37,7 +37,7 @@ export function ChipFilter({ filter, onChange, allPosts, topOffset = "49px" }: P
   for (const p of allPosts) counts[p.status]++;
 
   const categoryCounts: Record<ProjectCategory, number> = {
-    nertia: 0, ableton: 0, vantage: 0, "zen-holo": 0, misc: 0,
+    nertia: 0, ableton: 0, vantage: 0, "zen-holo": 0, devex: 0, misc: 0,
   };
   for (const p of allPosts) categoryCounts[categoryOf(projectOf(p))]++;
 

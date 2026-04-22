@@ -51,9 +51,10 @@ export function projectOf(p: { project?: string | null; cwd?: string | null }): 
   return derived && derived.length > 0 ? derived : "unknown";
 }
 
-// Project categories grouped by Scott's ~/code folders.
-// nertia is the main project (current repo). Everything unmatched → misc.
-export const PROJECT_CATEGORIES = ["nertia", "ableton", "vantage", "zen-holo", "misc"] as const;
+// Project categories grouped by Scott's ~/code folders and his Claude-skill
+// workspace. "devex" collects developer-experience work: skills, MCP,
+// radio-coms, notepad pipeline, claude-code workflow. Unmatched → misc.
+export const PROJECT_CATEGORIES = ["nertia", "ableton", "vantage", "zen-holo", "devex", "misc"] as const;
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
 
 export function categoryOf(project: string): ProjectCategory {
@@ -62,6 +63,11 @@ export function categoryOf(project: string): ProjectCategory {
   if (p.includes("ableton")) return "ableton";
   if (p.includes("vantage") || p === "2026") return "vantage";
   if (p.includes("zen-holo") || p === "holo") return "zen-holo";
+  if (
+    p === "claude" || p === "claude-code" ||
+    p === "notepad" || p === "radio" || p === "radio-coms" ||
+    p === "mcp" || p.includes("skill") || p.includes("devex")
+  ) return "devex";
   return "misc";
 }
 
