@@ -1,10 +1,12 @@
 import { getSection } from "@/sections";
-import type { CompositionSite, Tokens } from "@/lib/siteShapes";
+import type { CompositionSite } from "@/lib/siteShapes";
 
 /**
  * Renders a composition-keyed Site:
- *   - Injects tokens as CSS custom properties on the root wrapper so every
- *     section can style with var(--token-bg), var(--token-accent), etc.
+ *   - Injects the user's brand color as `--accent` on the root wrapper so
+ *     every section's accent colors resolve to that hex. Everything else
+ *     (dark/light mode, foreground/background, fonts, muted, card borders)
+ *     cascades from nertia's globals.css via prefers-color-scheme.
  *   - Walks composition.sections in order. For each instance, slices
  *     site.copy down to just that instance's slots (strips the instanceId
  *     prefix), looks up the section component in the registry, renders.
@@ -14,10 +16,15 @@ import type { CompositionSite, Tokens } from "@/lib/siteShapes";
  * rather than rendered as broken boxes.
  */
 export default function CompositionRenderer({ site }: { site: CompositionSite }) {
-    const tokenStyle = tokensToCssVars(site.tokens);
+    const wrapperStyle: React.CSSProperties = {
+        ["--accent" as string]: site.brandColor,
+    };
 
     return (
-        <div style={tokenStyle} className="min-h-screen">
+        <div
+            style={wrapperStyle}
+            className="min-h-screen bg-[var(--background)] text-[var(--foreground)]"
+        >
             {site.composition.sections.map((inst) => {
                 const section = getSection(inst.id);
                 if (!section) {
@@ -40,11 +47,11 @@ export default function CompositionRenderer({ site }: { site: CompositionSite })
 function Attribution() {
     return (
         <footer
-            className="py-5 text-center text-xs"
+            className="py-5 text-center text-xs border-t"
             style={{
-                color: "var(--token-muted, #6b6b6b)",
-                borderTop: "1px solid var(--token-muted, #1f1f1f)",
-                fontFamily: "var(--token-font-body)",
+                color: "var(--muted)",
+                borderColor: "var(--card-border)",
+                fontFamily: "var(--font-body)",
             }}
         >
             <a href="https://nertia.ai" style={{ color: "inherit" }}>
@@ -52,22 +59,6 @@ function Attribution() {
             </a>
         </footer>
     );
-}
-
-function tokensToCssVars(tokens: Tokens): React.CSSProperties {
-    const { palette: p, fontPair: f } = tokens;
-    return {
-        ["--token-bg" as string]: p.bg,
-        ["--token-fg" as string]: p.fg,
-        ["--token-muted" as string]: p.muted,
-        ["--token-accent" as string]: p.accent,
-        ["--token-heading-start" as string]: p.headingStart,
-        ["--token-heading-end" as string]: p.headingEnd,
-        ["--token-font-heading" as string]: f.heading,
-        ["--token-font-body" as string]: f.body,
-        backgroundColor: p.bg,
-        color: p.fg,
-    };
 }
 
 /**

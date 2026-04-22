@@ -38,6 +38,7 @@ yarn-error.log*
 
 # claude code — local per-user overrides stay out of git
 .claude/settings.local.json
+.superpowers/
 
 # typescript
 *.tsbuildinfo

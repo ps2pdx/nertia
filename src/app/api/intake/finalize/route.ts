@@ -32,7 +32,7 @@ const HandleSchema = z.object({
 
 const BrandContextSchema = z.object({
     purpose: z.string().optional(),
-    vibes: z.array(z.string()).optional(),
+    brandColor: z.string().optional(),
     handles: z.array(HandleSchema).optional(),
 });
 
@@ -44,7 +44,7 @@ const BodySchema = z.object({
 
 /**
  * Writes a composition-shaped site to Firebase. Zero LLM — composition +
- * tokens come from the picked emerge variant; copy comes from the
+ * brand color come from the picked emerge variant; copy comes from the
  * deterministic writeCopy pass over the brand context.
  */
 export async function POST(req: Request): Promise<Response> {
@@ -86,10 +86,7 @@ export async function POST(req: Request): Promise<Response> {
                     instanceId: s.instanceId,
                 })),
             },
-            tokens: {
-                palette: finalVariant.palette,
-                fontPair: finalVariant.fontPair,
-            },
+            brandColor: finalVariant.brandColor,
             copy: writeCopy(brandContext, {
                 id: compDef.id,
                 sections: compDef.sections.map((s) => ({

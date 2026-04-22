@@ -94,9 +94,11 @@ This keeps the site's visual language coherent, prevents drift between pages, an
 
 ## Blog convention
 
-Blog posts are markdown files in `src/content/blog/*.md`, loaded via `getAllPosts()` / `getPostBySlug()` in `src/lib/blog.ts`. Frontmatter: `title, description, date, hero, tags`. Hero images live in `public/blog/`. 4 posts published as of 2026-04-16.
+Blog posts and drafts both live in **Firebase RTDB** under `notepad/posts/{slug}` and `notepad/drafts/{id}` (as of 2026-04-21). The public `/blog` route renders from RTDB; drafts are managed via the phone-accessible admin at `/admin/notepad`. Frontmatter fields persist as RTDB columns: `title, description, date, slug, hero, tags, body, status, source, source_session_id, authored`.
 
-Blog stays file-based. Do not migrate to a DB. The `/admin/blog` BTS route reviews notepad-pipeline drafts from `src/content/blog-candidates/` before promoting to `src/content/blog/`.
+File-based content (`src/content/blog/*.md`, `src/content/blog-candidates/*.md`) and the `/admin/blog` route are **being retired** during the migration. Existing markdown posts are one-time imported into RTDB. Hero images continue to live in `public/blog/` and are referenced by path.
+
+The notepad pipeline (`~/.claude/skills/notepad/bin/notepad-sync`) pushes local session drafts directly to `notepad/drafts/*` in RTDB. Approval and publish happen from `/admin/notepad` on any device.
 
 ## Environment
 
@@ -123,7 +125,6 @@ Run `/zp-init` to load current project state, check the active branch, and surfa
 - Introduce Supabase (we use Firebase).
 - Recycle zen-holo / particles / blender assets into nertia templates.
 - Ship raw free React templates from the reference library as-is.
-- Migrate the blog to a database.
 - Resurrect `/generator`, `/admin/golden-examples`, or "design tokens" product language in new work.
 - Commit `.env*` files. `.env.local` stays uncommitted.
 - Use `--no-verify` on git commits unless Scott explicitly asks.

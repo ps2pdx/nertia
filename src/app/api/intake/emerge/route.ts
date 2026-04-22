@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { BrandContext } from "@/lib/brandContext";
-import { pickThreeForEmerge } from "@/lib/palette";
-import { pickFontPair } from "@/lib/fontPair";
-import { pickComposition } from "@/compositions";
+import { pickTopCompositions } from "@/compositions";
 import { getSection } from "@/sections";
 import type { CompositionDef } from "@/compositions";
 import { type EmergeVariant } from "@/lib/emerge";
@@ -19,7 +17,7 @@ const HandleSchema = z.object({
 
 const BrandContextSchema = z.object({
     purpose: z.string().optional(),
-    vibes: z.array(z.string()).optional(),
+    brandColor: z.string().optional(),
     handles: z.array(HandleSchema).optional(),
 });
 
@@ -27,9 +25,11 @@ const BodySchema = z.object({
     brandContext: BrandContextSchema,
 });
 
+const DEFAULT_BRAND_COLOR = "#22c55e";
+
 /**
- * Single-round emerge — zero LLM. Returns 3 visually distinct palette variants
- * all bound to the composition + font pair picked for the brand context.
+ * Single-round emerge — zero LLM. Returns 3 composition-variants all sharing
+ * the user's brand color. The user picks a structure, not a palette.
  */
 export async function POST(req: Request): Promise<Response> {
     try {
@@ -42,20 +42,16 @@ export async function POST(req: Request): Promise<Response> {
             );
         }
         const { brandContext } = parsed.data;
+        const brandColor = brandContext.brandColor ?? DEFAULT_BRAND_COLOR;
+        const tops = pickTopCompositions(brandContext as BrandContext, 3);
 
-        const composition = pickComposition(brandContext as BrandContext);
-        const fontPair = pickFontPair(brandContext as BrandContext);
-        const previewHeadline = buildPreviewHeadline(brandContext as BrandContext, composition);
-        const palettes = pickThreeForEmerge(brandContext as BrandContext);
-
-        const variants: EmergeVariant[] = palettes.map((palette, i) => ({
-            id: `emerge-${composition.id}-${i}`,
-            label: `${composition.displayName} · variant ${i + 1}`,
-            palette,
-            fontPair,
-            compositionId: composition.id,
-            compositionLabel: composition.displayName,
-            previewHeadline,
+        const variants: EmergeVariant[] = tops.map((comp, i) => ({
+            id: `emerge-${comp.id}-${i}`,
+            label: comp.displayName,
+            compositionId: comp.id,
+            compositionLabel: comp.displayName,
+            brandColor,
+            previewHeadline: buildPreviewHeadline(brandContext as BrandContext, comp),
         }));
 
         return NextResponse.json({ variants });
