@@ -22,9 +22,27 @@ const DOT: Record<string, string> = {
 };
 
 export function DraftRow({ post, selected, expanded, showCheckbox, knownProjects, onToggleSelect, onToggleExpand, onUpdate }: Props) {
+  const rowBg = selected
+    ? "bg-[var(--accent)]/15"
+    : expanded
+      ? "bg-[var(--card-bg)]"
+      : "";
   return (
-    <li className={`border-b border-[var(--card-border)] ${expanded ? "bg-[var(--card-bg)]" : ""}`}>
-      <div className="flex items-center gap-3 px-4 py-3">
+    <li className={`border-b border-[var(--card-border)] transition-colors ${rowBg}`}>
+      <button
+        type="button"
+        onClick={onToggleExpand}
+        aria-expanded={expanded}
+        className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:text-[var(--accent)]"
+      >
+        <svg
+          viewBox="0 0 20 20"
+          className={`w-3 h-3 flex-shrink-0 text-muted transition-transform ${expanded ? "rotate-90" : ""}`}
+          fill="currentColor"
+          aria-hidden
+        >
+          <path d="M7 5l6 5-6 5V5z" />
+        </svg>
         {showCheckbox && (
           <input
             type="checkbox"
@@ -39,10 +57,7 @@ export function DraftRow({ post, selected, expanded, showCheckbox, knownProjects
           style={{ background: DOT[post.status] }}
           aria-label={post.status}
         />
-        <button
-          onClick={onToggleExpand}
-          className="flex-1 text-left text-sm truncate flex items-center gap-2"
-        >
+        <span className="flex-1 text-sm truncate flex items-center gap-2">
           <span className="truncate">{post.title || "(untitled)"}</span>
           {post.merged_from && post.merged_from.length > 0 && (
             <span
@@ -60,9 +75,9 @@ export function DraftRow({ post, selected, expanded, showCheckbox, knownProjects
               → merged
             </span>
           )}
-        </button>
+        </span>
         <span className="text-xs text-muted">{post.date}</span>
-      </div>
+      </button>
       {expanded && <ExpandedRow post={post} knownProjects={knownProjects} onUpdate={onUpdate} />}
     </li>
   );

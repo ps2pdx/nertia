@@ -43,7 +43,7 @@ export function HeroUpload({ post, onUpdate }: Props) {
           <img
             src={post.hero}
             alt="hero"
-            className="w-full max-h-40 object-cover rounded border border-[var(--card-border)]"
+            className="w-full max-h-64 object-contain rounded border border-[var(--card-border)] bg-[var(--card-bg)]"
           />
           <div className="flex items-center gap-3 text-xs">
             <button

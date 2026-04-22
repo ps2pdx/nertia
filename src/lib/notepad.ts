@@ -51,6 +51,26 @@ export function projectOf(p: { project?: string | null; cwd?: string | null }): 
   return derived && derived.length > 0 ? derived : "unknown";
 }
 
+// Project categories grouped by Scott's ~/code folders and his Claude-skill
+// workspace. "devex" collects developer-experience work: skills, MCP,
+// radio-coms, notepad pipeline, claude-code workflow. Unmatched → misc.
+export const PROJECT_CATEGORIES = ["nertia", "ableton", "vantage", "zen-holo", "devex", "misc"] as const;
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+
+export function categoryOf(project: string): ProjectCategory {
+  const p = project.toLowerCase();
+  if (p.includes("nertia")) return "nertia";
+  if (p.includes("ableton")) return "ableton";
+  if (p.includes("vantage") || p === "2026") return "vantage";
+  if (p.includes("zen-holo") || p === "holo") return "zen-holo";
+  if (
+    p === "claude" || p === "claude-code" ||
+    p === "notepad" || p === "radio" || p === "radio-coms" ||
+    p === "mcp" || p.includes("skill") || p.includes("devex")
+  ) return "devex";
+  return "misc";
+}
+
 export function concatCompose(sources: Array<{ title: string; body: string }>): string {
   if (sources.length === 0) return "";
   return sources.map((s) => `## ${s.title}\n\n${s.body}`).join("\n\n");

@@ -1,5 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { projectOf, type Post } from "@/lib/notepad";
 import { useAdminToken } from "@/hooks/useAdminToken";
 import { PolishDiff } from "./PolishDiff";
@@ -17,8 +20,95 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   const [body, setBody] = useState(post.body);
   const [tags, setTags] = useState(post.tags.join(", "));
   const [project, setProject] = useState(projectOf(post));
+  const [slug, setSlug] = useState(post.slug ?? slugify(post.title));
   const [polishSuggestion, setPolishSuggestion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [bodyMode, setBodyMode] = useState<"edit" | "preview">("edit");
+  const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function applyWrap(before: string, after: string = before) {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = body.slice(start, end);
+
+    // Toggle: if the selection (or the chars just outside it) is already
+    // wrapped in `before`/`after`, strip the wrapping instead of re-adding.
+    const innerMatch =
+      selected.startsWith(before) && selected.endsWith(after) &&
+      selected.length >= before.length + after.length;
+    const outerMatch =
+      body.slice(Math.max(0, start - before.length), start) === before &&
+      body.slice(end, end + after.length) === after;
+
+    if (innerMatch) {
+      const unwrapped = selected.slice(before.length, selected.length - after.length);
+      const next = body.slice(0, start) + unwrapped + body.slice(end);
+      setBody(next);
+      queueMicrotask(() => {
+        ta.focus();
+        ta.setSelectionRange(start, start + unwrapped.length);
+      });
+      return;
+    }
+    if (outerMatch) {
+      const next = body.slice(0, start - before.length) + selected + body.slice(end + after.length);
+      setBody(next);
+      queueMicrotask(() => {
+        ta.focus();
+        ta.setSelectionRange(start - before.length, start - before.length + selected.length);
+      });
+      return;
+    }
+
+    const replaced = before + selected + after;
+    const next = body.slice(0, start) + replaced + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      const caret = start + before.length;
+      ta.setSelectionRange(caret, caret + selected.length);
+    });
+  }
+
+  function applyLinePrefix(prefix: string) {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const lineStart = body.lastIndexOf("\n", start - 1) + 1;
+    const block = body.slice(lineStart, end);
+    const lines = block.split("\n");
+    const allPrefixed = lines.every((l) => l.startsWith(prefix));
+    const next_lines = allPrefixed
+      ? lines.map((l) => l.slice(prefix.length))
+      : lines.map((l) => (l.startsWith(prefix) ? l : prefix + l));
+    const prefixed = next_lines.join("\n");
+    const next = body.slice(0, lineStart) + prefixed + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      ta.setSelectionRange(lineStart, lineStart + prefixed.length);
+    });
+  }
+
+  function applyLink() {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = body.slice(start, end) || "text";
+    const replaced = `[${selected}](url)`;
+    const next = body.slice(0, start) + replaced + body.slice(end);
+    setBody(next);
+    queueMicrotask(() => {
+      ta.focus();
+      const urlStart = start + selected.length + 3;
+      ta.setSelectionRange(urlStart, urlStart + 3);
+    });
+  }
 
   async function savePatch(patch: Partial<Post>) {
     if (!token) return;
@@ -30,18 +120,55 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
     if (res.ok) onUpdate({ ...post, ...patch } as Post);
   }
 
-  async function publish() {
-    const slug = window.prompt("Slug:", post.slug ?? slugify(post.title));
-    if (!slug || !token) return;
+  const tagsArr = tags.split(",").map((t) => t.trim()).filter(Boolean);
+  const derivedSlug = post.slug ?? slugify(post.title);
+  const dirty =
+    title !== post.title ||
+    body !== post.body ||
+    slug !== derivedSlug ||
+    project !== projectOf(post) ||
+    tagsArr.length !== post.tags.length ||
+    tagsArr.some((t, i) => t !== post.tags[i]);
+
+  async function saveAll() {
+    const patch: Partial<Post> = {};
+    if (title !== post.title) patch.title = title;
+    if (body !== post.body) patch.body = body;
+    if (slug !== derivedSlug) patch.slug = slug.trim();
+    if (project !== projectOf(post)) patch.project = project;
+    if (tagsArr.length !== post.tags.length || tagsArr.some((t, i) => t !== post.tags[i])) {
+      patch.tags = tagsArr;
+    }
+    if (Object.keys(patch).length === 0) return;
     setBusy(true);
+    try {
+      await savePatch(patch);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function publish() {
+    if (!token) return;
+    const finalSlug = slug.trim() || slugify(title || post.title);
+    if (!finalSlug) {
+      setPublishError("Slug required");
+      return;
+    }
+    setBusy(true);
+    setPublishError(null);
     try {
       const res = await fetch(`/api/admin/notepad/${post.id}/publish`, {
         method: "POST",
         headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-        body: JSON.stringify({ slug }),
+        body: JSON.stringify({ slug: finalSlug }),
       });
-      if (res.ok) onUpdate({ ...post, status: "published", slug, published_at: Date.now() });
-      else alert(`Publish failed: ${(await res.json()).error}`);
+      if (res.ok) {
+        setSlug(finalSlug);
+        onUpdate({ ...post, status: "published", slug: finalSlug, published_at: Date.now() });
+      } else {
+        setPublishError((await res.json()).error ?? `HTTP ${res.status}`);
+      }
     } finally {
       setBusy(false);
     }
@@ -66,7 +193,31 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   }
 
   return (
-    <div className="px-4 pb-4 space-y-3">
+    <div className="px-4 pb-4 space-y-3 border-l-2 border-[var(--accent)]/60">
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--accent)]">
+            Editing
+          </span>
+          <span className="text-[10px] text-muted">
+            · {dirty ? "unsaved changes" : "all changes saved"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={saveAll}
+          disabled={!dirty || busy}
+          className={`text-xs uppercase tracking-wide px-3 py-1 border ${
+            dirty && !busy
+              ? "border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/10"
+              : "border-[var(--card-border)] text-muted opacity-60"
+          }`}
+        >
+          {busy ? "Saving…" : dirty ? "Save" : "Saved"}
+        </button>
+      </div>
+
       <Field label="Title">
         <input
           value={title}
@@ -98,16 +249,66 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
       </Field>
 
       <Field label="Tags">
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          onBlur={() => {
-            const arr = tags.split(",").map((t) => t.trim()).filter(Boolean);
-            savePatch({ tags: arr });
-          }}
-          className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
-          placeholder="comma, separated"
-        />
+        <div className="flex flex-col gap-2">
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((t) => (
+                <span
+                  key={t}
+                  className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted inline-flex items-center gap-2"
+                >
+                  {t}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = post.tags.filter((x) => x !== t);
+                      setTags(next.join(", "));
+                      savePatch({ tags: next });
+                    }}
+                    className="text-muted hover:text-red-400 leading-none text-sm"
+                    aria-label={`remove tag ${t}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <input
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            onBlur={() => {
+              const arr = tags.split(",").map((t) => t.trim()).filter(Boolean);
+              const sameAsPost = arr.length === post.tags.length && arr.every((t, i) => t === post.tags[i]);
+              if (!sameAsPost) savePatch({ tags: arr });
+            }}
+            className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
+            placeholder="comma, separated"
+          />
+        </div>
+      </Field>
+
+      <Field label="Slug">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted whitespace-nowrap">nertia.ai/blog/</span>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              onBlur={() => {
+                const trimmed = slug.trim();
+                if (trimmed && trimmed !== post.slug) savePatch({ slug: trimmed });
+              }}
+              placeholder={slugify(title || post.title)}
+              className="flex-1 bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm"
+            />
+          </div>
+          {post.status === "published" && (
+            <span className="text-[10px] text-amber-400/80">
+              Published — changing the slug will break the live URL.
+            </span>
+          )}
+        </div>
       </Field>
 
       <Field label="Hero">
@@ -128,15 +329,88 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
             onRegenerate={requestPolish}
           />
         ) : (
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onBlur={() => body !== post.body && savePatch({ body })}
-            rows={12}
-            className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm font-mono"
-          />
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-1 text-[10px] uppercase tracking-wide">
+              <button
+                type="button"
+                onClick={() => setBodyMode("edit")}
+                className={`px-2 py-1 border ${
+                  bodyMode === "edit"
+                    ? "border-[var(--foreground)] text-[var(--foreground)]"
+                    : "border-[var(--card-border)] text-muted hover:text-[var(--foreground)]"
+                }`}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setBodyMode("preview")}
+                className={`px-2 py-1 border ${
+                  bodyMode === "preview"
+                    ? "border-[var(--foreground)] text-[var(--foreground)]"
+                    : "border-[var(--card-border)] text-muted hover:text-[var(--foreground)]"
+                }`}
+              >
+                Preview
+              </button>
+            </div>
+            {bodyMode === "edit" ? (
+              <div className="flex flex-col">
+                <div className="flex flex-wrap gap-1 border border-[var(--card-border)] border-b-0 rounded-t bg-[var(--card-bg)] p-1">
+                  <TB label="Bold" onClick={() => applyWrap("**")} className="font-bold">B</TB>
+                  <TB label="Italic" onClick={() => applyWrap("*")} className="italic">I</TB>
+                  <TB label="Inline code" onClick={() => applyWrap("`")} className="font-mono">{"`"}</TB>
+                  <span className="w-px bg-[var(--card-border)] mx-1 my-0.5" />
+                  <TB label="Heading 2" onClick={() => applyLinePrefix("## ")}>H2</TB>
+                  <TB label="Heading 3" onClick={() => applyLinePrefix("### ")}>H3</TB>
+                  <span className="w-px bg-[var(--card-border)] mx-1 my-0.5" />
+                  <TB label="List" onClick={() => applyLinePrefix("- ")}>List</TB>
+                  <TB label="Quote" onClick={() => applyLinePrefix("> ")}>Quote</TB>
+                  <TB label="Link" onClick={applyLink}>Link</TB>
+                </div>
+                <textarea
+                  ref={bodyRef}
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  onBlur={() => body !== post.body && savePatch({ body })}
+                  rows={14}
+                  className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded-b px-3 py-2 text-base leading-relaxed"
+                />
+              </div>
+            ) : (
+              <div
+                className="border border-[var(--card-border)] rounded px-4 py-3 min-h-[200px] text-base leading-relaxed
+                  [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2
+                  [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2
+                  [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1
+                  [&_p]:my-3
+                  [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
+                  [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-3
+                  [&_li]:my-1
+                  [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-muted [&_blockquote]:my-3
+                  [&_code]:bg-[var(--card-bg)] [&_code]:text-[var(--accent)] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[0.9em]
+                  [&_pre]:bg-[var(--card-bg)] [&_pre]:border [&_pre]:border-[var(--card-border)] [&_pre]:rounded [&_pre]:p-3 [&_pre]:my-3 [&_pre]:overflow-x-auto
+                  [&_pre_code]:bg-transparent [&_pre_code]:px-0 [&_pre_code]:text-[var(--foreground)]
+                  [&_a]:text-[var(--accent)] [&_a]:underline
+                  [&_strong]:font-semibold [&_strong]:text-[var(--foreground)]
+                  [&_hr]:border-[var(--card-border)] [&_hr]:my-4"
+              >
+                {body.trim() ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{body}</ReactMarkdown>
+                ) : (
+                  <p className="text-muted italic">Empty body.</p>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </Field>
+
+      {publishError && (
+        <div className="text-xs text-red-400 border border-red-500/40 bg-red-500/5 rounded px-3 py-2">
+          Publish failed: {publishError}
+        </div>
+      )}
 
       <div className="flex gap-2 flex-wrap pt-1">
         <button
@@ -144,7 +418,7 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
           disabled={busy}
           className="px-3 py-1.5 bg-[var(--accent)] text-black rounded text-sm font-semibold disabled:opacity-50"
         >
-          Publish
+          {post.status === "published" ? "Republish" : "Publish"}
         </button>
         <button
           onClick={requestPolish}
@@ -182,4 +456,29 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+}
+
+function TB({
+  children,
+  label,
+  onClick,
+  className = "",
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      className={`text-xs uppercase tracking-wide border border-transparent text-muted hover:text-[var(--foreground)] hover:border-[var(--card-border)] px-2 py-1 ${className}`}
+    >
+      {children}
+    </button>
+  );
 }
