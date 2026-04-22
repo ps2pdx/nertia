@@ -138,10 +138,10 @@ function Inner() {
           className={
             method
               ? "flex-1 bg-[var(--accent)] text-black rounded py-2 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-              : "flex-1 border border-[var(--card-border)] rounded py-2 text-sm text-muted cursor-not-allowed"
+              : "flex-1 rounded py-2 text-sm font-semibold border border-[var(--accent)] text-[var(--accent)] cursor-not-allowed"
           }
         >
-          {busy ? "Creating…" : method ? "Create draft" : "Pick a method first"}
+          {busy ? "Creating…" : "Create draft"}
         </button>
       </div>
     </main>
