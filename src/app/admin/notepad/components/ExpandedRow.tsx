@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { projectOf, type Post } from "@/lib/notepad";
 import { useAdminToken } from "@/hooks/useAdminToken";
 import { PolishDiff } from "./PolishDiff";
@@ -21,6 +23,7 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   const [polishSuggestion, setPolishSuggestion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [bodyMode, setBodyMode] = useState<"edit" | "preview">("edit");
 
   async function savePatch(patch: Partial<Post>) {
     if (!token) return;
@@ -189,13 +192,49 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
             onRegenerate={requestPolish}
           />
         ) : (
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onBlur={() => body !== post.body && savePatch({ body })}
-            rows={12}
-            className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-2 py-1.5 text-sm font-mono"
-          />
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-1 text-[10px] uppercase tracking-wide">
+              <button
+                type="button"
+                onClick={() => setBodyMode("edit")}
+                className={`px-2 py-1 border ${
+                  bodyMode === "edit"
+                    ? "border-[var(--foreground)] text-[var(--foreground)]"
+                    : "border-[var(--card-border)] text-muted hover:text-[var(--foreground)]"
+                }`}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setBodyMode("preview")}
+                className={`px-2 py-1 border ${
+                  bodyMode === "preview"
+                    ? "border-[var(--foreground)] text-[var(--foreground)]"
+                    : "border-[var(--card-border)] text-muted hover:text-[var(--foreground)]"
+                }`}
+              >
+                Preview
+              </button>
+            </div>
+            {bodyMode === "edit" ? (
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                onBlur={() => body !== post.body && savePatch({ body })}
+                rows={14}
+                className="w-full bg-[var(--background)] border border-[var(--card-border)] rounded px-3 py-2 text-base leading-relaxed"
+              />
+            ) : (
+              <div className="border border-[var(--card-border)] rounded px-4 py-3 min-h-[200px] prose prose-invert max-w-none prose-headings:font-semibold prose-p:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)]">
+                {body.trim() ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                ) : (
+                  <p className="text-muted italic">Empty body.</p>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </Field>
 
