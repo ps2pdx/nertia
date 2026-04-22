@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { BrandContext } from "@/lib/brandContext";
 
 /**
  * One copy slot in a section. Section schemas declare their slots using
@@ -37,9 +38,18 @@ export interface SectionProps {
     copy: Record<string, string>;
 }
 
+/**
+ * Pure function producing this section's copy from a BrandContext.
+ * Keys are slot names (same as SectionCopySchemaField.key). No LLM.
+ * Each section owns its voice — `lib/writeCopy.ts` orchestrates across a
+ * composition by calling this per-instance and prefixing keys.
+ */
+export type SectionWriteCopy = (ctx: BrandContext) => Record<string, string>;
+
 /** Everything a section exports. Registered by `src/sections/index.ts`. */
 export interface Section {
     meta: SectionMeta;
     schema: SectionCopySchemaField[];
     Component: ComponentType<SectionProps>;
+    writeCopy: SectionWriteCopy;
 }
