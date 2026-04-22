@@ -26,7 +26,7 @@ export async function POST(req: Request): Promise<Response> {
   const buffer = Buffer.from(await file.arrayBuffer());
   const obj = bucket.file(objectPath);
   await obj.save(buffer, { contentType: file.type, public: true });
-  const url = `https://storage.googleapis.com/${bucket.name}/${objectPath}`;
+  const url = `https://storage.googleapis.com/${bucket.name}/${objectPath}?v=${Date.now()}`;
 
   return NextResponse.json({ url });
 }

@@ -87,6 +87,34 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
     if (res.ok) onUpdate({ ...post, ...patch } as Post);
   }
 
+  const tagsArr = tags.split(",").map((t) => t.trim()).filter(Boolean);
+  const derivedSlug = post.slug ?? slugify(post.title);
+  const dirty =
+    title !== post.title ||
+    body !== post.body ||
+    slug !== derivedSlug ||
+    project !== projectOf(post) ||
+    tagsArr.length !== post.tags.length ||
+    tagsArr.some((t, i) => t !== post.tags[i]);
+
+  async function saveAll() {
+    const patch: Partial<Post> = {};
+    if (title !== post.title) patch.title = title;
+    if (body !== post.body) patch.body = body;
+    if (slug !== derivedSlug) patch.slug = slug.trim();
+    if (project !== projectOf(post)) patch.project = project;
+    if (tagsArr.length !== post.tags.length || tagsArr.some((t, i) => t !== post.tags[i])) {
+      patch.tags = tagsArr;
+    }
+    if (Object.keys(patch).length === 0) return;
+    setBusy(true);
+    try {
+      await savePatch(patch);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function publish() {
     if (!token) return;
     const finalSlug = slug.trim() || slugify(title || post.title);
@@ -132,7 +160,31 @@ export function ExpandedRow({ post, knownProjects, onUpdate }: Props) {
   }
 
   return (
-    <div className="px-4 pb-4 space-y-3">
+    <div className="px-4 pb-4 space-y-3 border-l-2 border-[var(--accent)]/60">
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--accent)]">
+            Editing
+          </span>
+          <span className="text-[10px] text-muted">
+            · {dirty ? "unsaved changes" : "all changes saved"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={saveAll}
+          disabled={!dirty || busy}
+          className={`text-xs uppercase tracking-wide px-3 py-1 border ${
+            dirty && !busy
+              ? "border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/10"
+              : "border-[var(--card-border)] text-muted opacity-60"
+          }`}
+        >
+          {busy ? "Saving…" : dirty ? "Save" : "Saved"}
+        </button>
+      </div>
+
       <Field label="Title">
         <input
           value={title}
