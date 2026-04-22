@@ -1,73 +1,84 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect } from "vitest";
 import { POST } from "@/app/api/intake/emerge/route";
-import type { ThemeVariant } from "@/lib/brandContext";
+import type { EmergeVariant } from "@/lib/emerge";
 
-const ORIG_DEMO = process.env.USE_DEMO_MODE;
-
-beforeAll(() => {
-  process.env.USE_DEMO_MODE = "true";
-});
-afterAll(() => {
-  if (ORIG_DEMO === undefined) delete process.env.USE_DEMO_MODE;
-  else process.env.USE_DEMO_MODE = ORIG_DEMO;
-});
-
-const ctx = {
-  purpose: "portfolio",
-  audience: "editors",
-  vibeWords: ["quiet"],
-  adaptive: [],
+const sampleCtx = {
+    purpose: "A photographer's portfolio",
+    audience: "Art directors and couples",
+    vibeWords: ["warm", "cinematic"],
+    adaptive: [],
 };
 
-describe("/api/intake/emerge (demo mode)", () => {
-  it("round 1 returns exactly 3 distinct variants", async () => {
-    const req = new Request("http://localhost/api/intake/emerge", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ brandContext: ctx, round: 1 }),
+function makeRequest(body: unknown): Request {
+    return new Request("http://localhost/api/intake/emerge", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
     });
-    const res = await POST(req);
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { variants: ThemeVariant[] };
-    expect(body.variants).toHaveLength(3);
-    const ids = new Set(body.variants.map((v) => v.id));
-    expect(ids.size).toBe(3);
-    // each variant is a valid ThemeVariant shape
-    for (const v of body.variants) {
-      expect(v.palette.bg).toMatch(/^#/);
-      expect(v.palette.accent).toMatch(/^#/);
-      expect(v.fontPair.heading.length).toBeGreaterThan(0);
-    }
-  });
+}
 
-  it("round 2 returns 3 near-neighbors of the picked variant", async () => {
-    const req = new Request("http://localhost/api/intake/emerge", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        brandContext: ctx,
-        round: 2,
-        pickedVariantId: "void-dark",
-      }),
+describe("/api/intake/emerge", () => {
+    it("round 1 returns 3 variants with composition + tokens + preview headline", async () => {
+        const res = await POST(
+            makeRequest({ brandContext: sampleCtx, round: 1 }),
+        );
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { variants: EmergeVariant[] };
+        expect(body.variants).toHaveLength(3);
+        for (const v of body.variants) {
+            expect(v.id).toBeTruthy();
+            expect(v.compositionId).toBeTruthy();
+            expect(v.compositionLabel).toBeTruthy();
+            expect(v.palette.bg).toBeTruthy();
+            expect(v.palette.accent).toBeTruthy();
+            expect(v.fontPair.heading).toBeTruthy();
+            expect(v.previewHeadline).toBeTruthy();
+        }
     });
-    const res = await POST(req);
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { variants: ThemeVariant[] };
-    expect(body.variants).toHaveLength(3);
-    // neighbors inherit the same bg/fg from void-dark (just accent varies)
-    for (const v of body.variants) {
-      expect(v.palette.bg).toBe("#0a0a0a");
-      expect(v.palette.fg).toBe("#f5f5f5");
-    }
-  });
 
-  it("rejects malformed body", async () => {
-    const req = new Request("http://localhost/api/intake/emerge", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ round: 3 }),
+    it("round 1 variants all use the same composition + fontPair (they vary only in palette)", async () => {
+        const res = await POST(
+            makeRequest({ brandContext: sampleCtx, round: 1 }),
+        );
+        const { variants } = (await res.json()) as { variants: EmergeVariant[] };
+        const compIds = new Set(variants.map((v) => v.compositionId));
+        expect(compIds.size).toBe(1);
+        const headings = new Set(variants.map((v) => v.fontPair.heading));
+        expect(headings.size).toBe(1);
     });
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-  });
+
+    it("round 2 returns 3 accent-neighbor variants of the picked round-1 option", async () => {
+        const r1 = await POST(makeRequest({ brandContext: sampleCtx, round: 1 }));
+        const r1Body = (await r1.json()) as { variants: EmergeVariant[] };
+        const picked = r1Body.variants[0];
+
+        const r2 = await POST(
+            makeRequest({
+                brandContext: sampleCtx,
+                round: 2,
+                pickedVariantId: picked.id,
+                previous: r1Body.variants,
+            }),
+        );
+        expect(r2.status).toBe(200);
+        const r2Body = (await r2.json()) as { variants: EmergeVariant[] };
+        expect(r2Body.variants).toHaveLength(3);
+        for (const v of r2Body.variants) {
+            expect(v.palette.bg).toBe(picked.palette.bg);
+            expect(v.palette.fg).toBe(picked.palette.fg);
+            expect(v.compositionId).toBe(picked.compositionId);
+        }
+    });
+
+    it("round 2 without picked variant returns 400", async () => {
+        const res = await POST(
+            makeRequest({ brandContext: sampleCtx, round: 2 }),
+        );
+        expect(res.status).toBe(400);
+    });
+
+    it("malformed body returns 400", async () => {
+        const res = await POST(makeRequest({ bogus: true }));
+        expect(res.status).toBe(400);
+    });
 });

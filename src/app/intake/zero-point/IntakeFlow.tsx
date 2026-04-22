@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { encodeTheme, type BrandContext, type ThemeVariant } from "@/lib/brandContext";
+import type { BrandContext } from "@/lib/brandContext";
+import type { EmergeVariant } from "@/lib/emerge";
 
 type Step =
   | "q1"
@@ -16,18 +17,14 @@ type Step =
 
 const STEPS: Step[] = ["q1", "q2", "q3", "q4", "q5", "emerge1", "emerge2"];
 
-interface IntakeFlowProps {
-  templateId: string;
-}
-
-export function IntakeFlow({ templateId }: IntakeFlowProps) {
+export function IntakeFlow() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("q1");
   const [ctx, setCtx] = useState<BrandContext>({ adaptive: [] });
   const [adaptiveQs, setAdaptiveQs] = useState<string[] | null>(null);
-  const [round1Variants, setRound1Variants] = useState<ThemeVariant[] | null>(null);
-  const [round2Variants, setRound2Variants] = useState<ThemeVariant[] | null>(null);
-  const [pickedRound1, setPickedRound1] = useState<ThemeVariant | null>(null);
+  const [round1Variants, setRound1Variants] = useState<EmergeVariant[] | null>(null);
+  const [round2Variants, setRound2Variants] = useState<EmergeVariant[] | null>(null);
+  const [pickedRound1, setPickedRound1] = useState<EmergeVariant | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,14 +43,13 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
       if (!res.ok) throw new Error("imagination failed");
       const data = (await res.json()) as { brandContext: BrandContext };
       setCtx(data.brandContext);
-      // skip straight to emerge round 1 with the imagined context
       const emergeRes = await fetch("/api/intake/emerge", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ brandContext: data.brandContext, round: 1 }),
       });
       if (!emergeRes.ok) throw new Error("failed to load variants");
-      const emergeData = (await emergeRes.json()) as { variants: ThemeVariant[] };
+      const emergeData = (await emergeRes.json()) as { variants: EmergeVariant[] };
       setRound1Variants(emergeData.variants);
       setStep("emerge1");
     } catch (e) {
@@ -124,7 +120,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
         body: JSON.stringify({ brandContext: nextCtx, round: 1 }),
       });
       if (!res.ok) throw new Error("failed to load variants");
-      const data = (await res.json()) as { variants: ThemeVariant[] };
+      const data = (await res.json()) as { variants: EmergeVariant[] };
       setRound1Variants(data.variants);
       setStep("emerge1");
     } catch (e) {
@@ -134,7 +130,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
     }
   }
 
-  async function pickRound1(variant: ThemeVariant) {
+  async function pickRound1(variant: EmergeVariant) {
     setPickedRound1(variant);
     setBusy(true);
     setError(null);
@@ -150,7 +146,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
         }),
       });
       if (!res.ok) throw new Error("failed to narrow variants");
-      const data = (await res.json()) as { variants: ThemeVariant[] };
+      const data = (await res.json()) as { variants: EmergeVariant[] };
       setRound2Variants(data.variants);
       setStep("emerge2");
     } catch (e) {
@@ -160,7 +156,7 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
     }
   }
 
-  async function pickRound2(variant: ThemeVariant) {
+  async function pickRound2(variant: EmergeVariant) {
     setStep("submitting");
     setError(null);
     try {
@@ -168,7 +164,6 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          templateId,
           brandContext: ctx,
           finalVariant: variant,
         }),
@@ -277,7 +272,6 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
             eyebrow="EMERGE · ROUND 1"
             question="Pick the direction that feels right."
             variants={round1Variants}
-            templateId={templateId}
             onPick={pickRound1}
             busy={busy}
           />
@@ -288,7 +282,6 @@ export function IntakeFlow({ templateId }: IntakeFlowProps) {
             eyebrow="EMERGE · ROUND 2"
             question="Narrow it down."
             variants={round2Variants}
-            templateId={templateId}
             onPick={pickRound2}
             busy={busy}
             subNote={
@@ -439,16 +432,14 @@ function EmergeChoice({
   eyebrow,
   question,
   variants,
-  templateId,
   onPick,
   busy,
   subNote,
 }: {
   eyebrow: string;
   question: string;
-  variants: ThemeVariant[];
-  templateId: string;
-  onPick: (v: ThemeVariant) => void;
+  variants: EmergeVariant[];
+  onPick: (v: EmergeVariant) => void;
   busy: boolean;
   subNote?: string;
 }) {
@@ -486,53 +477,61 @@ function EmergeChoice({
             type="button"
             onClick={() => !busy && onPick(v)}
             disabled={busy}
-            className="group flex flex-col gap-3 border text-left transition-colors hover:border-[var(--accent)] disabled:opacity-50"
-            style={{ borderColor: "var(--card-border)" }}
+            className="group flex flex-col text-left transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: v.palette.bg,
+              color: v.palette.fg,
+              border: "1px solid var(--card-border)",
+            }}
           >
+            {/* Headline preview in the variant's type + palette */}
             <div
-              className="relative w-full overflow-hidden"
+              className="p-6 pb-4 min-h-[160px] flex items-end"
               style={{
-                aspectRatio: "4 / 5",
-                borderBottom: "1px solid var(--card-border)",
+                backgroundColor: v.palette.bg,
+                color: v.palette.fg,
+              }}
+            >
+              <p
+                className="text-lg leading-tight"
+                style={{
+                  fontFamily: v.fontPair.heading,
+                  color: v.palette.headingStart,
+                  fontWeight: 600,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {v.previewHeadline || v.compositionLabel}
+              </p>
+            </div>
+
+            {/* Metadata strip — palette swatches + composition label */}
+            <div
+              className="px-6 py-4 border-t flex items-center justify-between"
+              style={{
+                borderColor: v.palette.muted,
                 backgroundColor: v.palette.bg,
               }}
             >
-              <iframe
-                src={`/preview/${templateId}?v=${encodeTheme(v)}`}
-                style={{
-                  width: "1600px",
-                  height: "2000px",
-                  transform: "scale(0.25)",
-                  transformOrigin: "top left",
-                  border: 0,
-                  pointerEvents: "none",
-                }}
-                title={v.label}
-                loading="lazy"
-              />
-            </div>
-            <div className="px-4 pb-4 pt-1">
               <p
                 className="text-[10px] uppercase tracking-[0.2em]"
-                style={{ color: "var(--muted)" }}
+                style={{ color: v.palette.muted, fontFamily: v.fontPair.body }}
               >
-                option {v.id.slice(0, 10)}
+                {v.compositionLabel}
               </p>
-              <p className="text-sm mt-1" style={{ color: "var(--foreground)" }}>
-                {v.label}
-              </p>
-              <div className="mt-3 flex gap-1">
-                {[v.palette.bg, v.palette.accent, v.palette.headingEnd].map((c, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      width: 12,
-                      height: 12,
-                      backgroundColor: c,
-                      border: "1px solid var(--card-border)",
-                    }}
-                  />
-                ))}
+              <div className="flex gap-1">
+                {[v.palette.bg, v.palette.accent, v.palette.headingEnd].map(
+                  (c, i) => (
+                    <span
+                      key={i}
+                      className="w-3 h-3"
+                      style={{
+                        backgroundColor: c,
+                        border: `1px solid ${v.palette.muted}`,
+                      }}
+                    />
+                  ),
+                )}
               </div>
             </div>
           </button>

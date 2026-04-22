@@ -12,7 +12,7 @@ export default function IntakePage() {
   return (
     <PageTemplate>
       <ComingSoonBanner />
-      <IntakeFlow templateId="precedent" />
+      <IntakeFlow />
     </PageTemplate>
   );
 }
