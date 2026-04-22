@@ -9,11 +9,29 @@
  * CSS variables into the template.
  */
 
+export type Platform =
+  | "twitter"
+  | "instagram"
+  | "linkedin"
+  | "youtube"
+  | "tiktok"
+  | "bluesky"
+  | "github"
+  | "substack"
+  | "mastodon"
+  | "site"
+  | "link";
+
+export interface Handle {
+  platform: Platform;
+  handle: string;
+  url: string;
+}
+
 export interface BrandContext {
   purpose?: string;
-  audience?: string;
-  vibeWords?: string[];
-  adaptive: Array<{ question: string; answer: string }>;
+  vibes?: string[];
+  handles?: Handle[];
 }
 
 /**
@@ -23,14 +41,12 @@ export interface BrandContext {
  * ("link-in-bio" is one token).
  */
 export function ctxTokens(ctx: BrandContext): Set<string> {
-  const blob = [
+  const parts: string[] = [
     ctx.purpose ?? "",
-    ctx.audience ?? "",
-    ...(ctx.vibeWords ?? []),
-    ...ctx.adaptive.map((a) => `${a.question} ${a.answer}`),
-  ]
-    .join(" ")
-    .toLowerCase();
+    ...(ctx.vibes ?? []),
+    ...(ctx.handles ?? []).map((h) => h.platform),
+  ];
+  const blob = parts.join(" ").toLowerCase();
   const tokens = blob.match(/[a-z][a-z-]{1,}/g) ?? [];
   return new Set(tokens);
 }
