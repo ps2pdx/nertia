@@ -21,7 +21,7 @@ function Inner() {
   const token = useAdminToken();
   const ids = (params.get("ids") ?? "").split(",").filter(Boolean);
   const [sources, setSources] = useState<Post[]>([]);
-  const [method, setMethod] = useState<"ai" | "concat">("ai");
+  const [method, setMethod] = useState<"ai" | "concat" | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +40,7 @@ function Inner() {
   }, [token, idsKey]);
 
   async function createMerged() {
-    if (!token) return;
+    if (!token || !method) return;
     setBusy(true);
     setError(null);
     try {
@@ -134,10 +134,14 @@ function Inner() {
         </button>
         <button
           onClick={createMerged}
-          disabled={busy || sources.length < 2}
-          className="flex-1 bg-[var(--accent)] text-black rounded py-2 text-sm font-semibold disabled:opacity-50"
+          disabled={busy || sources.length < 2 || !method}
+          className={
+            method
+              ? "flex-1 bg-[var(--accent)] text-black rounded py-2 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+              : "flex-1 border border-[var(--card-border)] rounded py-2 text-sm text-muted cursor-not-allowed"
+          }
         >
-          {busy ? "Creating…" : "Create draft"}
+          {busy ? "Creating…" : method ? "Create draft" : "Pick a method first"}
         </button>
       </div>
     </main>
