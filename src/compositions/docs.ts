@@ -6,9 +6,7 @@ export const docs: CompositionDef = {
     tags: ["docs", "documentation", "api", "reference", "guide", "sdk", "developer"],
     sections: [
         { id: "navbar", instanceId: "nav-1" },
-        { id: "marketing-hero", instanceId: "hero-1" },
-        { id: "about", instanceId: "about-1" },
-        { id: "contact", instanceId: "contact-1" },
+        { id: "docs-sidebar", instanceId: "docs-1" },
         { id: "footer", instanceId: "footer-1" },
     ],
 };
