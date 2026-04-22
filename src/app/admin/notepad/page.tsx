@@ -92,7 +92,11 @@ function Inner() {
             <button
               onClick={goMerge}
               disabled={selected.size < 2}
-              className="text-xs uppercase tracking-wide border border-[var(--card-border)] px-3 py-1 hover:border-[var(--foreground)] disabled:opacity-40 disabled:hover:border-[var(--card-border)]"
+              className={
+                selected.size >= 2
+                  ? "text-xs uppercase tracking-wide bg-blue-500 text-white px-3 py-1 hover:bg-blue-400"
+                  : "text-xs uppercase tracking-wide border border-[var(--card-border)] px-3 py-1 opacity-40"
+              }
             >
               Merge{selected.size >= 2 ? ` ${selected.size} →` : " →"}
             </button>
