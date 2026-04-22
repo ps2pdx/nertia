@@ -3,7 +3,7 @@ import { getDatabase, type Database } from "firebase-admin/database";
 
 let app: App | null = null;
 
-function initAdmin(): App {
+export function initAdmin(): App {
   if (app) return app;
   if (getApps().length > 0) {
     app = getApps()[0]!;
