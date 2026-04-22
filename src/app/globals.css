@@ -109,6 +109,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+  /* Site-wide offset for the fixed header. Every page's content starts below
+     the nav. Do not add per-page pt-[var(--header-height)] / pt-[80px] on top
+     of this — that'll double-offset. */
+  padding-top: var(--header-height);
 }
 
 h1,

@@ -5,9 +5,5 @@ interface PageContentProps {
 }
 
 export default function PageContent({ children }: PageContentProps) {
-    return (
-        <div className="pt-[80px]">
-            {children}
-        </div>
-    );
+    return <div>{children}</div>;
 }

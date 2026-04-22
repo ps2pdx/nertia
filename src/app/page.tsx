@@ -4,7 +4,7 @@ import Footer from '@/components/sections/Footer';
 
 export default function Home() {
   return (
-    <main className="pt-[var(--header-height)]">
+    <main>
       <section id="hero" className="min-h-[calc(88svh-var(--header-height))] relative overflow-hidden">
         <ButterflyRingParticles />
         <div className="absolute top-0 left-0 pl-6 z-10 pointer-events-none">
