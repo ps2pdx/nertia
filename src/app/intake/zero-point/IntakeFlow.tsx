@@ -357,13 +357,9 @@ function EmergeChoice({
                             type="button"
                             onClick={() => !busy && onPick(v)}
                             disabled={busy}
-                            className="group flex flex-col text-left transition-colors bg-[var(--card-bg)] border hover:border-[var(--accent)] disabled:opacity-50"
-                            style={{ borderColor: "var(--card-border)" }}
+                            className="group flex flex-col text-left transition-colors bg-[var(--card-bg)] border border-[var(--card-border)] hover:border-[var(--accent)] disabled:opacity-50"
                         >
-                            <div
-                                className="aspect-[3/4] overflow-hidden border-b"
-                                style={{ borderColor: "var(--card-border)" }}
-                            >
+                            <div className="aspect-[3/4] overflow-hidden border-b border-[var(--card-border)] group-hover:border-[var(--accent)] transition-colors">
                                 {Thumb && <Thumb brandColor={v.brandColor} />}
                             </div>
                             <div className="px-4 py-3 flex items-center justify-between">
