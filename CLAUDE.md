@@ -147,7 +147,27 @@ git checkout -b <type>/<kebab-topic>
 
 **PRs open via `gh pr create`** using the format in this file's commit-message guidance. The body explains what changed and why; the title is scoped-prefix + one-line summary. Do not merge your own PRs — Scott merges.
 
-**Concurrent agent sessions** (e.g. zero-point intake in one tab, notepad publishing in another): each session owns its own branch. Before editing a file, check `git log -1 --pretty=format:'%h %s' -- <path>` to see if the other session touched it recently; if so, either coordinate via Scott or rebase your branch onto main after their PR merges.
+**Concurrent agent sessions** (e.g. zero-point intake in one tab, notepad publishing in another): **each session must own its own git worktree**, not share the main checkout. Sharing the working tree across sessions caused HEAD to flip between branches mid-session twice during the 2026-04-21/22 work (one session's `git checkout` would silently move the other session's shell onto a different branch, leading to stale files, "banner still there" confusion, and near-destructive resets).
+
+Create a worktree for new feature work:
+```
+# from the main checkout at ~/code/nertia
+git checkout main && git pull
+git worktree add .worktrees/<branch-name> -b <branch-name>
+cd .worktrees/<branch-name>
+# run your dev server / edits from here
+```
+
+Remove it after the PR merges:
+```
+cd ~/code/nertia                              # back to main checkout
+git worktree remove .worktrees/<branch-name>
+git branch -D <branch-name>                   # local branch cleanup
+```
+
+The `.worktrees/` directory is gitignored. Each worktree has its own `.next/` cache, so parallel dev servers don't corrupt each other's builds. Run each session's `npm run dev` from inside its worktree, and the dev server + file watches stay scoped to that branch.
+
+Before editing a file in a shared area (e.g. `src/sections/`, `src/compositions/`, `CLAUDE.md`), still check `git log -1 --pretty=format:'%h %s' -- <path>` to see recent commits from other sessions' branches and coordinate via Scott.
 
 **Exceptions — agents may push to `main` only when:**
 - Scott explicitly says "push to main" or "skip the PR" for this task

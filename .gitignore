@@ -40,6 +40,9 @@ yarn-error.log*
 .claude/settings.local.json
 .superpowers/
 
+# concurrent-session worktrees (see CLAUDE.md § Branching + PR policy)
+.worktrees/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

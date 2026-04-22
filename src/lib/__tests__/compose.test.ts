@@ -27,6 +27,11 @@ describe("pickComposition", () => {
     it("is deterministic", () => {
         expect(pickComposition(marketingCtx).id).toBe(pickComposition(marketingCtx).id);
     });
+    it("marketing composition includes pricing section", () => {
+        const comp = pickComposition({ purpose: "A SaaS landing" });
+        expect(comp.id).toBe("marketing");
+        expect(comp.sections.some((s) => s.id === "pricing")).toBe(true);
+    });
 });
 
 describe("pickComposition — handle-count short-circuit", () => {

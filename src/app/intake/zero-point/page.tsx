@@ -1,5 +1,4 @@
 import PageTemplate from "@/components/PageTemplate";
-import ComingSoonBanner from "@/components/sections/ComingSoonBanner";
 import { IntakeFlow } from "./IntakeFlow";
 
 export const metadata = {
@@ -11,7 +10,6 @@ export const metadata = {
 export default function IntakePage() {
   return (
     <PageTemplate>
-      <ComingSoonBanner />
       <IntakeFlow />
     </PageTemplate>
   );

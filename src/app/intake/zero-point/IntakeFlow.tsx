@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { BrandContext, Handle } from "@/lib/brandContext";
 import type { EmergeVariant } from "@/lib/emerge";
 import { detectPlatform } from "@/lib/detectPlatform";
+import { getThumbnail } from "@/compositions/thumbnails";
 
 type Step = "form" | "emerge" | "submitting";
 
@@ -348,49 +349,34 @@ function EmergeChoice({
             </div>
 
             <div className="grid gap-4 md:gap-6 md:grid-cols-3">
-                {variants.map((v) => (
-                    <button
-                        key={v.id}
-                        type="button"
-                        onClick={() => !busy && onPick(v)}
-                        disabled={busy}
-                        className="group flex flex-col text-left transition-colors bg-[var(--card-bg)] border hover:border-[var(--accent)] disabled:opacity-50"
-                        style={{ borderColor: "var(--card-border)" }}
-                    >
-                        <div className="p-6 pb-4 min-h-[160px] flex flex-col gap-3">
-                            <p
-                                className="text-[10px] uppercase tracking-[0.3em]"
-                                style={{ color: v.brandColor }}
-                            >
-                                {v.compositionLabel}
-                            </p>
-                            <p
-                                className="text-lg leading-tight font-semibold"
-                                style={{ color: "var(--foreground)" }}
-                            >
-                                {v.previewHeadline || v.compositionLabel}
-                            </p>
-                        </div>
-                        <div
-                            className="px-6 py-4 border-t flex items-center gap-3"
-                            style={{ borderColor: "var(--card-border)" }}
+                {variants.map((v) => {
+                    const Thumb = getThumbnail(v.compositionId);
+                    return (
+                        <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => !busy && onPick(v)}
+                            disabled={busy}
+                            className="group flex flex-col text-left transition-colors bg-[var(--card-bg)] border border-[var(--card-border)] hover:border-[var(--accent)] disabled:opacity-50"
                         >
-                            <span
-                                className="w-5 h-5"
-                                style={{
-                                    backgroundColor: v.brandColor,
-                                    border: "1px solid var(--card-border)",
-                                }}
-                            />
-                            <span
-                                className="text-xs uppercase tracking-wide"
-                                style={{ color: "var(--muted)" }}
-                            >
-                                {v.compositionId}
-                            </span>
-                        </div>
-                    </button>
-                ))}
+                            <div className="aspect-[3/4] overflow-hidden border-b border-[var(--card-border)] group-hover:border-[var(--accent)] transition-colors">
+                                {Thumb && <Thumb brandColor={v.brandColor} />}
+                            </div>
+                            <div className="px-4 py-3 flex items-center justify-between">
+                                <p
+                                    className="text-xs uppercase tracking-[0.2em]"
+                                    style={{ color: v.brandColor }}
+                                >
+                                    {v.compositionLabel}
+                                </p>
+                                <span
+                                    className="w-3 h-3"
+                                    style={{ backgroundColor: v.brandColor }}
+                                />
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
 
             {busy && (
