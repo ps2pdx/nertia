@@ -35,6 +35,12 @@ export default function Header() {
     };
   }, [mobileMenuOpen]);
 
+  // Generated user sites (hosted + preview) are not "the nertia site" —
+  // they render their own chrome. Don't overlay our global header on them.
+  const isUserSiteRoute =
+    pathname.startsWith("/hosted/") || pathname.startsWith("/preview/");
+  if (isUserSiteRoute) return null;
+
   const isActiveItem = (href: string) => pathname === href;
 
   const shouldShowHeader = showHeader;

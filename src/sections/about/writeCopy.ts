@@ -1,10 +1,9 @@
 import type { SectionWriteCopy } from "../types";
 
 export const writeCopy: SectionWriteCopy = (ctx) => {
-    const vibesText = (ctx.vibes ?? []).join(", ");
-    const parts = [ctx.purpose, vibesText].filter(Boolean).join(" ").trim();
+    // Vibes drive aesthetics (palette, font) — they never appear as copy.
     return {
         heading: "About",
-        body: parts || "More to come.",
+        body: (ctx.purpose ?? "").trim() || "More to come.",
     };
 };

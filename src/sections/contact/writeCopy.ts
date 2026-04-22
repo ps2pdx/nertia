@@ -1,10 +1,10 @@
 import type { SectionWriteCopy } from "../types";
 
-export const writeCopy: SectionWriteCopy = (ctx) => {
-    const vibes = ctx.vibes ?? [];
+export const writeCopy: SectionWriteCopy = () => {
+    // Vibes drive aesthetics, not copy. Body stays empty until the user adds
+    // one — the Component renders a clean heading-only variant in that case.
     return {
         heading: "Say hi.",
-        body: vibes.length > 0 ? vibes.join(" · ") : "",
-        // email + ctaLabel + ctaHref start empty; users fill them in
+        body: "",
     };
 };
