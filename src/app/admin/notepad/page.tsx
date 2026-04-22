@@ -5,7 +5,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useAuth } from "@/lib/auth-context";
 import { isAdminEmail } from "@/lib/admin";
 import { useAdminToken } from "@/hooks/useAdminToken";
-import type { Post } from "@/lib/notepad";
+import { projectOf, type Post } from "@/lib/notepad";
 import { ChipFilter, type FilterState } from "./components/ChipFilter";
 import { DraftRow } from "./components/DraftRow";
 
@@ -53,13 +53,12 @@ function Inner() {
 
   const visible = (posts ?? []).filter((p) => {
     if (filter.statuses.length && !filter.statuses.includes(p.status)) return false;
-    if (filter.projects.length) {
-      const proj = p.cwd?.split("/").pop() ?? "unknown";
-      if (!filter.projects.includes(proj)) return false;
-    }
+    if (filter.projects.length && !filter.projects.includes(projectOf(p))) return false;
     if (filter.search && !p.title.toLowerCase().includes(filter.search.toLowerCase())) return false;
     return true;
   });
+
+  const knownProjects = Array.from(new Set((posts ?? []).map(projectOf))).sort();
 
   function toggleSelect(id: string) {
     const next = new Set(selected);
@@ -132,6 +131,7 @@ function Inner() {
               selected={selected.has(p.id)}
               expanded={expanded === p.id}
               showCheckbox={mergeMode}
+              knownProjects={knownProjects}
               onToggleSelect={() => toggleSelect(p.id)}
               onToggleExpand={() => toggleExpand(p.id)}
               onUpdate={(updated) =>

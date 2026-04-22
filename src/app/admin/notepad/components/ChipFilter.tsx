@@ -1,5 +1,5 @@
 "use client";
-import type { Post, Status } from "@/lib/notepad";
+import { projectOf, type Post, type Status } from "@/lib/notepad";
 
 export type FilterState = {
   statuses: Status[];
@@ -23,7 +23,7 @@ export function ChipFilter({ filter, onChange, allPosts }: Props) {
 
   const projectCounts = new Map<string, number>();
   for (const p of allPosts) {
-    const proj = p.cwd?.split("/").pop() ?? "unknown";
+    const proj = projectOf(p);
     projectCounts.set(proj, (projectCounts.get(proj) ?? 0) + 1);
   }
 

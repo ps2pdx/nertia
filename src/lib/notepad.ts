@@ -22,6 +22,7 @@ export const PostSchema = z.object({
   merged_from: z.array(z.string()).nullable().optional(),
   merged_into: z.string().nullable().optional(),
   cwd: z.string().nullable().optional(),
+  project: z.string().nullable().optional(),
   created_at: z.number(),
   updated_at: z.number(),
   published_at: z.number().nullable().optional(),
@@ -41,6 +42,13 @@ export function canTransition(from: Status, to: Status): boolean {
     archived: ["draft", "ready", "published"],
   };
   return graph[from]?.includes(to) ?? false;
+}
+
+export function projectOf(p: { project?: string | null; cwd?: string | null }): string {
+  const explicit = p.project?.trim();
+  if (explicit) return explicit;
+  const derived = p.cwd?.split("/").pop();
+  return derived && derived.length > 0 ? derived : "unknown";
 }
 
 export function concatCompose(sources: Array<{ title: string; body: string }>): string {
