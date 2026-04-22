@@ -59,7 +59,7 @@ describe("pickComposition — handle-count short-circuit", () => {
 
     it("does NOT force linkinbio when any handle is a site", () => {
         const ctx: BrandContext = {
-            purpose: "Field notes on craft",
+            purpose: "My writing and essays, a newsletter",
             handles: [h("twitter"), h("instagram"), h("site")],
         };
         expect(pickComposition(ctx).id).toBe("blog");
