@@ -13,7 +13,19 @@ export const dynamic = "force-dynamic";
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_NERTIA_DOMAIN ?? "nertia.ai";
 
 const HandleSchema = z.object({
-    platform: z.string(),
+    platform: z.enum([
+        "twitter",
+        "instagram",
+        "linkedin",
+        "youtube",
+        "tiktok",
+        "bluesky",
+        "github",
+        "substack",
+        "mastodon",
+        "site",
+        "link",
+    ]),
     handle: z.string(),
     url: z.string(),
 });
