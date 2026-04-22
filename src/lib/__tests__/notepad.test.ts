@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PostSchema, STATUSES, type Post } from "@/lib/notepad";
+import { PostSchema, STATUSES, canTransition, type Post } from "@/lib/notepad";
 
 describe("PostSchema", () => {
   it("accepts a minimal valid draft", () => {
@@ -26,5 +26,28 @@ describe("PostSchema", () => {
 
   it("exposes all status values", () => {
     expect(STATUSES).toEqual(["draft", "ready", "published", "merged", "archived"]);
+  });
+});
+
+describe("canTransition", () => {
+  it("allows draft → ready", () => {
+    expect(canTransition("draft", "ready")).toBe(true);
+  });
+  it("allows ready → published", () => {
+    expect(canTransition("ready", "published")).toBe(true);
+  });
+  it("allows draft → published (skip ready)", () => {
+    expect(canTransition("draft", "published")).toBe(true);
+  });
+  it("allows published → ready (unpublish)", () => {
+    expect(canTransition("published", "ready")).toBe(true);
+  });
+  it("allows any → archived", () => {
+    expect(canTransition("draft", "archived")).toBe(true);
+    expect(canTransition("published", "archived")).toBe(true);
+  });
+  it("blocks merged → anything but archived", () => {
+    expect(canTransition("merged", "draft")).toBe(false);
+    expect(canTransition("merged", "archived")).toBe(true);
   });
 });

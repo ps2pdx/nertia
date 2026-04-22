@@ -28,3 +28,17 @@ export const PostSchema = z.object({
 });
 
 export type Post = z.infer<typeof PostSchema>;
+
+export function canTransition(from: Status, to: Status): boolean {
+  if (from === to) return true;
+  if (to === "archived") return true;
+  if (from === "merged") return false;
+  const graph: Record<Status, Status[]> = {
+    draft: ["ready", "published", "merged"],
+    ready: ["draft", "published", "merged"],
+    published: ["ready", "draft"],
+    merged: [],
+    archived: ["draft", "ready", "published"],
+  };
+  return graph[from]?.includes(to) ?? false;
+}
