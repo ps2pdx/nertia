@@ -4,10 +4,10 @@ import Footer from '@/components/sections/Footer';
 
 export default function Home() {
   return (
-    <main>
-      <section id="hero" className="min-h-[88svh] relative overflow-hidden">
+    <main className="pt-[var(--header-height)]">
+      <section id="hero" className="min-h-[calc(88svh-var(--header-height))] relative overflow-hidden">
         <ButterflyRingParticles />
-        <div className="absolute top-0 left-0 pt-header pl-6 z-10 pointer-events-none">
+        <div className="absolute top-0 left-0 pl-6 z-10 pointer-events-none">
           <div className="max-w-md pt-6">
             <h1 className="text-sm font-medium mb-2">Butterfly Ring</h1>
             <p className="text-xs text-muted mb-3">

@@ -75,7 +75,7 @@ export default function ButterflyRingParticles() {
             // Camera - perpendicular angle (tilted view)
             const camera = new THREE.PerspectiveCamera(
                 50,
-                window.innerWidth / window.innerHeight,
+                container.clientWidth / container.clientHeight,
                 0.1,
                 1000
             );
@@ -84,7 +84,7 @@ export default function ButterflyRingParticles() {
 
             // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
@@ -261,9 +261,9 @@ export default function ButterflyRingParticles() {
 
             // Event handlers
             const onResize = () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(container.clientWidth, container.clientHeight);
             };
 
             // For proper mouse-to-world mapping
