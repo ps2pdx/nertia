@@ -27,11 +27,20 @@ export function ChipFilter({ filter, onChange, allPosts }: Props) {
     projectCounts.set(proj, (projectCounts.get(proj) ?? 0) + 1);
   }
 
+  const sortedProjects = Array.from(projectCounts.entries()).sort((a, b) => b[1] - a[1]);
+
   function toggleStatus(s: Status) {
     const next = filter.statuses.includes(s)
       ? filter.statuses.filter((x) => x !== s)
       : [...filter.statuses, s];
     onChange({ ...filter, statuses: next });
+  }
+
+  function toggleProject(p: string) {
+    const next = filter.projects.includes(p)
+      ? filter.projects.filter((x) => x !== p)
+      : [...filter.projects, p];
+    onChange({ ...filter, projects: next });
   }
 
   return (
@@ -60,6 +69,26 @@ export function ChipFilter({ filter, onChange, allPosts }: Props) {
           </button>
         ))}
       </div>
+      {sortedProjects.length > 0 && (
+        <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto">
+          <span className="text-[10px] uppercase tracking-wide text-muted self-center whitespace-nowrap">
+            project
+          </span>
+          {sortedProjects.map(([proj, n]) => (
+            <button
+              key={proj}
+              onClick={() => toggleProject(proj)}
+              className={`text-xs px-3 py-1 rounded-full whitespace-nowrap border ${
+                filter.projects.includes(proj)
+                  ? "bg-blue-500 text-white border-blue-500 font-semibold"
+                  : "border-[var(--card-border)] text-muted"
+              }`}
+            >
+              {proj} {n}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

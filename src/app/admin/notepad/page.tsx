@@ -53,6 +53,10 @@ function Inner() {
 
   const visible = (posts ?? []).filter((p) => {
     if (filter.statuses.length && !filter.statuses.includes(p.status)) return false;
+    if (filter.projects.length) {
+      const proj = p.cwd?.split("/").pop() ?? "unknown";
+      if (!filter.projects.includes(proj)) return false;
+    }
     if (filter.search && !p.title.toLowerCase().includes(filter.search.toLowerCase())) return false;
     return true;
   });
