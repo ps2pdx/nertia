@@ -13,6 +13,12 @@ type Tool = {
 
 const TOOLS: Tool[] = [
   {
+    title: "Dev dashboard",
+    href: "/admin/dashboard",
+    description: "Pivot punch list — sub-projects, today's lanes, blockers, and step-by-step instructions.",
+    status: "current",
+  },
+  {
     title: "Notepad",
     href: "/admin/notepad",
     description: "Review, edit, merge, and publish session drafts from RTDB. Mobile-friendly.",
