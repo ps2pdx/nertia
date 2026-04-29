@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@calcom/embed-react": "^1.5.3",
     "@types/three": "^0.182.0",
     "cheerio": "^1.1.2",
     "firebase": "^12.7.0",
