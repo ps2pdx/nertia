@@ -48,7 +48,7 @@ export default function Hero() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
-            href="/about"
+            href="/services"
             className="inline-flex items-center gap-2 text-green-500 font-medium text-base tracking-wide hover:text-green-400 transition-colors underline underline-offset-4"
           >
             Begin

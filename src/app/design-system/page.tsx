@@ -12,6 +12,7 @@ import IconSystem from '@/components/design-system/IconSystem';
 import Alert from '@/components/ui/Alert';
 import ComingSoonBanner from '@/components/sections/ComingSoonBanner';
 import EarlyAccessForm from '@/components/sections/EarlyAccessForm';
+import PackageCard from '@/components/sections/services/PackageCard';
 
 const sections: SidebarSection[] = [
     { id: 'colors', label: 'Colors' },
@@ -24,6 +25,7 @@ const sections: SidebarSection[] = [
     { id: 'spacing', label: 'Spacing' },
     { id: 'logo', label: 'Logo' },
     { id: 'grid', label: 'Grid' },
+    { id: 'services-booking', label: 'Services & Booking' },
     { id: 'voice', label: 'Voice & Tone' },
 ];
 
@@ -491,6 +493,95 @@ export default function DesignSystemPage() {
                                 Primary layout pattern used for all content sections. Sidebar contains section labels and navigation; content area contains the main content.
                             </p>
                         </div>
+                        </section>
+
+                        {/* Services & Booking */}
+                        <section id="services-booking" className="p-8 lg:p-12 border-b border-[var(--card-border)] space-y-12">
+                            <div>
+                                <h2 className="text-xl font-bold mb-4">Services &amp; Booking</h2>
+                                <p className="text-muted text-sm leading-relaxed">
+                                    Components used on <code>/services</code> and <code>/book</code>. Tier names use quantum-physics vocabulary (Particle / Wave / Entanglement); bookings flow through a Cal.com embed.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6">PackageCard</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <PackageCard
+                                        name="Particle"
+                                        price="$2,500"
+                                        audience="I need one specific thing built well."
+                                        timeline="1–2 weeks"
+                                        deliverables={[
+                                            'Pick one: site, brand, video reel, content sprint',
+                                            'Fixed scope, fixed price, fixed timeline',
+                                            'One discovery call, one delivery call',
+                                        ]}
+                                        eventSlug="particle"
+                                        ctaLabel="Initiate Particle"
+                                    />
+                                    <PackageCard
+                                        name="Wave"
+                                        price="$10,000"
+                                        audience="We need to ship a coordinated launch in 6 weeks."
+                                        timeline="4–6 weeks"
+                                        deliverables={[
+                                            'Multi-deliverable bundle',
+                                            'Weekly check-ins through the burn',
+                                            'SOW within 48 hours of scoping',
+                                        ]}
+                                        eventSlug="wave"
+                                        ctaLabel="Initiate Wave"
+                                        accentTone="highlight"
+                                    />
+                                </div>
+                                <p className="text-sm text-muted mt-4">
+                                    Used in <code>PackagesGrid</code> on <code>/services</code>. <code>accentTone=&quot;highlight&quot;</code> emphasises the recommended middle tier.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6">ServicesMenu row (Quanta)</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                    <div className="flex flex-col gap-2 py-5 border-t border-[var(--card-border)]">
+                                        <div className="flex items-baseline justify-between gap-4">
+                                            <h4 className="text-lg font-semibold">Positioning audit</h4>
+                                            <span className="text-sm font-medium whitespace-nowrap">from $1,200</span>
+                                        </div>
+                                        <p className="text-sm text-muted leading-relaxed">Pin down who you are and what you sell.</p>
+                                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">Anchor: Particle</p>
+                                    </div>
+                                    <div className="flex flex-col gap-2 py-5 border-t border-[var(--card-border)]">
+                                        <div className="flex items-baseline justify-between gap-4">
+                                            <h4 className="text-lg font-semibold">GTM plan</h4>
+                                            <span className="text-sm font-medium whitespace-nowrap">from $3,000</span>
+                                        </div>
+                                        <p className="text-sm text-muted leading-relaxed">Launch sequence, channels, content calendar.</p>
+                                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">Anchor: Wave</p>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-muted mt-4">
+                                    À la carte items. Each row: name, price label, oneliner, anchor tier.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6">Booking flow</h3>
+                                <div className="p-6 border border-[var(--card-border)] bg-[var(--card-bg)] rounded-lg">
+                                    <p className="text-sm leading-relaxed mb-4">
+                                        <code>/book</code> renders a Cal.com embed via <code>@calcom/embed-react</code>. The page reads <code>?event=</code> from the URL to preselect one of four event types:
+                                    </p>
+                                    <ul className="space-y-2 text-sm text-muted ml-2">
+                                        <li>• <code>observation</code> — 20 min, free intro (default)</li>
+                                        <li>• <code>particle</code> — 30 min, scope a one-shot</li>
+                                        <li>• <code>wave</code> — 45 min, scope a sprint</li>
+                                        <li>• <code>entanglement</code> — 45 min, scope an ongoing partnership</li>
+                                    </ul>
+                                    <p className="text-sm text-muted leading-relaxed mt-4">
+                                        Falls back to a direct inquiry form (POSTs to <code>/api/book-inquiry</code> → RTDB <code>inquiries/</code>) if the calendar isn&apos;t configured or fails to load.
+                                    </p>
+                                </div>
+                            </div>
                         </section>
 
                         {/* Voice & Tone */}
