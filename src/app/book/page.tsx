@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import PageTemplate from '@/components/PageTemplate';
 import BookIntro from '@/components/sections/book/BookIntro';
 import CalEmbed from '@/components/sections/book/CalEmbed';
-import BookFallback from '@/components/sections/book/BookFallback';
 
 const VALID_EVENTS = new Set(['observation', 'particle', 'wave', 'entanglement']);
 
@@ -21,7 +20,6 @@ export default async function BookPage({ searchParams }: BookPageProps) {
             <Suspense fallback={null}>
                 <CalEmbed eventSlug={eventSlug} />
             </Suspense>
-            <BookFallback eventSlug={eventSlug} />
         </PageTemplate>
     );
 }
