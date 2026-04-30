@@ -578,7 +578,7 @@ export default function DesignSystemPage() {
                                         <li>• <code>entanglement</code> — 45 min, scope an ongoing partnership</li>
                                     </ul>
                                     <p className="text-sm text-muted leading-relaxed mt-4">
-                                        Falls back to a direct inquiry form (POSTs to <code>/api/book-inquiry</code> → RTDB <code>inquiries/</code>) if the calendar isn&apos;t configured or fails to load.
+                                        Capped at <code>max-w-4xl</code> on desktop so the calendar doesn&apos;t stretch full-width on large viewports.
                                     </p>
                                 </div>
                             </div>

@@ -3,11 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import ButterflyRingParticles from '@/components/ButterflyRingParticles';
-import { useAuth } from '@/lib/auth-context';
 
 export default function Hero() {
-  const { user } = useAuth();
-
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Butterfly Ring Particles Background */}
@@ -49,9 +46,9 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
             href="/services"
-            className="inline-flex items-center gap-2 text-green-500 font-medium text-base tracking-wide hover:text-green-400 transition-colors underline underline-offset-4"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] text-white font-medium text-sm rounded-lg hover:opacity-90 transition-opacity"
           >
-            Begin
+            See services
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -62,16 +59,16 @@ export default function Hero() {
             </svg>
           </Link>
           <Link
-            href={user ? '/generator' : '/login'}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] text-white font-medium text-sm rounded-lg hover:opacity-90 transition-opacity"
+            href="/book?event=observation"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--accent)] text-[var(--accent)] font-medium text-sm rounded-lg hover:bg-[var(--accent)] hover:text-white transition-colors"
           >
-            {user ? 'Go to Generator' : 'Sign In'}
+            Book a call
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
               />
             </svg>
           </Link>
