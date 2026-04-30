@@ -86,6 +86,10 @@ export default function ButterflyRingParticles() {
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            // Reserve vertical pan to the browser so the page can still scroll
+            // on mobile; horizontal-axis touch motion routes to our pointer
+            // handlers for Y-axis rotation.
+            renderer.domElement.style.touchAction = 'pan-y';
             container.appendChild(renderer.domElement);
 
             // Convert vertices to Float32Array with scaling
@@ -272,8 +276,8 @@ export default function ButterflyRingParticles() {
             const intersectPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
             const intersectPoint = new THREE.Vector3();
 
-            const onMouseMove = (e: MouseEvent) => {
-                // Normalize mouse position
+            const onPointerMove = (e: PointerEvent) => {
+                // Normalize pointer position
                 mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
                 mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
@@ -306,14 +310,20 @@ export default function ButterflyRingParticles() {
                 }
             };
 
-            const onMouseDown = (e: MouseEvent) => {
+            const onPointerDown = (e: PointerEvent) => {
                 dragRef.current.isDragging = true;
                 dragRef.current.lastX = e.clientX;
                 dragRef.current.lastY = e.clientY;
+                // Capture the pointer so the gesture continues even if the
+                // finger leaves the canvas.
+                const target = e.target as Element | null;
+                target?.setPointerCapture?.(e.pointerId);
             };
 
-            const onMouseUp = () => {
+            const onPointerUp = (e: PointerEvent) => {
                 dragRef.current.isDragging = false;
+                const target = e.target as Element | null;
+                target?.releasePointerCapture?.(e.pointerId);
             };
 
             const onWheel = (e: WheelEvent) => {
@@ -338,9 +348,10 @@ export default function ButterflyRingParticles() {
             };
 
             window.addEventListener('resize', onResize);
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mousedown', onMouseDown);
-            window.addEventListener('mouseup', onMouseUp);
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerdown', onPointerDown);
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
             renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
             mql.addEventListener('change', onThemeChange);
 
@@ -348,9 +359,10 @@ export default function ButterflyRingParticles() {
 
             return () => {
                 window.removeEventListener('resize', onResize);
-                window.removeEventListener('mousemove', onMouseMove);
-                window.removeEventListener('mousedown', onMouseDown);
-                window.removeEventListener('mouseup', onMouseUp);
+                window.removeEventListener('pointermove', onPointerMove);
+                window.removeEventListener('pointerdown', onPointerDown);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
                 renderer.domElement.removeEventListener('wheel', onWheel);
                 mql.removeEventListener('change', onThemeChange);
             };
