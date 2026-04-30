@@ -291,18 +291,21 @@ export default function ButterflyRingParticles() {
                     mouseRef.current.worldY = intersectPoint.y;
                 }
 
-                // Handle drag rotation with velocity tracking
+                // Handle drag rotation with velocity tracking.
+                // Horizontal motion uses direct-manipulation mapping
+                // (drag right → butterfly rotates right) which matches the
+                // touch-native expectation. Vertical mapping is unchanged.
                 const drag = dragRef.current;
                 if (drag.isDragging) {
                     const deltaX = e.clientX - drag.lastX;
                     const deltaY = e.clientY - drag.lastY;
 
                     // Apply rotation
-                    drag.rotationY += deltaX * 0.005;
+                    drag.rotationY -= deltaX * 0.005;
                     drag.rotationX += deltaY * 0.005;
 
                     // Store velocity for inertia
-                    drag.velocityY = deltaX * 0.005;
+                    drag.velocityY = -deltaX * 0.005;
                     drag.velocityX = deltaY * 0.005;
 
                     drag.lastX = e.clientX;
