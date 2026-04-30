@@ -62,45 +62,45 @@ export const SUB_PROJECTS: SubProject[] = [
         id: 'sp-1',
         number: 1,
         title: 'Booking + Services page',
-        status: 'in-review',
-        blurb: 'Particle / Wave / Entanglement + Cal.com /book embed.',
-        branch: 'feature/booking-and-services',
+        status: 'done',
+        blurb: 'Particle / Wave / Entanglement live + Cal.com /book embed configured.',
         pr: 'https://github.com/ps2pdx/nertia/pull/15',
+    },
+    {
+        id: 'sp-6',
+        number: 6,
+        title: 'Mobile butterfly tap-drag fix',
+        status: 'done',
+        blurb: 'Pointer Events + touch-action: pan-y. Horizontal swipe rotates, vertical scrolls.',
+        pr: 'https://github.com/ps2pdx/nertia/pull/17',
+    },
+    {
+        id: 'sp-design',
+        number: 7,
+        title: 'Design refresh (next active project)',
+        status: 'next',
+        blurb: 'Holistic site redesign using superpowers:brainstorming → frontend-design skill. Card overflow + hero copy + visual direction in one pass.',
     },
     {
         id: 'sp-2',
         number: 2,
         title: 'Resource hub',
-        status: 'next',
-        blurb: 'Top-of-funnel — blog, tutorials, tools, build-in-public surface.',
+        status: 'queued',
+        blurb: 'Pinned — larger ongoing scope. Top-of-funnel build-in-public surface.',
     },
     {
         id: 'sp-3',
         number: 3,
         title: 'Brand System Generator v2',
         status: 'queued',
-        blurb: 'Customize nertia\'s schema; replaces retired BSG thesis.',
+        blurb: 'Pinned — dependency for #4 (zero-point gen). Customize nertia\'s schema.',
     },
     {
         id: 'sp-4',
         number: 4,
-        title: 'Subdomain templates + 5 dogfood sites',
+        title: 'Subdomain templates + dogfood sites (#5 folded in)',
         status: 'queued',
-        blurb: '_sites/[slug] renderer + scott./s35./rayme./purplescott./pacificpatterns.',
-    },
-    {
-        id: 'sp-5',
-        number: 5,
-        title: 'Live-stream + admin for rayme.',
-        status: 'queued',
-        blurb: 'One template\'s special sauce. Depends on #4.',
-    },
-    {
-        id: 'sp-6',
-        number: 6,
-        title: 'Mobile butterfly tap-drag fix',
-        status: 'queued',
-        blurb: 'Pre-pivot bug — pointer events not handling touch.',
+        blurb: 'Pinned — depends on #3. _sites/[slug] renderer + scott./s35./rayme. (live-stream/admin)/purplescott./pacificpatterns.',
     },
 ];
 
@@ -113,75 +113,44 @@ export const TODAY_LANES: Lane[] = [
         id: 'lane-scott',
         title: 'Scott — admin',
         subtitle:
-            'Manual setup + content edits. Cal.com + Vercel env are gating PR #15.',
+            'Post-launch validation + design-refresh prep. Most gating blockers are now resolved.',
         items: [
             {
-                id: 'scott-cal-account',
-                title: 'Set up Cal.com account',
-                note: 'Pick the username that becomes scott-campbell or whatever you want — it shows in booking URLs.',
+                id: 'scott-verify-live',
+                title: 'Verify live nertia.ai end-to-end',
+                href: 'https://nertia.ai',
+                note: 'After Vercel rebuild lands. Walk the funnel: hero → /services → /book → real test booking.',
                 stepGroups: [
                     {
                         steps: [
-                            'Go to cal.com/signup',
-                            'Pick a username (suggested: scott-campbell)',
-                            'Connect Google Calendar in Settings → Apps',
-                            'Connect Apple/iCloud Calendar in the same panel',
-                            'Verify availability syncs from both calendars',
+                            'Visit / on desktop and mobile',
+                            'Confirm hero shows "See services" + "Book a call" CTAs',
+                            'Click "See services" → /services renders Particle / Wave / Entanglement',
+                            'Click each tier\'s "Initiate" CTA → lands on /book with the right event preselected',
+                            'Book a real test slot for Observation; confirm calendar invite hits Google + iCloud',
+                            'Mobile: horizontal swipe rotates butterfly; vertical scrolls page',
                         ],
                     },
                 ],
             },
             {
-                id: 'scott-cal-events',
-                title: 'Create the four Cal event types',
-                note: 'Slugs must match exactly: observation, particle, wave, entanglement. /book reads them from ?event=.',
-                stepGroups: [
-                    {
-                        heading: 'Observation (free intro)',
-                        steps: [
-                            'Cal dashboard → Event Types → New',
-                            'Title: Observation',
-                            'Slug: observation',
-                            'Length: 20 min',
-                            'Free, no payment',
-                            'Buffer: 5 min before / 10 min after',
-                        ],
-                    },
-                    {
-                        heading: 'Particle / Wave / Entanglement',
-                        steps: [
-                            'Repeat for each tier with slug: particle (30 min), wave (45 min), entanglement (45 min)',
-                            'All free at booking — deposits enabled per-tier later when ready',
-                            'Add intake question: "What are you trying to ship?"',
-                        ],
-                    },
-                ],
-            },
-            {
-                id: 'scott-env-cal',
-                title: 'Set NEXT_PUBLIC_CAL_USERNAME in Vercel + .env.local',
-                note: 'Without this, /book renders the fallback inquiry form instead of the Cal embed.',
+                id: 'scott-cal-teams-decision',
+                title: 'Decide on Cal.com Teams upgrade ($12/mo)',
+                note: 'Free tier shows the "Cal.com" footer. Teams plan removes it. One Particle ($2,500) booking covers ~23 years of subscription.',
                 stepGroups: [
                     {
                         steps: [
-                            'Vercel project → Settings → Environment Variables',
-                            'Add NEXT_PUBLIC_CAL_USERNAME = your Cal handle (production scope)',
-                            'Add the same line to local .env.local',
-                            'Redeploy (or wait for next push) so the prod env picks it up',
+                            'Decide if footer is worth removing now or later',
+                            'If yes: cal.com → Settings → Billing → Teams plan',
+                            'Embed automatically updates after upgrade — no code change needed',
                         ],
                     },
                 ],
-            },
-            {
-                id: 'scott-merge-pr15',
-                title: 'Review + merge PR #15 (booking + services)',
-                href: 'https://github.com/ps2pdx/nertia/pull/15',
-                note: 'Once Cal env is set, merge to ship /services and /book to nertia.ai.',
             },
             {
                 id: 'scott-prices',
-                title: 'Lock real prices + scope on /services',
-                note: 'Placeholders shipped: Particle $2,500 / Wave $10,000 / Entanglement $6,000/mo. Edit live; no architectural change.',
+                title: 'Lock real prices + scope on /services if placeholders need changing',
+                note: 'Live placeholders: Particle $2,500 / Wave $10,000 / Entanglement $6,000/mo. Edit live.',
                 stepGroups: [
                     {
                         steps: [
@@ -189,93 +158,65 @@ export const TODAY_LANES: Lane[] = [
                             'Edit price, audience, timeline, deliverables[] for each tier',
                             'Open src/components/sections/services/ServicesMenu.tsx',
                             'Edit priceLabel and oneliner for each Quanta row',
-                            'Commit on a separate branch (chore/services-content) and PR',
+                            'Commit on chore/services-content branch and PR',
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'scott-enable-frontend-design',
+                title: 'Enable frontend-design plugin before design-refresh kickoff',
+                note: 'Plugin lives in marketplace at ~/.claude/plugins/marketplaces/claude-plugins-official/plugins/frontend-design but isn\'t active in current session.',
+                stepGroups: [
+                    {
+                        steps: [
+                            'Run /plugin in Claude Code',
+                            'Find frontend-design in claude-plugins-official',
+                            'Install + enable',
+                            'Restart session before kicking off design refresh',
                         ],
                     },
                 ],
             },
             {
                 id: 'scott-claude-md',
-                title: 'Update CLAUDE.md to reflect new positioning',
-                note: 'Current copy says BSG thesis is "being retired". Replace with production-engineering-studio framing post-#15 merge.',
-                stepGroups: [
-                    {
-                        steps: [
-                            'Branch docs/claude-md-pivot from main',
-                            'Update "What we\'re building" section to lead with production studio',
-                            'Add Particle / Wave / Entanglement vocabulary to brand voice',
-                            'Note the 6 sub-project decomposition',
-                            'PR via gh',
-                        ],
-                    },
-                ],
+                title: 'Update CLAUDE.md to reflect new positioning (deferred docs PR)',
+                note: 'Current copy still says BSG thesis is "being retired". Replace with production-engineering-studio framing.',
             },
         ],
     },
     {
         id: 'lane-claude',
         title: 'Claude — code',
-        subtitle: 'Next code work. Each sub-project ships on its own branch + PR.',
+        subtitle: 'Awaiting design-refresh kickoff. Pinned sub-projects stay queued until larger scopes resolve.',
         items: [
             {
-                id: 'claude-mobile-butterfly',
-                title: 'Sub-project #6 — mobile butterfly tap-drag fix',
-                note: 'Smallest scope, ship as a quick warmup before #2.',
+                id: 'claude-design-refresh',
+                title: 'Design refresh project — kickoff when Scott is ready',
+                note: 'Holistic site redesign. Brainstorming first to lock aesthetic direction, then frontend-design to execute. Likely scope a single page (probably / or /services) as the design proof before sitewide.',
                 stepGroups: [
                     {
+                        heading: 'Kickoff sequence',
                         steps: [
-                            'Branch fix/mobile-butterfly-tap-drag from main',
-                            'Reproduce on mobile viewport (375px) at /butterfly-test or /',
-                            'Inspect src/components/ButterflyRingParticles.tsx pointer handlers',
-                            'Add touchstart/touchmove/touchend events alongside mouse events',
-                            'Use unified pointer-event API where available',
-                            'Test on real device + emulated touch',
-                            'PR with before/after gif in the body',
+                            'Fresh session in a new worktree feature/design-refresh',
+                            'superpowers:brainstorming — lock aesthetic direction (minimal / editorial / brutalist / maximalist?)',
+                            'frontend-design skill — execute against direction',
+                            'Pilot on one page first; react to direction before sitewide rollout',
+                        ],
+                    },
+                    {
+                        heading: 'Known issues to absorb',
+                        steps: [
+                            'Card overflow on /services — Entanglement card pill ("ONGOING") clips at certain desktop widths. Folds into the redesign.',
+                            'Hero tagline still pre-pivot: "Identity in motion. Strategy, design, code. Brand systems built to ship." Replace as part of refresh.',
                         ],
                     },
                 ],
             },
             {
-                id: 'claude-resource-hub',
-                title: 'Sub-project #2 — resource hub start',
-                note: 'Bigger scope. Brainstorm + spec first; don\'t skip writing-plans.',
-                stepGroups: [
-                    {
-                        heading: 'Spec phase',
-                        steps: [
-                            'Brainstorm IA: home → categories (tutorials, tools, build-in-public, blog index)',
-                            'Decide where /resource-hub vs / lives (homepage redesign?)',
-                            'Schema for tutorials in RTDB: notepad/tutorials/{slug}',
-                            'Schema for tools: notepad/tools/{slug}',
-                        ],
-                    },
-                    {
-                        heading: 'Build phase',
-                        steps: [
-                            'Branch feature/resource-hub from main',
-                            'Reuse PageTemplate + PageSidebar like /blog',
-                            'New components: ResourceCard, ResourceList, CategoryFilter',
-                            'Wire each route to its RTDB slice',
-                            'Add catalogue entries to /design-system',
-                        ],
-                    },
-                ],
-            },
-            {
-                id: 'claude-subdomain-spec',
-                title: 'Sub-project #4 — subdomain pipeline spec only',
-                note: 'Plan + spec only this turn — no build until tier-2 directions ship.',
-                stepGroups: [
-                    {
-                        steps: [
-                            'Open canonical spec: docs/superpowers/specs/2026-04-16-zero-point-generator-design.md',
-                            'Sketch _sites/[slug]/page.tsx renderer that takes RTDB site data + a direction',
-                            'Map 5 dogfood sites → directions: scott. (resume), s35. (reels), rayme. (album+stream), purplescott. (TBD), pacificpatterns. (artist)',
-                            'Spec the Vercel wildcard subdomain config + middleware route rewriting',
-                            'Open spec PR for review before any code',
-                        ],
-                    },
-                ],
+                id: 'claude-pinned-subprojects',
+                title: 'Pinned sub-projects (queued)',
+                note: '#2 (resource hub), #3 (BSG v2), #4 (subdomain pipeline + #5 folded in) all stay queued. Each is a larger ongoing scope dependent on earlier work or strategic alignment.',
             },
         ],
     },
@@ -287,14 +228,34 @@ export const TODAY_LANES: Lane[] = [
 
 export const DONE: DoneItem[] = [
     {
-        id: 'done-pr15-open',
+        id: 'done-pr18',
+        date: '2026-04-30',
+        title: 'PR #18 merged — /book embed width cap, hero CTAs renamed (See services + Book a call), inquiry-form fallback dropped',
+    },
+    {
+        id: 'done-cal-live',
+        date: '2026-04-30',
+        title: 'Cal.com fully wired — scott-campbell handle, 4 event types live, NEXT_PUBLIC_CAL_USERNAME set in Vercel + .env.local',
+    },
+    {
+        id: 'done-pr17',
         date: '2026-04-29',
-        title: 'PR #15 opened — booking + services rebuild (Particle / Wave / Entanglement + /book Cal embed)',
+        title: 'PR #17 merged — mobile butterfly tap-drag via Pointer Events; sub-project #6 closed',
+    },
+    {
+        id: 'done-pr16',
+        date: '2026-04-29',
+        title: 'PR #16 merged — dev dashboard at /admin/dashboard',
+    },
+    {
+        id: 'done-pr15',
+        date: '2026-04-29',
+        title: 'PR #15 merged — Particle/Wave/Entanglement /services rebuild + Cal.com /book; sub-project #1 shipped',
     },
     {
         id: 'done-spec-1',
         date: '2026-04-29',
-        title: 'Spec + plan written for sub-project #1; brand voice locked',
+        title: 'Spec + plan written for sub-project #1; brand voice locked (Particle / Wave / Entanglement)',
     },
     {
         id: 'done-pivot-decompose',
@@ -321,16 +282,6 @@ export const DONE: DoneItem[] = [
         date: '2026-04-21',
         title: 'PR #8 merged — mobile admin + blog migration to RTDB',
     },
-    {
-        id: 'done-emerge-hover',
-        date: '2026-04-21',
-        title: 'PR #9 merged — emerge card hover highlight (Tailwind classes over inline style)',
-    },
-    {
-        id: 'done-worktree-convention',
-        date: '2026-04-21',
-        title: 'PR #10 merged — worktree convention for concurrent agent sessions',
-    },
 ];
 
 // ----------------------------------------------------------------------
@@ -339,28 +290,28 @@ export const DONE: DoneItem[] = [
 
 export const BLOCKERS: Blocker[] = [
     {
-        id: 'block-cal-setup',
-        priority: 'gating',
-        item: 'Cal.com account setup + 4 event types created',
-        impact: 'Blocks PR #15 merge / launch of /book. Must complete before /book embed loads in prod.',
-    },
-    {
-        id: 'block-cal-env',
-        priority: 'launch',
-        item: 'NEXT_PUBLIC_CAL_USERNAME set in Vercel',
-        impact: 'Without this, prod /book renders the fallback inquiry form, not the calendar.',
-    },
-    {
         id: 'block-prices',
         priority: 'polish',
         item: 'Real prices + scope on the 3 tiers',
-        impact: 'Placeholders ($2.5k / $10k / $6k/mo) shipped. Customers will see them until edited.',
+        impact: 'Placeholders ($2.5k / $10k / $6k/mo) are live in prod. Customers see them until Scott edits.',
+    },
+    {
+        id: 'block-cal-branding',
+        priority: 'polish',
+        item: 'Cal.com footer ("Cal.com" branding) on /book embed',
+        impact: 'Free-tier requirement. Removed by upgrading Cal to Teams plan ($12/mo).',
+    },
+    {
+        id: 'block-card-overflow',
+        priority: 'polish',
+        item: 'Entanglement card "ONGOING" pill clips at certain desktop widths',
+        impact: 'Folds into the design-refresh project; not a standalone fix worth shipping.',
     },
     {
         id: 'block-hero-copy',
         priority: 'polish',
-        item: 'Hero copy refresh — pre-pivot tagline still on /',
-        impact: 'Tonal seam: hero says "Identity in motion" then /services hits new physics-vocab voice.',
+        item: 'Hero tagline still pre-pivot ("Identity in motion. Strategy, design, code...")',
+        impact: 'Tonal seam between hero and rebuilt /services. Replace in design-refresh pass.',
     },
     {
         id: 'block-stripe',
@@ -372,7 +323,7 @@ export const BLOCKERS: Blocker[] = [
         id: 'block-claude-md',
         priority: 'deferred',
         item: 'CLAUDE.md positioning update',
-        impact: 'Separate docs PR after PR #15 merges. Current language still says BSG thesis is "being retired" without naming the replacement.',
+        impact: 'Separate docs PR. Current language still says BSG thesis is "being retired" without naming the replacement.',
     },
 ];
 
@@ -382,14 +333,14 @@ export const BLOCKERS: Blocker[] = [
 
 export const QUICK_LINKS: QuickLink[] = [
     {
+        title: 'Live site',
+        href: 'https://nertia.ai',
+        note: 'Production deploy.',
+    },
+    {
         title: 'GitHub repo',
         href: 'https://github.com/ps2pdx/nertia',
         note: 'main branch; deploys to Vercel.',
-    },
-    {
-        title: 'PR #15 — booking + services',
-        href: 'https://github.com/ps2pdx/nertia/pull/15',
-        note: 'In review. Merge after Cal setup.',
     },
     {
         title: 'Vercel dashboard',
@@ -397,29 +348,29 @@ export const QUICK_LINKS: QuickLink[] = [
         note: 'Env vars + deploy logs.',
     },
     {
+        title: 'Cal.com bookings',
+        href: 'https://cal.com/scott-campbell',
+        note: 'Public booking page; embed source.',
+    },
+    {
+        title: 'Cal.com dashboard',
+        href: 'https://app.cal.com/event-types',
+        note: 'Manage event types + calendar connections.',
+    },
+    {
         title: 'Firebase console',
         href: 'https://console.firebase.google.com/',
-        note: 'RTDB — notepad/, inquiries/, waitlist/.',
+        note: 'RTDB — notepad/, waitlist/.',
     },
     {
-        title: 'Cal.com signup',
-        href: 'https://cal.com/signup',
-        note: 'Step one of the gating blocker.',
-    },
-    {
-        title: 'Live site',
-        href: 'https://nertia.ai',
-        note: 'Production deploy.',
-    },
-    {
-        title: '/services preview',
+        title: '/services',
         href: '/services',
-        note: 'After PR #15 merges, this is the rebuilt page.',
+        note: 'Particle / Wave / Entanglement.',
     },
     {
-        title: '/book preview',
+        title: '/book',
         href: '/book',
-        note: 'After PR #15 + Cal env set.',
+        note: 'Cal embed; ?event= preselects tier.',
     },
     {
         title: '/design-system',
