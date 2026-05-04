@@ -1,637 +1,1111 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Footer from '@/components/sections/Footer';
-import PageContent from '@/components/PageContent';
-import PageSidebar, { SidebarSection } from '@/components/PageSidebar';
-import MotionSystem from '@/components/design-system/MotionSystem';
-import TableSystem from '@/components/design-system/TableSystem';
-import DataVizSystem from '@/components/design-system/DataVizSystem';
-import IconSystem from '@/components/design-system/IconSystem';
-import Alert from '@/components/ui/Alert';
-import ComingSoonBanner from '@/components/sections/ComingSoonBanner';
-import EarlyAccessForm from '@/components/sections/EarlyAccessForm';
-import PackageCard from '@/components/sections/services/PackageCard';
-
-const sections: SidebarSection[] = [
-    { id: 'colors', label: 'Colors' },
-    { id: 'typography', label: 'Typography' },
-    { id: 'icons', label: 'Icons' },
-    { id: 'components', label: 'Components' },
-    { id: 'motion', label: 'Motion' },
-    { id: 'tables', label: 'Tables' },
-    { id: 'data-viz', label: 'Data Viz' },
-    { id: 'spacing', label: 'Spacing' },
-    { id: 'logo', label: 'Logo' },
-    { id: 'grid', label: 'Grid' },
-    { id: 'services-booking', label: 'Services & Booking' },
-    { id: 'voice', label: 'Voice & Tone' },
-];
+import { useEffect } from 'react';
 
 export default function DesignSystemPage() {
-    const [copiedToken, setCopiedToken] = useState<string | null>(null);
+    useEffect(() => {
+        const root = document.documentElement;
 
-    const copyToClipboard = (text: string, tokenName: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedToken(tokenName);
-        setTimeout(() => setCopiedToken(null), 2000);
-    };
+        /* ---------- THEME TOGGLE ---------- */
+        const tt = document.getElementById('themeToggle');
+        const STORE = 'n.ds.theme';
+        function applyTheme(mode: string) {
+            if (mode === 'auto') root.removeAttribute('data-theme');
+            else root.setAttribute('data-theme', mode);
+            tt?.querySelectorAll<HTMLElement>('.theme-toggle__seg').forEach((s) => {
+                s.dataset.active = s.dataset.mode === mode ? 'true' : 'false';
+            });
+            try { localStorage.setItem(STORE, mode); } catch {}
+        }
+        let saved = 'auto';
+        try { saved = localStorage.getItem(STORE) || 'auto'; } catch {}
+        applyTheme(saved);
+        const themeHandler = (e: Event) => {
+            const seg = (e.target as HTMLElement).closest<HTMLElement>('.theme-toggle__seg');
+            if (!seg || !seg.dataset.mode) return;
+            applyTheme(seg.dataset.mode);
+        };
+        tt?.addEventListener('click', themeHandler);
 
-    const colors = [
-        { name: 'Background', token: '--background', lightValue: '#ffffff', darkValue: '#0a0a0a' },
-        { name: 'Foreground', token: '--foreground', lightValue: '#171717', darkValue: '#ededed' },
-        { name: 'Muted', token: '--muted', lightValue: '#6b7280', darkValue: '#9ca3af' },
-        { name: 'Accent', token: '--accent', lightValue: '#22c55e', darkValue: '#22c55e' },
-        { name: 'Accent Hover', token: '--accent-hover', lightValue: '#16a34a', darkValue: '#4ade80' },
-        { name: 'Card Background', token: '--card-bg', lightValue: '#f9fafb', darkValue: '#111111' },
-        { name: 'Card Border', token: '--card-border', lightValue: '#e5e7eb', darkValue: '#262626' },
-    ];
+        /* ---------- TOKEN GROUPS ---------- */
+        const TOKEN_GROUPS = [
+            { name: 'INK',      kind: 'color',  vars: ['--ink-1000','--ink-900','--ink-800','--ink-700','--ink-600','--ink-500','--ink-400','--ink-300','--ink-200','--ink-100'] },
+            { name: 'PAPER',    kind: 'color',  vars: ['--paper-1000','--paper-900','--paper-800','--paper-700','--paper-600'] },
+            { name: 'SIGNAL',   kind: 'color',  vars: ['--signal-red','--signal-red-2','--signal-amber','--signal-green','--signal-blue','--signal-violet'] },
+            { name: 'SEMANTIC', kind: 'mixed',  vars: ['--bg','--surface','--surface-2','--line','--line-soft','--fg','--fg-muted','--fg-quiet','--accent'] },
+            { name: 'TYPE',     kind: 'font',   vars: ['--f-display','--f-body','--f-mono'] },
+            { name: 'SPACING',  kind: 'size',   vars: ['--s-0','--s-1','--s-2','--s-3','--s-4','--s-6','--s-8','--s-12','--s-16','--s-24','--s-32'] },
+            { name: 'RADIUS',   kind: 'size',   vars: ['--r-0','--r-1','--r-2'] },
+            { name: 'STROKE',   kind: 'size',   vars: ['--w-hair','--w-struct','--w-loud'] },
+            { name: 'MOTION',   kind: 'motion', vars: ['--e-linear','--e-out','--e-in-out','--d-1','--d-2','--d-3','--d-4'] },
+        ];
+        function tokenKind(v: string) {
+            if (v.startsWith('--f-')) return 'font';
+            if (v.startsWith('--d-')) return 'duration';
+            if (v.startsWith('--e-')) return 'easing';
+            if (v.startsWith('--s-') || v.startsWith('--r-') || v.startsWith('--w-')) return 'size';
+            return 'color';
+        }
 
-    const typography = [
-        { name: 'Display', element: 'h1', classes: 'text-5xl lg:text-6xl font-bold', sample: 'Brand systems that move.' },
-        { name: 'Heading 1', element: 'h1', classes: 'text-4xl sm:text-5xl font-bold', sample: 'Page Headline' },
-        { name: 'Heading 2', element: 'h2', classes: 'text-2xl sm:text-3xl font-bold', sample: 'Section Title' },
-        { name: 'Heading 3', element: 'h3', classes: 'text-xl font-semibold', sample: 'Subsection Title' },
-        { name: 'Body', element: 'p', classes: 'text-base leading-relaxed', sample: 'Body text for paragraphs and general content. Uses Space Mono for a technical, precise feel.' },
-        { name: 'Small / Label', element: 'span', classes: 'text-sm text-muted', sample: 'Labels and secondary text' },
-        { name: 'Micro', element: 'span', classes: 'text-xs tracking-[0.2em] uppercase text-muted', sample: 'Section Label' },
-    ];
+        /* ---------- OVERRIDES ---------- */
+        const STORE_OVR = 'n.ds.overrides';
+        let overrides: Record<string, string> = {};
+        try { overrides = JSON.parse(localStorage.getItem(STORE_OVR) || '{}'); } catch { overrides = {}; }
+        try {
+            if (location.hash.startsWith('#t=')) {
+                const decoded = JSON.parse(atob(decodeURIComponent(location.hash.slice(3))));
+                if (decoded && typeof decoded === 'object') overrides = decoded;
+            }
+        } catch {}
+        function applyOverrides() {
+            Object.entries(overrides).forEach(([k, v]) => root.style.setProperty(k, v));
+        }
+        function persistOverrides() {
+            try { localStorage.setItem(STORE_OVR, JSON.stringify(overrides)); } catch {}
+            updateEditedCount();
+        }
+        function updateEditedCount() {
+            const n = Object.keys(overrides).length;
+            const el = document.getElementById('tokenEditedCount');
+            if (el) el.textContent = n ? `${n} EDITED` : 'DEFAULTS';
+            const reset = document.getElementById('tokenReset') as HTMLButtonElement | null;
+            if (reset) reset.disabled = !n;
+        }
+        applyOverrides();
 
-    const spacing = [
-        { name: 'Section Padding', value: 'p-8 lg:p-12', px: '32px / 48px' },
-        { name: 'Card Padding', value: 'p-8 (2rem)', px: '32px' },
-        { name: 'Component Gap', value: 'gap-6', px: '24px' },
-        { name: 'Text Gap', value: 'space-y-4', px: '16px' },
-        { name: 'Inline Gap', value: 'gap-2', px: '8px' },
-    ];
+        function isColor(val: string) { return /^(#|rgb|hsl|oklch|oklab|color\()/.test(val.trim()); }
+        function readVar(name: string) {
+            if (overrides[name] != null) return overrides[name];
+            return getComputedStyle(root).getPropertyValue(name).trim();
+        }
+        function setVar(name: string, val: string) {
+            overrides[name] = val;
+            root.style.setProperty(name, val);
+            persistOverrides();
+            refreshRow(name);
+            refreshLabels();
+        }
+        function clearVar(name: string) {
+            delete overrides[name];
+            root.style.removeProperty(name);
+            persistOverrides();
+            refreshRow(name);
+            refreshLabels();
+        }
+        function refreshRow(name: string) {
+            const row = document.querySelector<HTMLElement>(`.tk-row[data-var="${name}"]`);
+            if (!row) return;
+            const val = readVar(name);
+            row.dataset.val = val;
+            row.dataset.search = (name + ' ' + val).toLowerCase();
+            row.dataset.edited = overrides[name] != null ? 'true' : 'false';
+            const sw = row.querySelector<HTMLElement>('.tk-swatch');
+            if (sw) {
+                if (isColor(val)) { sw.className = 'tk-swatch'; sw.style.background = val; }
+                else { sw.className = 'tk-swatch tk-swatch--empty'; sw.style.background = ''; }
+            }
+            const valEl = row.querySelector<HTMLElement>('.tk-val'); if (valEl) valEl.textContent = val;
+        }
+
+        function buildTokens() {
+            const body = document.getElementById('tokenBody');
+            if (!body) return;
+            body.innerHTML = '';
+            TOKEN_GROUPS.forEach((group) => {
+                const sec = document.createElement('div');
+                sec.className = 'tk-group';
+                sec.dataset.group = group.name;
+                sec.innerHTML = `<div class="tk-group__head"><span class="t-eyebrow fg-quiet">${group.name}</span><span class="t-mono fg-quiet">${group.vars.length}</span></div>`;
+                const list = document.createElement('div');
+                list.className = 'tk-list';
+                group.vars.forEach((v) => {
+                    const val = readVar(v);
+                    const row = document.createElement('div');
+                    row.className = 'tk-row';
+                    row.dataset.var = v;
+                    row.dataset.val = val;
+                    row.dataset.search = (v + ' ' + val).toLowerCase();
+                    row.dataset.edited = overrides[v] != null ? 'true' : 'false';
+                    const swatch = isColor(val)
+                        ? `<span class="tk-swatch" style="background:${val}"></span>`
+                        : `<span class="tk-swatch tk-swatch--empty"></span>`;
+                    row.innerHTML = `
+                        ${swatch}
+                        <span class="tk-key">${v}</span>
+                        <span class="tk-val">${val}</span>
+                        <button class="tk-act" data-act="edit" title="Edit">&#10000;</button>
+                        <button class="tk-act" data-act="copy" title="Copy var()">&#9133;</button>
+                        <button class="tk-act tk-act--reset" data-act="reset" title="Reset">&#8634;</button>
+                    `;
+                    row.addEventListener('click', (e) => {
+                        const act = (e.target as HTMLElement).closest<HTMLElement>('[data-act]')?.dataset.act;
+                        if (act === 'copy') return copyToken(v, readVar(v), row);
+                        if (act === 'reset') return clearVar(v);
+                        openEditor(v, row);
+                    });
+                    list.appendChild(row);
+                });
+                sec.appendChild(list);
+                body.appendChild(sec);
+            });
+            updateEditedCount();
+        }
+
+        function copyToken(name: string, val: string, row: HTMLElement) {
+            const text = `var(${name}) /* ${val} */`;
+            navigator.clipboard?.writeText(text).then(() => {
+                showToast(`COPIED · ${name}`);
+                row.dataset.copied = 'true';
+                setTimeout(() => { delete row.dataset.copied; }, 900);
+            }).catch(() => showToast('COPY FAILED'));
+        }
+
+        let activeEditor: HTMLElement | null = null;
+        function closeEditor() { if (activeEditor) { activeEditor.remove(); activeEditor = null; } }
+        function openEditor(name: string, row: HTMLElement) {
+            closeEditor();
+            const kind = tokenKind(name);
+            const val = readVar(name);
+            const ed = document.createElement('div');
+            ed.className = 'tk-editor';
+            ed.innerHTML = renderEditor(kind, name, val);
+            row.after(ed);
+            activeEditor = ed;
+            wireEditor(ed, kind, name);
+        }
+
+        function renderEditor(kind: string, name: string, val: string) {
+            if (kind === 'color') {
+                const hex = toHex(val);
+                const ok = parseOklch(val);
+                return `
+                    <div class="tk-editor__head"><span class="t-eyebrow fg-quiet">EDIT &middot; ${name}</span><button class="tk-editor__x" data-act="close">&times;</button></div>
+                    <div class="tk-editor__row"><label>HEX</label><input type="color" data-fld="hex" value="${hex}"><input type="text" class="input-ds" data-fld="hexText" value="${hex}"></div>
+                    <div class="tk-editor__row"><label>L</label><input type="range" min="0" max="1" step="0.01" data-fld="L" value="${ok.l.toFixed(2)}"><span class="tk-num" data-out="L">${ok.l.toFixed(2)}</span></div>
+                    <div class="tk-editor__row"><label>C</label><input type="range" min="0" max="0.4" step="0.005" data-fld="C" value="${ok.c.toFixed(3)}"><span class="tk-num" data-out="C">${ok.c.toFixed(3)}</span></div>
+                    <div class="tk-editor__row"><label>H</label><input type="range" min="0" max="360" step="1" data-fld="H" value="${ok.h.toFixed(0)}"><span class="tk-num" data-out="H">${ok.h.toFixed(0)}</span></div>
+                    <div class="tk-editor__row"><label>RAW</label><input type="text" class="input-ds" data-fld="raw" value="${val}"></div>
+                `;
+            }
+            if (kind === 'font') {
+                const fams = ['Archivo','Geist','Inter Tight','JetBrains Mono','SF Mono, ui-monospace, Menlo, monospace','IBM Plex Mono','IBM Plex Sans','Space Grotesk','Space Mono','Manrope','Fira Code','DM Mono','DM Sans','Roboto Mono','ui-sans-serif, system-ui, sans-serif','ui-monospace, Menlo, monospace'];
+                const opts = fams.map((f) => `<option value='${f}' ${val.includes(f.split(',')[0].replace(/"/g, '')) ? 'selected' : ''}>${f}</option>`).join('');
+                return `
+                    <div class="tk-editor__head"><span class="t-eyebrow fg-quiet">EDIT &middot; ${name}</span><button class="tk-editor__x" data-act="close">&times;</button></div>
+                    <div class="tk-editor__row"><label>STACK</label><input type="text" class="input-ds" data-fld="raw" value='${val.replace(/"/g, '&quot;')}'></div>
+                    <div class="tk-editor__row"><label>PRESET</label><select class="input-ds" data-fld="preset">${opts}</select></div>
+                    <div class="t-mono fg-quiet" style="padding:6px 12px;">Google Font names auto-load.</div>
+                `;
+            }
+            if (kind === 'size') {
+                const px = parseFloat(val) || 0;
+                const max = name.startsWith('--w-') ? 8 : (name.startsWith('--r-') ? 32 : 200);
+                return `
+                    <div class="tk-editor__head"><span class="t-eyebrow fg-quiet">EDIT &middot; ${name}</span><button class="tk-editor__x" data-act="close">&times;</button></div>
+                    <div class="tk-editor__row"><label>PX</label><input type="range" min="0" max="${max}" step="${name.startsWith('--w-') ? 0.5 : 1}" data-fld="px" value="${px}"><input type="number" class="input-ds" data-fld="pxText" value="${px}" style="width:80px;"></div>
+                    <div class="tk-editor__row"><label>RAW</label><input type="text" class="input-ds" data-fld="raw" value="${val}"></div>
+                `;
+            }
+            if (kind === 'duration') {
+                const ms = parseFloat(val) || 0;
+                return `
+                    <div class="tk-editor__head"><span class="t-eyebrow fg-quiet">EDIT &middot; ${name}</span><button class="tk-editor__x" data-act="close">&times;</button></div>
+                    <div class="tk-editor__row"><label>MS</label><input type="range" min="0" max="1000" step="10" data-fld="ms" value="${ms}"><input type="number" class="input-ds" data-fld="msText" value="${ms}" style="width:80px;"></div>
+                    <div class="tk-editor__row"><label>RAW</label><input type="text" class="input-ds" data-fld="raw" value="${val}"></div>
+                `;
+            }
+            return `
+                <div class="tk-editor__head"><span class="t-eyebrow fg-quiet">EDIT &middot; ${name}</span><button class="tk-editor__x" data-act="close">&times;</button></div>
+                <div class="tk-editor__row"><label>RAW</label><input type="text" class="input-ds" data-fld="raw" value="${val}"></div>
+                <div class="t-mono fg-quiet" style="padding:6px 12px;">e.g. linear &middot; cubic-bezier(0.2,0,0,1)</div>
+            `;
+        }
+
+        function wireEditor(ed: HTMLElement, kind: string, name: string) {
+            ed.querySelector<HTMLElement>('[data-act="close"]')?.addEventListener('click', () => {
+                if (ed.classList.contains('edit-popover')) closePopover();
+                else closeEditor();
+            });
+            const $ = <T extends HTMLElement = HTMLElement>(sel: string) => ed.querySelector<T>(sel)!;
+            const raw = $<HTMLInputElement>('[data-fld="raw"]');
+            const commitRaw = () => setVar(name, raw.value.trim());
+            raw.addEventListener('change', commitRaw);
+
+            if (kind === 'color') {
+                const hex = $<HTMLInputElement>('[data-fld="hex"]');
+                const hexText = $<HTMLInputElement>('[data-fld="hexText"]');
+                const L = $<HTMLInputElement>('[data-fld="L"]');
+                const C = $<HTMLInputElement>('[data-fld="C"]');
+                const H = $<HTMLInputElement>('[data-fld="H"]');
+                const outL = $('[data-out="L"]');
+                const outC = $('[data-out="C"]');
+                const outH = $('[data-out="H"]');
+                hex.addEventListener('input', () => {
+                    hexText.value = hex.value;
+                    setVar(name, hex.value);
+                    syncOklch(hex.value);
+                    raw.value = readVar(name);
+                });
+                hexText.addEventListener('change', () => {
+                    setVar(name, hexText.value);
+                    hex.value = toHex(hexText.value);
+                    syncOklch(hexText.value);
+                    raw.value = readVar(name);
+                });
+                function syncOklch(v: string) {
+                    const o = parseOklch(v);
+                    L.value = o.l.toFixed(2);
+                    C.value = o.c.toFixed(3);
+                    H.value = o.h.toFixed(0);
+                    outL.textContent = L.value;
+                    outC.textContent = C.value;
+                    outH.textContent = H.value;
+                }
+                const updateFromOklch = () => {
+                    const v = `oklch(${(+L.value).toFixed(3)} ${(+C.value).toFixed(3)} ${(+H.value).toFixed(0)})`;
+                    outL.textContent = (+L.value).toFixed(2);
+                    outC.textContent = (+C.value).toFixed(3);
+                    outH.textContent = (+H.value).toFixed(0);
+                    setVar(name, v);
+                    raw.value = v;
+                    hexText.value = v;
+                    hex.value = toHex(v);
+                };
+                [L, C, H].forEach((s) => s.addEventListener('input', updateFromOklch));
+            } else if (kind === 'font') {
+                $<HTMLSelectElement>('[data-fld="preset"]').addEventListener('change', (e) => {
+                    const family = (e.target as HTMLSelectElement).value;
+                    const stack = family.includes(',') ? family : `"${family}", ui-sans-serif, system-ui, sans-serif`;
+                    raw.value = stack;
+                    setVar(name, stack);
+                    const googleName = family.split(',')[0].replace(/"/g, '').trim();
+                    if (googleName && !document.querySelector(`link[data-gf="${googleName}"]`)) {
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.dataset.gf = googleName;
+                        link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(googleName).replace(/%20/g, '+')}:wght@400;500;600;700&display=swap`;
+                        document.head.appendChild(link);
+                    }
+                });
+            } else if (kind === 'size') {
+                const px = $<HTMLInputElement>('[data-fld="px"]');
+                const pxText = $<HTMLInputElement>('[data-fld="pxText"]');
+                const sync = (val: string) => { const v = `${val}px`; raw.value = v; setVar(name, v); };
+                px.addEventListener('input', () => { pxText.value = px.value; sync(px.value); });
+                pxText.addEventListener('change', () => { px.value = pxText.value; sync(pxText.value); });
+            } else if (kind === 'duration') {
+                const ms = $<HTMLInputElement>('[data-fld="ms"]');
+                const msText = $<HTMLInputElement>('[data-fld="msText"]');
+                const sync = (val: string) => { const v = `${val}ms`; raw.value = v; setVar(name, v); };
+                ms.addEventListener('input', () => { msText.value = ms.value; sync(ms.value); });
+                msText.addEventListener('change', () => { ms.value = msText.value; sync(msText.value); });
+            }
+        }
+
+        function toHex(val: string) {
+            if (!val) return '#000000';
+            val = val.trim();
+            if (val.startsWith('#')) return val.length === 4 ? '#' + val.slice(1).split('').map((c) => c + c).join('') : val.slice(0, 7);
+            try {
+                const c = document.createElement('canvas').getContext('2d')!;
+                c.fillStyle = '#000';
+                c.fillStyle = val;
+                const r = c.fillStyle as string;
+                if (r.startsWith('#')) return r;
+                const m = r.match(/rgba?\(([^)]+)\)/);
+                if (m) {
+                    const [r2, g2, b2] = m[1].split(',').map((x) => parseFloat(x));
+                    return '#' + [r2, g2, b2].map((x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('');
+                }
+            } catch {}
+            return '#000000';
+        }
+        function parseOklch(val: string) {
+            const m = val.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+            if (m) return { l: +m[1], c: +m[2], h: +m[3] };
+            const hex = toHex(val).replace('#', '');
+            if (hex.length < 6) return { l: 0.5, c: 0.1, h: 0 };
+            const r = parseInt(hex.slice(0, 2), 16) / 255;
+            const g = parseInt(hex.slice(2, 4), 16) / 255;
+            const b = parseInt(hex.slice(4, 6), 16) / 255;
+            const lin = (x: number) => (x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4));
+            const R = lin(r), G = lin(g), B = lin(b);
+            const l = 0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B;
+            const m2 = 0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B;
+            const s = 0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B;
+            const l_ = Math.cbrt(l), m_ = Math.cbrt(m2), s_ = Math.cbrt(s);
+            const L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+            const a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+            const b2 = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+            const C = Math.sqrt(a * a + b2 * b2);
+            let H = (Math.atan2(b2, a) * 180) / Math.PI;
+            if (H < 0) H += 360;
+            return { l: L, c: C, h: H };
+        }
+
+        let toastTimer: ReturnType<typeof setTimeout> | undefined;
+        function showToast(msg: string) {
+            const t = document.getElementById('tokenToast');
+            if (!t) return;
+            t.textContent = msg;
+            t.dataset.show = 'true';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { t.dataset.show = 'false'; }, 1400);
+        }
+
+        const drawer = document.getElementById('tokenDrawer')!;
+        const tab = document.getElementById('tokenTab')!;
+        const closeBtn = document.getElementById('tokenClose')!;
+        function setDrawer(open: boolean) {
+            drawer.dataset.open = open ? 'true' : 'false';
+            tab.dataset.open = open ? 'true' : 'false';
+            drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (open) buildTokens();
+        }
+        const tabHandler = () => setDrawer(drawer.dataset.open !== 'true');
+        const closeHandler = () => setDrawer(false);
+        const escHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawer(false); };
+        tab.addEventListener('click', tabHandler);
+        closeBtn.addEventListener('click', closeHandler);
+        document.addEventListener('keydown', escHandler);
+
+        const themeMo = new MutationObserver(() => { if (drawer.dataset.open === 'true') buildTokens(); });
+        themeMo.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+        const filter = document.getElementById('tokenFilter') as HTMLInputElement | null;
+        const filterHandler = () => {
+            const q = filter?.value.trim().toLowerCase() || '';
+            document.querySelectorAll<HTMLElement>('.tk-row').forEach((r) => {
+                r.style.display = !q || (r.dataset.search || '').includes(q) ? '' : 'none';
+            });
+            document.querySelectorAll<HTMLElement>('.tk-group').forEach((g) => {
+                const anyVisible = [...g.querySelectorAll<HTMLElement>('.tk-row')].some((r) => r.style.display !== 'none');
+                g.style.display = anyVisible ? '' : 'none';
+            });
+        };
+        filter?.addEventListener('input', filterHandler);
+
+        const exportButtons = drawer.querySelectorAll<HTMLElement>('[data-export]');
+        const exportHandlers: Array<() => void> = [];
+        exportButtons.forEach((b) => {
+            const handler = () => {
+                const fmt = b.dataset.export;
+                const all = TOKEN_GROUPS.flatMap((g) => g.vars.map((v) => [v, readVar(v)] as [string, string]));
+                let text: string;
+                if (fmt === 'css') {
+                    text = ':root {\n' + all.map(([k, v]) => `  ${k}: ${v};`).join('\n') + '\n}';
+                } else {
+                    const obj: Record<string, Record<string, string>> = {};
+                    TOKEN_GROUPS.forEach((g) => { obj[g.name.toLowerCase()] = Object.fromEntries(g.vars.map((v) => [v, readVar(v)])); });
+                    text = JSON.stringify(obj, null, 2);
+                }
+                navigator.clipboard?.writeText(text).then(() => showToast(`COPIED · ${(fmt || '').toUpperCase()} (${all.length} TOKENS)`));
+            };
+            exportHandlers.push(handler);
+            b.addEventListener('click', handler);
+        });
+
+        const resetBtn = document.getElementById('tokenReset');
+        const resetHandler = () => {
+            Object.keys(overrides).forEach((k) => root.style.removeProperty(k));
+            overrides = {};
+            persistOverrides();
+            closeEditor();
+            buildTokens();
+            refreshLabels();
+            showToast('RESET · DEFAULTS RESTORED');
+            history.replaceState(null, '', location.pathname + location.search);
+        };
+        resetBtn?.addEventListener('click', resetHandler);
+
+        const shareBtn = document.getElementById('tokenShare');
+        const shareHandler = () => {
+            const n = Object.keys(overrides).length;
+            const hash = n ? '#t=' + encodeURIComponent(btoa(JSON.stringify(overrides))) : '';
+            const url = location.origin + location.pathname + location.search + hash;
+            history.replaceState(null, '', url);
+            navigator.clipboard?.writeText(url).then(() => showToast(`LINK COPIED · ${n} TOKENS`));
+        };
+        shareBtn?.addEventListener('click', shareHandler);
+
+        /* ---------- INLINE PAGE EDITING ---------- */
+        const STORE_EDIT = 'n.ds.editmode';
+        let editMode = false;
+        try { editMode = localStorage.getItem(STORE_EDIT) === 'true'; } catch {}
+        const editToggleEl = document.getElementById('editToggle');
+        let popover: HTMLElement | null = null;
+        function closePopover() { if (popover) { popover.remove(); popover = null; } }
+        function setEditMode(on: boolean) {
+            editMode = on;
+            document.body.dataset.editMode = on ? 'true' : 'false';
+            if (editToggleEl) editToggleEl.dataset.active = on ? 'true' : 'false';
+            try { localStorage.setItem(STORE_EDIT, String(on)); } catch {}
+            if (!on) closePopover();
+        }
+        const editToggleHandler = () => setEditMode(!editMode);
+        editToggleEl?.addEventListener('click', editToggleHandler);
+        setEditMode(editMode);
+
+        function openPopover(el: HTMLElement, name: string) {
+            closePopover();
+            const kind = tokenKind(name);
+            const val = readVar(name);
+            const pop = document.createElement('div');
+            pop.className = 'edit-popover';
+            pop.innerHTML = `<div class="edit-popover__arrow"></div>${renderEditor(kind, name, val)}`;
+            document.body.appendChild(pop);
+            const rect = el.getBoundingClientRect();
+            const w = 320;
+            let left = rect.left + rect.width / 2 - w / 2;
+            left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+            pop.style.left = left + 'px';
+            pop.style.top = rect.bottom + window.scrollY + 10 + 'px';
+            pop.style.width = w + 'px';
+            popover = pop;
+            wireEditor(pop, kind, name);
+            setTimeout(() => {
+                const handler = (e: MouseEvent) => {
+                    if (popover && !popover.contains(e.target as Node) && !el.contains(e.target as Node)) {
+                        closePopover();
+                        document.removeEventListener('mousedown', handler);
+                    }
+                };
+                document.addEventListener('mousedown', handler);
+            }, 0);
+        }
+
+        const inlineClickHandler = (e: MouseEvent) => {
+            if (!editMode) return;
+            const target = (e.target as HTMLElement).closest<HTMLElement>('[data-edit-var]');
+            if (!target) return;
+            if (target.closest('#tokenDrawer')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const name = target.dataset.editVar!;
+            openPopover(target, name);
+        };
+        document.addEventListener('click', inlineClickHandler);
+
+        function refreshLabels() {
+            document.querySelectorAll<HTMLElement>('[data-show-var]').forEach((el) => {
+                const v = readVar(el.dataset.showVar!);
+                el.textContent = v.toUpperCase();
+            });
+            document.querySelectorAll<HTMLElement>('[data-show-px]').forEach((el) => {
+                el.textContent = readVar(el.dataset.showPx!);
+            });
+            document.querySelectorAll<HTMLElement>('[data-show-ms]').forEach((el) => {
+                const v = readVar(el.dataset.showMs!);
+                el.textContent = String(parseFloat(v) || v);
+            });
+            document.querySelectorAll<HTMLElement>('[data-show-font]').forEach((el) => {
+                const stack = readVar(el.dataset.showFont!);
+                const first = stack.split(',')[0].replace(/['"]/g, '').trim();
+                el.textContent = first;
+            });
+        }
+        refreshLabels();
+
+        /* ---------- SIDEBAR SCROLL-SPY ---------- */
+        const links = document.querySelectorAll<HTMLAnchorElement>('.ds-sidebar__link');
+        const sections = document.querySelectorAll<HTMLElement>('.ds-section');
+        function setActive(id: string) {
+            links.forEach((l) => { l.dataset.active = l.getAttribute('href') === '#' + id ? 'true' : 'false'; });
+        }
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((e) => { if (e.isIntersecting) setActive((e.target as HTMLElement).id); });
+        }, { rootMargin: '-30% 0px -60% 0px' });
+        sections.forEach((s) => io.observe(s));
+
+        return () => {
+            tt?.removeEventListener('click', themeHandler);
+            tab.removeEventListener('click', tabHandler);
+            closeBtn.removeEventListener('click', closeHandler);
+            document.removeEventListener('keydown', escHandler);
+            filter?.removeEventListener('input', filterHandler);
+            exportButtons.forEach((b, i) => b.removeEventListener('click', exportHandlers[i]));
+            resetBtn?.removeEventListener('click', resetHandler);
+            shareBtn?.removeEventListener('click', shareHandler);
+            editToggleEl?.removeEventListener('click', editToggleHandler);
+            document.removeEventListener('click', inlineClickHandler);
+            themeMo.disconnect();
+            io.disconnect();
+            closeEditor();
+            closePopover();
+            document.body.dataset.editMode = 'false';
+        };
+    }, []);
 
     return (
-        <main className="pb-24">
-            <PageContent>
-                <div className="grid grid-cols-1 lg:grid-cols-12 border-t border-[var(--card-border)]">
-                    {/* Sidebar Navigation */}
-                    <PageSidebar
-                        sections={sections}
-                        title="Design System"
-                        description="A comprehensive guide to Nertia's visual language, components, and patterns."
-                    />
+        <div className="ds-root">
+            {/* DS topbar — sits below the site header */}
+            <div className="ds-topbar">
+                <div className="ds-topbar__crumbs">
+                    <span>n.[ds]</span><span>system</span><span>v1.0.0</span><span>2026.05.04</span>
+                </div>
+                <div className="ds-topbar__meta">
+                    <span><span className="ds-topbar__pulse" />BUILDING · 1 OF 1</span>
+                    <span>UNCLASSIFIED · INTERNAL</span>
+                    <button className="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+                        <span className="theme-toggle__seg" data-mode="dark">DARK</span>
+                        <span className="theme-toggle__seg" data-mode="light">LIGHT</span>
+                        <span className="theme-toggle__seg" data-mode="auto">AUTO</span>
+                    </button>
+                    <button className="edit-toggle" id="editToggle" type="button" aria-label="Toggle inline editing">
+                        <span className="edit-toggle__dot" />
+                        <span className="edit-toggle__label">EDIT</span>
+                    </button>
+                </div>
+            </div>
 
-                    {/* Content Sections */}
-                    <div className="lg:col-span-9">
-                        {/* Colors */}
-                        <section id="colors" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                        <h2 className="text-xl font-bold mb-4">Colors</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Semantic color tokens that adapt to light and dark mode automatically.
-                        </p>
-                        <div className="grid gap-4">
-                            {colors.map((color) => (
-                                <div 
-                                    key={color.token}
-                                    className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-[var(--card-border)] group hover:border-[var(--accent)] transition-colors cursor-pointer"
-                                    onClick={() => copyToClipboard(`var(${color.token})`, color.token)}
-                                >
-                                    <div 
-                                        className="w-16 h-16 rounded border border-[var(--card-border)] flex-shrink-0"
-                                        style={{ background: `var(${color.token})` }}
-                                    />
-                                    <div className="flex-1">
-                                        <div className="font-semibold mb-1">{color.name}</div>
-                                        <code className="text-sm text-muted">{color.token}</code>
-                                    </div>
-                                    <div className="text-sm text-muted">
-                                        <div>Light: <code>{color.lightValue}</code></div>
-                                        <div>Dark: <code>{color.darkValue}</code></div>
-                                    </div>
-                                    <div className="text-xs text-[var(--accent)]">
-                                        {copiedToken === color.token ? 'Copied!' : 'Click to copy'}
-                                    </div>
+            <div className="ds-shell">
+                <aside className="ds-sidebar">
+                    <div className="ds-sidebar__brand">
+                        <span style={{ fontFamily: 'var(--f-mono)', fontWeight: 700, fontSize: 18, letterSpacing: '-0.02em' }}>
+                            n<span style={{ color: 'var(--accent)' }}>.</span><span style={{ color: 'var(--fg-quiet)' }}>[</span>ds<span style={{ color: 'var(--fg-quiet)' }}>]</span>
+                        </span>
+                    </div>
+                    <div className="ds-sidebar__nav">
+                        <div className="ds-sidebar__nav-section">FOUNDATIONS</div>
+                        <a className="ds-sidebar__link" href="#color"  data-active="true"><span>00 / COLOR</span><span>11+6</span></a>
+                        <a className="ds-sidebar__link" href="#type"><span>01 / TYPE</span><span>3+10</span></a>
+                        <a className="ds-sidebar__link" href="#scale"><span>02 / SCALE</span><span>11</span></a>
+                        <a className="ds-sidebar__link" href="#radius"><span>03 / RADIUS</span><span>3</span></a>
+                        <a className="ds-sidebar__link" href="#stroke"><span>04 / STROKE</span><span>3</span></a>
+                        <a className="ds-sidebar__link" href="#motion"><span>05 / MOTION</span><span>3·4</span></a>
+                        <a className="ds-sidebar__link" href="#icons"><span>06 / ICONS</span><span>16</span></a>
+                        <div className="ds-sidebar__nav-section">PRIMITIVES</div>
+                        <a className="ds-sidebar__link" href="#buttons"><span>07 / BUTTONS</span><span>4</span></a>
+                        <a className="ds-sidebar__link" href="#inputs"><span>08 / INPUTS</span><span>3</span></a>
+                        <a className="ds-sidebar__link" href="#tags"><span>09 / TAGS</span><span>5</span></a>
+                        <a className="ds-sidebar__link" href="#cards"><span>10 / CARDS</span><span>3</span></a>
+                        <a className="ds-sidebar__link" href="#alerts"><span>11 / ALERTS</span><span>4</span></a>
+                        <div className="ds-sidebar__nav-section">DATA</div>
+                        <a className="ds-sidebar__link" href="#stats"><span>12 / STATS</span><span>3</span></a>
+                        <a className="ds-sidebar__link" href="#bars"><span>13 / BARS</span><span>5</span></a>
+                        <div className="ds-sidebar__nav-section">BRAND</div>
+                        <a className="ds-sidebar__link" href="#voice"><span>14 / VOICE</span><span /></a>
+                        <a className="ds-sidebar__link" href="#logo" style={{ color: 'var(--fg-quiet)' }}><span>15 / LOGO</span><span>TBD</span></a>
+                    </div>
+                </aside>
+
+                <main className="ds-main">
+                    <section className="ds-hero">
+                        <h1 className="ds-hero__title">SYSTEMS<br />FOR<em>.</em><br />SCALE.</h1>
+                        <div className="ds-hero__meta">
+                            <div className="ds-hero__meta-row"><span className="k">DOC</span><span className="v">n.[ds] / industrial v1.0.0</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">DATE</span><span className="v">2026.05.04 // BROOKLYN</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">AUTHOR</span><span className="v">scott campbell</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">TONE</span><span className="v">technical · dense · declarative</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">SEED</span><span className="v">crusoe · vercel · o-p-e-n</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">STATUS</span><span className="v" style={{ color: 'var(--signal-green)' }}>● LIVE — TOKENS LOCKED</span></div>
+                        </div>
+                    </section>
+
+                    {/* 00 COLOR */}
+                    <section className="ds-section" id="color">
+                        <div className="ds-section__head">
+                            <div><div className="num">00 / COLOR</div></div>
+                            <div>
+                                <div className="title">PALETTE.</div>
+                                <div className="desc">Two ink scales, one signal accent, six semantic tones. Dark-mode primary. No saturation in greys (pure technical neutrals).</div>
+                            </div>
+                        </div>
+                        <div className="t-eyebrow" style={{ marginBottom: 8 }}>INK · 11 STEPS</div>
+                        <div className="swatch-row">
+                            {[
+                                ['--ink-1000', '#000000', 'paper-800'],
+                                ['--ink-900',  '#0C0C0C', 'paper-800'],
+                                ['--ink-800',  '#1A1A1A', 'paper-800'],
+                                ['--ink-700',  '#262624', 'paper-800'],
+                                ['--ink-600',  '#34332F', 'paper-800'],
+                                ['--ink-500',  '#3D3D3A', 'paper-800'],
+                                ['--ink-400',  '#5A5A55', 'ink-900'],
+                                ['--ink-300',  '#80807A', 'ink-900'],
+                                ['--ink-200',  '#A8A8A0', 'ink-900'],
+                                ['--ink-100',  '#C8C5BC', 'ink-900'],
+                                ['--paper-900','#F3F1EC', 'ink-900'],
+                            ].map(([v, hex, fg], i) => (
+                                <div key={v}
+                                     className="swatch"
+                                     data-edit-var={v}
+                                     style={{ background: `var(${v})`, color: `var(--${fg})` }}>
+                                    <span className="swatch__step">{i === 10 ? '0' : v.split('-')[2]}</span>
+                                    <span className="swatch__hex" data-show-var={v}>{hex}</span>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Accent Color Showcase */}
-                        <div className="mt-8 p-6 bg-[var(--accent)] text-white">
-                            <h3 className="text-xl font-bold mb-2">Accent: Green 500</h3>
-                            <p className="opacity-90">The primary accent color used for CTAs, active states, and interactive elements. Hex: #22c55e</p>
-                        </div>
-                        </section>
-
-                        {/* Typography */}
-                        <section id="typography" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                        <h2 className="text-xl font-bold mb-4">Typography</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Two font families: Helvetica Neue for headings, Space Mono for body text.
-                        </p>
-                        {/* Font Families */}
-                        <div className="mb-12">
-                            <h3 className="text-lg font-semibold mb-6">Font Families</h3>
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="p-6 border border-[var(--card-border)]">
-                                    <div className="text-xs tracking-[0.2em] uppercase text-muted mb-4">Headings</div>
-                                    <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                                        Helvetica Neue
-                                    </div>
-                                    <code className="text-sm text-muted">--font-heading</code>
-                                </div>
-                                <div className="p-6 border border-[var(--card-border)]">
-                                    <div className="text-xs tracking-[0.2em] uppercase text-muted mb-4">Body</div>
-                                    <div className="text-2xl mb-2">
-                                        Space Mono
-                                    </div>
-                                    <code className="text-sm text-muted">--font-body / --font-space-mono</code>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Type Scale */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Type Scale</h3>
-                            <div className="space-y-6">
-                                {typography.map((type, index) => (
-                                    <div key={index} className="border-t border-[var(--card-border)] pb-6 last:border-0">
-                                        <div className="flex flex-wrap items-baseline gap-4 mb-2">
-                                            <span className="text-xs tracking-[0.2em] uppercase text-muted">{type.name}</span>
-                                            <code className="text-xs text-muted">{type.classes}</code>
-                                        </div>
-                                        <div className={type.classes}>
-                                            {type.sample}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        </section>
-
-                        {/* Icons */}
-                        <section id="icons" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                            <h2 className="text-xl font-bold mb-4">Icons</h2>
-                            <p className="text-muted text-sm leading-relaxed mb-8">
-                                Custom icon set for consistent visual language. Click any icon to copy usage code.
-                            </p>
-                            <IconSystem />
-                        </section>
-
-                        {/* Components */}
-                        <section id="components" className="p-8 lg:p-12 border-b border-[var(--card-border)] space-y-12">
-                        <h2 className="text-xl font-bold mb-4">Components</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Reusable UI patterns used throughout the site.
-                        </p>
-                        {/* Buttons */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Buttons</h3>
-                            <div className="flex flex-wrap gap-4 mb-6">
-                                <button className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-medium text-sm tracking-wide hover:bg-green-400 transition-colors">
-                                    Primary Button
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </button>
-                                <button className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--card-border)] font-medium text-sm tracking-wide hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors">
-                                    Secondary Button
-                                </button>
-                                <a href="#" className="flex items-center gap-2 text-sm tracking-wide hover:text-[var(--accent)] transition-colors">
-                                    Text Link →
-                                </a>
-                            </div>
-                            <div className="text-sm text-muted">
-                                <p>Primary: <code>bg-green-500 text-white hover:bg-green-400</code></p>
-                                <p>Secondary: <code>border border-[var(--card-border)] hover:border-[var(--accent)]</code></p>
-                            </div>
-                        </div>
-
-                        {/* Cards */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Cards</h3>
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="card">
-                                    <svg className="w-6 h-6 text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
-                                    </svg>
-                                    <h4 className="font-semibold mb-2">Card Title</h4>
-                                    <p className="text-muted text-sm">Card content with hover state that highlights the border in accent color.</p>
-                                </div>
-                                <div className="p-6 border border-[var(--card-border)] hover:border-[var(--accent)] transition-colors">
-                                    <h4 className="font-semibold mb-2">Bordered Container</h4>
-                                    <p className="text-muted text-sm">Simple bordered container without background fill.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tags */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Tags</h3>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                <span className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted">
-                                    AI Infrastructure
-                                </span>
-                                <span className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted">
-                                    GPU Cloud
-                                </span>
-                                <span className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted">
-                                    Series A
-                                </span>
-                                <span className="text-xs tracking-wide px-3 py-1 border border-[var(--card-border)] text-muted">
-                                    Webflow
-                                </span>
-                            </div>
-                            <p className="text-sm text-muted">
-                                <code>text-xs tracking-wide px-3 py-1 border border-[var(--card-border)]</code>
-                            </p>
-                        </div>
-
-                        {/* Navigation */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Navigation Tabs</h3>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                <button className="px-4 py-3 text-sm font-medium border border-[var(--accent)] text-[var(--accent)]">
-                                    Active Tab
-                                </button>
-                                <button className="px-4 py-3 text-sm font-medium border border-[var(--card-border)] text-muted hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors">
-                                    Inactive Tab
-                                </button>
-                                <button className="px-4 py-3 text-sm font-medium border border-[var(--card-border)] text-muted hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors">
-                                    Another Tab
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Alerts */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Alerts / Callouts</h3>
-                            <div className="space-y-4 mb-4">
-                                <Alert variant="default" title="Default Alert">
-                                    Standard alert with left border accent matching the foreground color.
-                                </Alert>
-                                <Alert variant="accent" title="Accent Alert">
-                                    Highlighted alert using the brand accent color for important callouts.
-                                </Alert>
-                                <Alert variant="muted" title="Muted Alert">
-                                    Subtle alert for secondary information or notes.
-                                </Alert>
-                                <Alert>
-                                    Alert without a title - just the message content.
-                                </Alert>
-                            </div>
-                            <p className="text-sm text-muted">
-                                <code>{'<Alert variant="accent" title="Title">Content</Alert>'}</code>
-                            </p>
-                        </div>
-
-                        {/* Banners */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Banners</h3>
-                            <div className="space-y-4 mb-4 border border-[var(--card-border)]">
-                                <ComingSoonBanner />
-                            </div>
-                            <p className="text-sm text-muted">
-                                <code>{'<ComingSoonBanner label="..." message="..." />'}</code>
-                            </p>
-                        </div>
-
-                        {/* Early access form */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Early access form</h3>
-                            <div className="p-8 border border-[var(--card-border)] mb-4">
-                                <EarlyAccessForm source="design-system" />
-                            </div>
-                            <p className="text-sm text-muted">
-                                <code>{'<EarlyAccessForm source="..." />'}</code> · POSTs to <code>/api/waitlist</code>
-                            </p>
-                        </div>
-
-                        {/* Form Elements */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-6">Form Elements</h3>
-                            <div className="max-w-md space-y-4">
-                                <div>
-                                    <label className="text-sm text-muted block mb-2">Text Input</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Enter text..."
-                                        className="w-full px-4 py-3 bg-transparent border border-[var(--card-border)] text-[var(--foreground)] placeholder:text-muted focus:border-[var(--accent)] focus:outline-none transition-colors"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-muted block mb-2">Textarea</label>
-                                    <textarea 
-                                        placeholder="Enter message..."
-                                        rows={3}
-                                        className="w-full px-4 py-3 bg-transparent border border-[var(--card-border)] text-[var(--foreground)] placeholder:text-muted focus:border-[var(--accent)] focus:outline-none transition-colors resize-none"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        </section>
-
-                        {/* Motion System */}
-                        <MotionSystem />
-
-                        {/* Tables */}
-                        <TableSystem />
-
-                        {/* Data Visualization */}
-                        <DataVizSystem />
-
-                        {/* Spacing */}
-                        <section id="spacing" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                        <h2 className="text-xl font-bold mb-4">Spacing</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Consistent spacing scale based on Tailwind defaults.
-                        </p>
-                        <div className="space-y-4">
-                            {spacing.map((space, index) => (
-                                <div key={index} className="flex items-center gap-4 p-4 border border-[var(--card-border)]">
-                                    <div className="w-32 text-sm font-medium">{space.name}</div>
-                                    <div className="flex-1">
-                                        <code className="text-sm text-muted">{space.value}</code>
-                                    </div>
-                                    <div className="text-sm text-muted">{space.px}</div>
+                        <div className="t-eyebrow" style={{ margin: '24px 0 8px' }}>SIGNAL · 6 ACCENTS · USE SPARINGLY</div>
+                        <div className="semantic-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                            {[
+                                ['--signal-red',    'RED · PRIMARY'],
+                                ['--signal-red-2',  'RED·2'],
+                                ['--signal-amber',  'AMBER'],
+                                ['--signal-green',  'GREEN'],
+                                ['--signal-blue',   'BLUE'],
+                                ['--signal-violet', 'VIOLET'],
+                            ].map(([v, name]) => (
+                                <div className="semantic" key={v}>
+                                    <div className="semantic__chip" data-edit-var={v} style={{ background: `var(${v})` }} />
+                                    <div className="semantic__name">{name}</div>
+                                    <div className="semantic__token">{v}</div>
                                 </div>
                             ))}
                         </div>
+                    </section>
 
-                        {/* Visual Spacing Demo */}
-                        <div className="mt-8">
-                            <h3 className="text-lg font-semibold mb-6">Visual Scale</h3>
-                            <div className="space-y-2">
-                                {[2, 4, 6, 8, 12, 16, 24, 32, 48].map((size) => (
-                                    <div key={size} className="flex items-center gap-4">
-                                        <div className="w-16 text-sm text-muted">{size}px</div>
-                                        <div 
-                                            className="h-4 bg-[var(--accent)]"
-                                            style={{ width: `${size * 4}px` }}
-                                        />
+                    {/* 01 TYPE */}
+                    <section className="ds-section" id="type">
+                        <div className="ds-section__head">
+                            <div><div className="num">01 / TYPE</div></div>
+                            <div>
+                                <div className="title">TYPOGRAPHY.</div>
+                                <div className="desc">Archivo carries the loud headlines. Geist handles body. SF Mono is the technical chrome — labels, data, code, status. No serifs.</div>
+                            </div>
+                        </div>
+
+                        <div className="type-pairing">
+                            <div className="type-card" data-edit-var="--f-display">
+                                <div className="role">DISPLAY</div>
+                                <div className="name" style={{ fontFamily: 'var(--f-display)' }} data-show-font="--f-display">Archivo</div>
+                                <div className="sample" style={{ fontFamily: 'var(--f-display)', fontWeight: 800 }}>Aa01</div>
+                                <div className="t-mono fg-quiet">400 · 600 · 700 · 800 · 900</div>
+                            </div>
+                            <div className="type-card" data-edit-var="--f-body">
+                                <div className="role">BODY</div>
+                                <div className="name" style={{ fontFamily: 'var(--f-body)' }} data-show-font="--f-body">Geist</div>
+                                <div className="sample" style={{ fontFamily: 'var(--f-body)', fontWeight: 500 }}>Aa01</div>
+                                <div className="t-mono fg-quiet">400 · 500 · 600 · 700</div>
+                            </div>
+                            <div className="type-card" data-edit-var="--f-mono">
+                                <div className="role">MONO</div>
+                                <div className="name" style={{ fontFamily: 'var(--f-mono)' }} data-show-font="--f-mono">SF Mono</div>
+                                <div className="sample" style={{ fontFamily: 'var(--f-mono)', fontWeight: 600 }}>Aa01</div>
+                                <div className="t-mono fg-quiet">SYSTEM · ui-monospace fallback</div>
+                            </div>
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '24px 0 0' }}>SCALE</div>
+                        <div className="type-stack">
+                            <div className="type-row"><span className="k">DISPLAY 1</span><span className="v t-display-1">PROPULSION.</span><span className="meta">96 / 0.92 / -3%</span></div>
+                            <div className="type-row"><span className="k">DISPLAY 2</span><span className="v t-display-2">FOR SCALE.</span><span className="meta">72 / 0.94 / -2.5%</span></div>
+                            <div className="type-row"><span className="k">DISPLAY 3</span><span className="v t-display-3">Built in Brooklyn.</span><span className="meta">48 / 0.98 / -2%</span></div>
+                            <div className="type-row"><span className="k">H1</span><span className="v t-h1">Industrial systems reference.</span><span className="meta">36 / 1.05 / -2%</span></div>
+                            <div className="type-row"><span className="k">H2</span><span className="v t-h2">Tokens. Primitives. Patterns.</span><span className="meta">28 / 1.1 / -1.5%</span></div>
+                            <div className="type-row"><span className="k">H3</span><span className="v t-h3">Technical neutrals · one signal.</span><span className="meta">20 / 1.2 / -1%</span></div>
+                            <div className="type-row"><span className="k">BODY LG</span><span className="v t-body-lg">Built for dense data and long reads alike — Geist at 16/1.55 reads as confidently at hero scale as it does in column.</span><span className="meta">16 / 1.55</span></div>
+                            <div className="type-row"><span className="k">BODY</span><span className="v t-body">Default body copy. Sentence rhythm tight, paragraphs disciplined. No ornament.</span><span className="meta">14 / 1.55</span></div>
+                            <div className="type-row"><span className="k">MONO</span><span className="v t-mono">$ select tokens. → 11 ink steps. 6 signals. 11 spacing. 3 radii.</span><span className="meta">12 / 1.4 / +2%</span></div>
+                            <div className="type-row"><span className="k">LABEL</span><span className="v t-label">SECTION · CHANNEL · TIMESTAMP</span><span className="meta">10 / +16% / UPPER</span></div>
+                        </div>
+                    </section>
+
+                    {/* 02 SCALE */}
+                    <section className="ds-section" id="scale">
+                        <div className="ds-section__head">
+                            <div><div className="num">02 / SCALE</div></div>
+                            <div>
+                                <div className="title">SPACING.</div>
+                                <div className="desc">4px base. Eleven steps. Used for padding, gaps, gutters. Larger jumps top-end (48 → 64 → 96 → 128) for editorial whitespace at section breaks.</div>
+                            </div>
+                        </div>
+                        <div className="scale-table">
+                            {[
+                                ['--s-0',  '0px',   '0',      0],
+                                ['--s-1',  '4px',   '0.25rem',4],
+                                ['--s-2',  '8px',   '0.5rem', 8],
+                                ['--s-3',  '12px',  '0.75rem',12],
+                                ['--s-4',  '16px',  '1rem',   16],
+                                ['--s-6',  '24px',  '1.5rem', 24],
+                                ['--s-8',  '32px',  '2rem',   32],
+                                ['--s-12', '48px',  '3rem',   48],
+                                ['--s-16', '64px',  '4rem',   64],
+                                ['--s-24', '96px',  '6rem',   96],
+                                ['--s-32', '128px', '8rem',   128],
+                            ].map(([v, px, rem, w]) => (
+                                <div className="scale-row" data-edit-var={v} key={v as string}>
+                                    <span className="label">{v}</span>
+                                    <span className="px" data-show-px={v}>{px}</span>
+                                    <span className="rem">{rem}</span>
+                                    <span className="bar"><div style={{ width: `${w}px` }} /></span>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 03 RADIUS */}
+                    <section className="ds-section" id="radius">
+                        <div className="ds-section__head">
+                            <div><div className="num">03 / RADIUS</div></div>
+                            <div>
+                                <div className="title">RADII.</div>
+                                <div className="desc">Sharp by default. 0 is the standard; 2 and 4 reserved for inputs and chips where edges feel too aggressive. Never above 4.</div>
+                            </div>
+                        </div>
+                        <div className="radius-row">
+                            <div className="radius-card" data-edit-var="--r-0"><div className="radius-demo" style={{ borderRadius: 'var(--r-0)' }} /><div className="t-mono">--r-0 · 0px · DEFAULT</div></div>
+                            <div className="radius-card" data-edit-var="--r-1"><div className="radius-demo" style={{ borderRadius: 'var(--r-1)' }} /><div className="t-mono">--r-1 · 2px · INPUTS</div></div>
+                            <div className="radius-card" data-edit-var="--r-2"><div className="radius-demo" style={{ borderRadius: 'var(--r-2)' }} /><div className="t-mono">--r-2 · 4px · CHIPS</div></div>
+                        </div>
+                    </section>
+
+                    {/* 04 STROKE */}
+                    <section className="ds-section" id="stroke">
+                        <div className="ds-section__head">
+                            <div><div className="num">04 / STROKE</div></div>
+                            <div>
+                                <div className="title">STROKES.</div>
+                                <div className="desc">Three weights. Hairlines for tables and dividers. Structural for buttons and frames. Loud — 2px in accent — for active states only.</div>
+                            </div>
+                        </div>
+                        <div className="stroke-row">
+                            <div className="stroke-card" data-edit-var="--w-hair"><div className="stroke-demo" data-w="hair" /><div className="t-mono">--w-hair · 1px · DIVIDERS</div></div>
+                            <div className="stroke-card" data-edit-var="--w-struct"><div className="stroke-demo" data-w="struct" /><div className="t-mono">--w-struct · 1.5px · STRUCTURAL</div></div>
+                            <div className="stroke-card" data-edit-var="--w-loud"><div className="stroke-demo" data-w="loud" /><div className="t-mono fg-accent">--w-loud · 2px · ACTIVE / ACCENT</div></div>
+                        </div>
+                    </section>
+
+                    {/* 05 MOTION */}
+                    <section className="ds-section" id="motion">
+                        <div className="ds-section__head">
+                            <div><div className="num">05 / MOTION</div></div>
+                            <div>
+                                <div className="title">MOTION.</div>
+                                <div className="desc">Three curves, four durations. Linear for industrial chrome (status, ticker). Out-curve for response to user. In-out for transports.</div>
+                            </div>
+                        </div>
+                        <div className="motion-row">
+                            <div className="motion-card" data-curve="linear" data-edit-var="--e-linear">
+                                <div className="t-mono">--e-linear · linear</div>
+                                <div className="motion-track"><div className="motion-dot" /></div>
+                                <div className="t-eyebrow fg-quiet">USE: TICKER · STATUS BARS · MARQUEES</div>
+                            </div>
+                            <div className="motion-card" data-curve="out" data-edit-var="--e-out">
+                                <div className="t-mono">--e-out · cubic(0.2,0,0,1)</div>
+                                <div className="motion-track"><div className="motion-dot" /></div>
+                                <div className="t-eyebrow fg-quiet">USE: HOVER · TAP · MICRO-FEEDBACK</div>
+                            </div>
+                            <div className="motion-card" data-curve="inout" data-edit-var="--e-in-out">
+                                <div className="t-mono">--e-in-out · cubic(0.6,0,0.4,1)</div>
+                                <div className="motion-track"><div className="motion-dot" /></div>
+                                <div className="t-eyebrow fg-quiet">USE: PAGE · DRAWER · MODAL</div>
+                            </div>
+                        </div>
+                        <div className="t-eyebrow" style={{ margin: '24px 0 8px' }}>DURATIONS</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 0, border: '1px solid var(--line)' }}>
+                            {[
+                                ['--d-1', 80,  'SNAP · TAP'],
+                                ['--d-2', 160, 'DEFAULT'],
+                                ['--d-3', 240, 'TRANSPORT'],
+                                ['--d-4', 400, 'REVEAL'],
+                            ].map(([v, ms, label], i, arr) => (
+                                <div key={v as string}
+                                     style={{ padding: 24, borderRight: i === arr.length - 1 ? 0 : '1px solid var(--line)' }}
+                                     data-edit-var={v}>
+                                    <div className="t-mono fg-quiet">{v}</div>
+                                    <div className="t-h2" style={{ marginTop: 8 }}>
+                                        <span data-show-ms={v}>{ms}</span>
+                                        <span className="fg-quiet" style={{ fontSize: 14 }}> ms</span>
                                     </div>
-                                ))}
+                                    <div className="t-mono fg-quiet" style={{ marginTop: 4 }}>{label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 06 ICONS */}
+                    <section className="ds-section" id="icons">
+                        <div className="ds-section__head">
+                            <div><div className="num">06 / ICONS</div></div>
+                            <div>
+                                <div className="title">ICONS.</div>
+                                <div className="desc">20px nominal, 1.5px stroke, square caps + miter joins. Monoline. No fills. Built on a 24-grid with 2px optical padding.</div>
                             </div>
                         </div>
-                        </section>
+                        <div className="icon-grid">
+                            {[
+                                ['PLUS',     'M3 12h18M12 3v18'],
+                                ['MINUS',    'M3 12h18'],
+                                ['ARROW',    'M5 12h14M13 5l7 7-7 7'],
+                                ['BACK',     'M19 12H5M11 5l-7 7 7 7'],
+                                ['CHEVRON',  'M5 7l7 7 7-7'],
+                                ['CLOSE',    'M5 5l14 14M19 5L5 19'],
+                                ['MENU',     'M4 6h16M4 12h16M4 18h16'],
+                            ].map(([name, d]) => (
+                                <div className="icon-cell" key={name}>
+                                    <svg viewBox="0 0 24 24"><path d={d} /></svg>
+                                    <span className="name">{name}</span>
+                                </div>
+                            ))}
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M16 16l5 5" /></svg><span className="name">SEARCH</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" /><path d="M4 9h16" /></svg><span className="name">DOC</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><path d="M4 7l8 6 8-6M4 7v10h16V7" /></svg><span className="name">MAIL</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg><span className="name">CLOCK</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><path d="M12 4l8 4v6c0 4-3 7-8 8-5-1-8-4-8-8V8z" /></svg><span className="name">SHIELD</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><path d="M4 19l4-4 4 4 8-8M16 7h4v4" /></svg><span className="name">TREND</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><circle cx="12" cy="12" r="8" /></svg><span className="name">TARGET</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><path d="M5 4h14v16l-7-4-7 4z" /></svg><span className="name">FLAG</span></div>
+                            <div className="icon-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M12 7v6M12 17v.5" /></svg><span className="name">ALERT</span></div>
+                        </div>
+                    </section>
 
-                        {/* Logo */}
-                        <section id="logo" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                        <h2 className="text-xl font-bold mb-4">Logo</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Logo variants for different contexts and backgrounds.
-                        </p>
-                        <div className="grid gap-8 md:grid-cols-2">
-                            {/* Hero Logo */}
-                            <div className="p-8 border border-[var(--card-border)] flex flex-col items-center justify-center">
-                                <div className="mb-4">
-                                    <Image
-                                        src="/logo-hero.svg"
-                                        alt="Nertia Hero Logo"
-                                        width={200}
-                                        height={128}
-                                    />
-                                </div>
-                                <div className="text-xs text-muted text-center">
-                                    Hero Logo<br />
-                                    <code>/logo-hero.svg</code>
-                                </div>
-                            </div>
-
-                            {/* Light Logo (for dark backgrounds) */}
-                            <div className="p-8 bg-[#0a0a0a] border border-[var(--card-border)] flex flex-col items-center justify-center">
-                                <div className="mb-4">
-                                    <Image
-                                        src="/logo-light.svg"
-                                        alt="Nertia Light Logo"
-                                        width={80}
-                                        height={51}
-                                    />
-                                </div>
-                                <div className="text-xs text-[#9ca3af] text-center">
-                                    Light Logo (dark bg)<br />
-                                    <code>/logo-light.svg</code>
-                                </div>
-                            </div>
-
-                            {/* Dark Logo (for light backgrounds) */}
-                            <div className="p-8 bg-white border border-[var(--card-border)] flex flex-col items-center justify-center">
-                                <div className="mb-4">
-                                    <Image
-                                        src="/logo-dark.svg"
-                                        alt="Nertia Dark Logo"
-                                        width={80}
-                                        height={51}
-                                    />
-                                </div>
-                                <div className="text-xs text-[#6b7280] text-center">
-                                    Dark Logo (light bg)<br />
-                                    <code>/logo-dark.svg</code>
-                                </div>
-                            </div>
-
-                            {/* Wordmark */}
-                            <div className="p-8 border border-[var(--card-border)] flex flex-col items-center justify-center">
-                                <div className="mb-4">
-                                    <Image
-                                        src="/wordmark-light.svg"
-                                        alt="Nertia Wordmark"
-                                        width={120}
-                                        height={24}
-                                        className="hidden dark:block"
-                                    />
-                                    <Image
-                                        src="/wordmark-dark.svg"
-                                        alt="Nertia Wordmark"
-                                        width={120}
-                                        height={24}
-                                        className="block dark:hidden"
-                                    />
-                                </div>
-                                <div className="text-xs text-muted text-center">
-                                    Wordmark<br />
-                                    <code>/wordmark-[light|dark].svg</code>
-                                </div>
+                    {/* 07 BUTTONS */}
+                    <section className="ds-section" id="buttons">
+                        <div className="ds-section__head">
+                            <div><div className="num">07 / BUTTONS</div></div>
+                            <div>
+                                <div className="title">BUTTONS.</div>
+                                <div className="desc">Square edges, mono labels, uppercase. Press translates 1px. Accent variant inverts on hover. Ghost is for secondary action only.</div>
                             </div>
                         </div>
-
-                        {/* Clear Space */}
-                        <div className="mt-8 p-6 border border-[var(--card-border)]">
-                            <h3 className="text-lg font-semibold mb-4">Clear Space</h3>
-                            <p className="text-muted text-sm leading-relaxed">
-                                Maintain minimum clear space around the logo equal to the height of the &quot;n&quot; in the wordmark. This ensures the logo remains legible and impactful across all applications.
-                            </p>
-                        </div>
-                        </section>
-
-                        {/* Grid System */}
-                        <section id="grid" className="p-8 lg:p-12 border-b border-[var(--card-border)]">
-                        <h2 className="text-xl font-bold mb-4">Grid System</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            12-column grid with 3/9 split for content sections.
-                        </p>
-                        <div className="mb-8">
-                            <h3 className="text-lg font-semibold mb-4">12-Column Grid</h3>
-                            <div className="grid grid-cols-12 gap-2 mb-4">
-                                {[...Array(12)].map((_, i) => (
-                                    <div key={i} className="h-12 bg-[var(--accent)] opacity-20 flex items-center justify-center text-xs">
-                                        {i + 1}
-                                    </div>
-                                ))}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                                <button className="btn-ds">PRIMARY ACTION</button>
+                                <button className="btn-ds" data-tone="accent">EMERGE NOW</button>
+                                <button className="btn-ds" data-tone="ghost">SECONDARY</button>
+                                <button className="btn-ds" data-size="sm">COMPACT</button>
+                                <button className="btn-ds" data-size="lg" data-tone="accent">LARGE / CTA</button>
+                                <button className="btn-ds" disabled>DISABLED</button>
                             </div>
-                            <p className="text-sm text-muted">
-                                <code>grid grid-cols-12</code>
-                            </p>
+                            <div className="t-eyebrow fg-quiet">SIZES · SM 28 · MD 36 · LG 48</div>
                         </div>
+                    </section>
 
+                    {/* 08 INPUTS */}
+                    <section className="ds-section" id="inputs">
+                        <div className="ds-section__head">
+                            <div><div className="num">08 / INPUTS</div></div>
+                            <div>
+                                <div className="title">INPUTS.</div>
+                                <div className="desc">Bottom-rule only. No box. Mono input text — fields read like terminal prompts. Focus shifts the rule to accent.</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32, maxWidth: 900 }}>
+                            <label className="field">
+                                <span className="field__label">SLUG</span>
+                                <input className="input-ds" placeholder="propulsion-news" defaultValue="propulsion-news" />
+                                <span className="field__hint">→ propulsion-news.nertia.ai</span>
+                            </label>
+                            <label className="field">
+                                <span className="field__label">PURPOSE</span>
+                                <input className="input-ds" placeholder="// describe in one line" />
+                                <span className="field__hint">↵ to confirm · esc to skip</span>
+                            </label>
+                            <label className="field">
+                                <span className="field__label" style={{ color: 'var(--signal-red)' }}>EMAIL · INVALID</span>
+                                <input className="input-ds" defaultValue="not-an-email" style={{ borderBottomColor: 'var(--signal-red)' }} />
+                                <span className="field__hint" style={{ color: 'var(--signal-red)' }}>missing @</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    {/* 09 TAGS */}
+                    <section className="ds-section" id="tags">
+                        <div className="ds-section__head">
+                            <div><div className="num">09 / TAGS</div></div>
+                            <div>
+                                <div className="title">TAGS.</div>
+                                <div className="desc">Inline status. Use color sparingly — most metadata reads in default outline. Reserve solid ink fill for emphasis, accent for &ldquo;this matters.&rdquo;</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                            <span className="tag-ds">DEFAULT</span>
+                            <span className="tag-ds" data-tone="ink">INK / EMPHATIC</span>
+                            <span className="tag-ds" data-tone="accent">ACCENT / HOT</span>
+                            <span className="tag-ds" data-tone="success">● LIVE</span>
+                            <span className="tag-ds" data-tone="warn">▲ DRAFT</span>
+                            <span className="tag-ds" data-tone="danger">■ FAILED</span>
+                        </div>
+                    </section>
+
+                    {/* 10 CARDS */}
+                    <section className="ds-section" id="cards">
+                        <div className="ds-section__head">
+                            <div><div className="num">10 / CARDS</div></div>
+                            <div>
+                                <div className="title">CARDS.</div>
+                                <div className="desc">Surface 800 fill, 1px line, no shadow. Numbered top-left for series. Cards never round.</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 0, border: '1px solid var(--line)' }}>
+                            <div className="card-ds" style={{ border: 0, borderRight: '1px solid var(--line)' }}>
+                                <div className="card-ds__head"><span className="card-ds__num">01 / GENERATOR</span><span className="tag-ds" data-tone="success">● LIVE</span></div>
+                                <div className="t-h3">ZERO·POINT.</div>
+                                <div className="t-body fg-muted">Free websites that emerge from a brief. Hosted on .nertia.ai. Upgrade for a custom domain.</div>
+                                <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}><button className="btn-ds" data-size="sm">OPEN ↗</button></div>
+                            </div>
+                            <div className="card-ds" style={{ border: 0, borderRight: '1px solid var(--line)' }}>
+                                <div className="card-ds__head"><span className="card-ds__num">02 / GENERATOR</span><span className="tag-ds">BETA</span></div>
+                                <div className="t-h3">DESIGN·SYS.</div>
+                                <div className="t-body fg-muted">Industrial token systems. Brief → emerge → tune → export. JSON, CSS, Tailwind, Figma.</div>
+                                <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}><button className="btn-ds" data-size="sm">OPEN ↗</button></div>
+                            </div>
+                            <div className="card-ds" style={{ border: 0 }}>
+                                <div className="card-ds__head"><span className="card-ds__num">03 / LAB</span><span className="tag-ds" data-tone="warn">UNSTABLE</span></div>
+                                <div className="t-h3">LAB / WIP.</div>
+                                <div className="t-body fg-muted">Snippets, prototypes, asset starters. Nothing here ships. Raw material for future builds.</div>
+                                <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}><button className="btn-ds" data-size="sm" data-tone="ghost">PEEK</button></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 11 ALERTS */}
+                    <section className="ds-section" id="alerts">
+                        <div className="ds-section__head">
+                            <div><div className="num">11 / ALERTS</div></div>
+                            <div>
+                                <div className="title">ALERTS.</div>
+                                <div className="desc">Mono body. Color through a 4px left bar — the rest of the alert stays neutral. Never a tinted background.</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <div className="alert-ds" data-tone="info"><span className="alert-ds__bar" /><span><b>INFO</b> · build queued. position 2 of 4. ETA 12s.</span><button className="btn-ds" data-size="sm" data-tone="ghost">DISMISS</button></div>
+                            <div className="alert-ds" data-tone="success"><span className="alert-ds__bar" /><span><b>OK</b> · system locked. tokens written to /sites/propulsion-news.</span><button className="btn-ds" data-size="sm" data-tone="ghost">VIEW</button></div>
+                            <div className="alert-ds" data-tone="warn"><span className="alert-ds__bar" /><span><b>WARN</b> · slug exists. appended hash → propulsion-news-3a2f.</span><button className="btn-ds" data-size="sm" data-tone="ghost">CHANGE</button></div>
+                            <div className="alert-ds" data-tone="danger"><span className="alert-ds__bar" /><span><b>FAIL</b> · generation timed out. retrying with fallback model.</span><button className="btn-ds" data-size="sm">RETRY</button></div>
+                        </div>
+                    </section>
+
+                    {/* 12 STATS */}
+                    <section className="ds-section" id="stats">
+                        <div className="ds-section__head">
+                            <div><div className="num">12 / STATS</div></div>
+                            <div>
+                                <div className="title">STATS.</div>
+                                <div className="desc">Display numbers, mono labels. Delta in green/red. For dashboards and case-study evidence rows. Always grouped — singular stats look anemic.</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 0, border: '1px solid var(--line)' }}>
+                            <div className="stat" style={{ border: 0, borderRight: '1px solid var(--line)' }}>
+                                <span className="stat__k">SITES BUILT</span>
+                                <span className="stat__v">2,841</span>
+                                <span className="stat__d" data-tone="up">↑ 18.2% / 30D</span>
+                            </div>
+                            <div className="stat" style={{ border: 0, borderRight: '1px solid var(--line)' }}>
+                                <span className="stat__k">UPGRADE RATE</span>
+                                <span className="stat__v">3.4<span style={{ fontSize: 24, color: 'var(--fg-quiet)' }}>%</span></span>
+                                <span className="stat__d" data-tone="up">↑ 0.6 / 30D</span>
+                            </div>
+                            <div className="stat" style={{ border: 0, borderRight: '1px solid var(--line)' }}>
+                                <span className="stat__k">P50 EMERGE</span>
+                                <span className="stat__v">8.2<span style={{ fontSize: 24, color: 'var(--fg-quiet)' }}>s</span></span>
+                                <span className="stat__d" data-tone="down">↓ 1.1 / 30D</span>
+                            </div>
+                            <div className="stat" style={{ border: 0 }}>
+                                <span className="stat__k">COST / GEN</span>
+                                <span className="stat__v">$0.04</span>
+                                <span className="stat__d fg-quiet">FLAT / 30D</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 13 BARS */}
+                    <section className="ds-section" id="bars">
+                        <div className="ds-section__head">
+                            <div><div className="num">13 / BARS</div></div>
+                            <div>
+                                <div className="title">BARS.</div>
+                                <div className="desc">Horizontal bars on hairlines. Reads like a console rank. Default unit is normalized 0-100; can also stand for raw counts.</div>
+                            </div>
+                        </div>
+                        <div style={{ maxWidth: 680 }}>
+                            <div className="bar-row"><span>ZERO·POINT</span><span className="bar"><div style={{ width: '78%' }} /></span><span className="v">78%</span></div>
+                            <div className="bar-row"><span>EDITORIAL</span><span className="bar"><div style={{ width: '62%', background: 'var(--signal-amber)' }} /></span><span className="v">62%</span></div>
+                            <div className="bar-row"><span>BRUTALIST</span><span className="bar"><div style={{ width: '54%', background: 'var(--signal-blue)' }} /></span><span className="v">54%</span></div>
+                            <div className="bar-row"><span>ORGANIC</span><span className="bar"><div style={{ width: '31%', background: 'var(--signal-green)' }} /></span><span className="v">31%</span></div>
+                            <div className="bar-row"><span>TECH</span><span className="bar"><div style={{ width: '18%', background: 'var(--signal-violet)' }} /></span><span className="v">18%</span></div>
+                        </div>
+                    </section>
+
+                    {/* 14 VOICE */}
+                    <section className="ds-section" id="voice">
+                        <div className="ds-section__head">
+                            <div><div className="num">14 / VOICE</div></div>
+                            <div>
+                                <div className="title">VOICE.</div>
+                                <div className="desc">Confident. Declarative. Technical. Few adjectives. Numbers when possible. Active voice. No SaaS clichés.</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, border: '1px solid var(--line)' }}>
+                            <div style={{ padding: 32, borderRight: '1px solid var(--line)' }}>
+                                <div className="t-eyebrow fg-quiet" style={{ marginBottom: 8 }}>DO ✓</div>
+                                <div className="t-h3" style={{ marginBottom: 16 }}>&ldquo;Frameworks for propulsion.&rdquo;</div>
+                                <div className="t-body fg-muted">Short. Confident. Implies motion. The reader fills the meaning in.</div>
+                                <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
+                                <div className="t-h3" style={{ marginBottom: 16 }}>&ldquo;4 systems emerged. Pick one.&rdquo;</div>
+                                <div className="t-body fg-muted">Imperative. Numbers. Trusts the user to act.</div>
+                            </div>
+                            <div style={{ padding: 32 }}>
+                                <div className="t-eyebrow fg-quiet" style={{ marginBottom: 8, color: 'var(--signal-red)' }}>DON&apos;T ✕</div>
+                                <div className="t-h3 fg-quiet" style={{ marginBottom: 16, textDecoration: 'line-through' }}>&ldquo;Empower your brand journey.&rdquo;</div>
+                                <div className="t-body fg-muted">Empty verbs. Buzz. Says nothing.</div>
+                                <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
+                                <div className="t-h3 fg-quiet" style={{ marginBottom: 16, textDecoration: 'line-through' }}>&ldquo;We&apos;ve crafted a delightful experience.&rdquo;</div>
+                                <div className="t-body fg-muted">Adjective stack. First-person plural. Marketing voice.</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* FOOTER */}
+                    <div className="ds-foot">
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">Section Layout (3/9 Split)</h3>
-                            <div className="grid grid-cols-12 gap-2 mb-4">
-                                <div className="col-span-3 h-24 bg-[var(--accent)] opacity-40 flex items-center justify-center text-xs p-2 text-center">
-                                    Sidebar<br />col-span-3
-                                </div>
-                                <div className="col-span-9 h-24 bg-[var(--accent)] opacity-20 flex items-center justify-center text-xs p-2 text-center">
-                                    Content Area<br />col-span-9
-                                </div>
-                            </div>
-                            <p className="text-sm text-muted">
-                                Primary layout pattern used for all content sections. Sidebar contains section labels and navigation; content area contains the main content.
-                            </p>
-                        </div>
-                        </section>
-
-                        {/* Services & Booking */}
-                        <section id="services-booking" className="p-8 lg:p-12 border-b border-[var(--card-border)] space-y-12">
-                            <div>
-                                <h2 className="text-xl font-bold mb-4">Services &amp; Booking</h2>
-                                <p className="text-muted text-sm leading-relaxed">
-                                    Components used on <code>/services</code> and <code>/book</code>. Tier names use quantum-physics vocabulary (Particle / Wave / Entanglement); bookings flow through a Cal.com embed.
-                                </p>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold mb-6">PackageCard</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <PackageCard
-                                        name="Particle"
-                                        price="$2,500"
-                                        audience="I need one specific thing built well."
-                                        timeline="1–2 weeks"
-                                        deliverables={[
-                                            'Pick one: site, brand, video reel, content sprint',
-                                            'Fixed scope, fixed price, fixed timeline',
-                                            'One discovery call, one delivery call',
-                                        ]}
-                                        eventSlug="particle"
-                                        ctaLabel="Initiate Particle"
-                                    />
-                                    <PackageCard
-                                        name="Wave"
-                                        price="$10,000"
-                                        audience="We need to ship a coordinated launch in 6 weeks."
-                                        timeline="4–6 weeks"
-                                        deliverables={[
-                                            'Multi-deliverable bundle',
-                                            'Weekly check-ins through the burn',
-                                            'SOW within 48 hours of scoping',
-                                        ]}
-                                        eventSlug="wave"
-                                        ctaLabel="Initiate Wave"
-                                        accentTone="highlight"
-                                    />
-                                </div>
-                                <p className="text-sm text-muted mt-4">
-                                    Used in <code>PackagesGrid</code> on <code>/services</code>. <code>accentTone=&quot;highlight&quot;</code> emphasises the recommended middle tier.
-                                </p>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold mb-6">ServicesMenu row (Quanta)</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                    <div className="flex flex-col gap-2 py-5 border-t border-[var(--card-border)]">
-                                        <div className="flex items-baseline justify-between gap-4">
-                                            <h4 className="text-lg font-semibold">Positioning audit</h4>
-                                            <span className="text-sm font-medium whitespace-nowrap">from $1,200</span>
-                                        </div>
-                                        <p className="text-sm text-muted leading-relaxed">Pin down who you are and what you sell.</p>
-                                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">Anchor: Particle</p>
-                                    </div>
-                                    <div className="flex flex-col gap-2 py-5 border-t border-[var(--card-border)]">
-                                        <div className="flex items-baseline justify-between gap-4">
-                                            <h4 className="text-lg font-semibold">GTM plan</h4>
-                                            <span className="text-sm font-medium whitespace-nowrap">from $3,000</span>
-                                        </div>
-                                        <p className="text-sm text-muted leading-relaxed">Launch sequence, channels, content calendar.</p>
-                                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">Anchor: Wave</p>
-                                    </div>
-                                </div>
-                                <p className="text-sm text-muted mt-4">
-                                    À la carte items. Each row: name, price label, oneliner, anchor tier.
-                                </p>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold mb-6">Booking flow</h3>
-                                <div className="p-6 border border-[var(--card-border)] bg-[var(--card-bg)] rounded-lg">
-                                    <p className="text-sm leading-relaxed mb-4">
-                                        <code>/book</code> renders a Cal.com embed via <code>@calcom/embed-react</code>. The page reads <code>?event=</code> from the URL to preselect one of four event types:
-                                    </p>
-                                    <ul className="space-y-2 text-sm text-muted ml-2">
-                                        <li>• <code>observation</code> — 20 min, free intro (default)</li>
-                                        <li>• <code>particle</code> — 30 min, scope a one-shot</li>
-                                        <li>• <code>wave</code> — 45 min, scope a sprint</li>
-                                        <li>• <code>entanglement</code> — 45 min, scope an ongoing partnership</li>
-                                    </ul>
-                                    <p className="text-sm text-muted leading-relaxed mt-4">
-                                        Capped at <code>max-w-4xl</code> on desktop so the calendar doesn&apos;t stretch full-width on large viewports.
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Voice & Tone */}
-                        <section id="voice" className="p-8 lg:p-12">
-                        <h2 className="text-xl font-bold mb-4">Voice & Tone</h2>
-                        <p className="text-muted text-sm leading-relaxed mb-8">
-                            Writing guidelines for consistent communication.
-                        </p>
-                        <div className="grid gap-6 md:grid-cols-2 mb-8">
-                            <div className="p-6 border border-[var(--accent)]">
-                                <h3 className="text-lg font-semibold mb-4 text-[var(--accent)]">Do</h3>
-                                <ul className="space-y-3 text-sm text-muted">
-                                    <li>• Direct, confident, no hedging</li>
-                                    <li>• Builder-focused: emphasize what was shipped</li>
-                                    <li>• Technical specificity: &quot;Grafana-style dashboard&quot;</li>
-                                    <li>• First person where appropriate</li>
-                                    <li>• Let the work speak for itself</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 border border-red-500/50">
-                                <h3 className="text-lg font-semibold mb-4 text-red-400">Don&apos;t</h3>
-                                <ul className="space-y-3 text-sm text-muted">
-                                    <li>• Corporate fluff: &quot;leverage,&quot; &quot;synergy&quot;</li>
-                                    <li>• Vague claims: &quot;cutting-edge solutions&quot;</li>
-                                    <li>• Passive voice when active works</li>
-                                    <li>• Overselling or exaggerating</li>
-                                    <li>• Jargon without substance</li>
-                                </ul>
+                            <div className="t-label">v1.0.0 · 2026.05.04</div>
+                            <div className="ds-foot__mono" style={{ marginTop: 16 }}>
+                                n<span style={{ color: 'var(--accent)' }}>.</span><span style={{ color: 'var(--fg-quiet)' }}>[</span>ds<span style={{ color: 'var(--fg-quiet)' }}>]</span>
                             </div>
                         </div>
-
-                        <div className="p-6 border border-[var(--card-border)]">
-                            <h3 className="text-lg font-semibold mb-4">Example</h3>
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div>
-                                    <div className="text-xs tracking-[0.2em] uppercase text-red-400 mb-2">Before</div>
-                                    <p className="text-sm text-muted italic">&quot;Leveraging cutting-edge technologies to deliver world-class solutions that drive synergistic outcomes.&quot;</p>
-                                </div>
-                                <div>
-                                    <div className="text-xs tracking-[0.2em] uppercase text-[var(--accent)] mb-2">After</div>
-                                    <p className="text-sm text-muted">&quot;Built production-ready dashboard components. Shipped as embeddable HTML.&quot;</p>
-                                </div>
+                        <div>
+                            <div className="t-label">CHANGELOG</div>
+                            <div style={{ marginTop: 16, lineHeight: 1.8 }}>
+                                <div>v1.0.0 — initial industrial direction</div>
+                                <div>v0.9 — color &amp; type pairings locked</div>
+                                <div>v0.8 — scrapped Inter-only stack</div>
                             </div>
                         </div>
-                        </section>
+                        <div>
+                            <div className="t-label">NEXT</div>
+                            <div style={{ marginTop: 16, lineHeight: 1.8, color: 'var(--fg)' }}>
+                                <div>15 / LOGO — n.[n] explorations</div>
+                                <div>16 / PATTERNS — page templates</div>
+                                <div>17 / DARK / LIGHT MODE PARITY</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            {/* TOKEN INSPECTOR DRAWER */}
+            <button className="token-tab" id="tokenTab" type="button" aria-label="Open tokens panel">
+                <span className="token-tab__glyph">{'{ }'}</span>
+                <span className="token-tab__label">TOKENS</span>
+            </button>
+            <aside className="token-drawer" id="tokenDrawer" aria-hidden="true">
+                <div className="token-drawer__head">
+                    <div>
+                        <div className="t-eyebrow fg-quiet">INSPECTOR · LIVE</div>
+                        <div className="t-h3" style={{ marginTop: 4 }}>TOKENS</div>
+                    </div>
+                    <button className="token-drawer__close" id="tokenClose" type="button" aria-label="Close">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square"><path d="M5 5l14 14M19 5L5 19" /></svg>
+                    </button>
+                </div>
+                <div className="token-drawer__filter">
+                    <input className="input-ds" id="tokenFilter" placeholder="// filter — e.g. ink, signal, s-, mono" />
+                </div>
+                <div className="token-drawer__hint t-mono fg-quiet">click any value to copy</div>
+                <div className="token-drawer__body" id="tokenBody" />
+                <div className="token-drawer__foot">
+                    <span className="t-mono fg-quiet" id="tokenEditedCount">DEFAULTS</span>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        <button className="btn-ds" data-size="sm" data-tone="ghost" id="tokenReset" disabled>RESET</button>
+                        <button className="btn-ds" data-size="sm" data-tone="ghost" id="tokenShare">LINK</button>
+                        <button className="btn-ds" data-size="sm" data-tone="ghost" data-export="css">CSS</button>
+                        <button className="btn-ds" data-size="sm" data-tone="ghost" data-export="json">JSON</button>
                     </div>
                 </div>
-
-                <Footer />
-            </PageContent>
-        </main>
+                <div className="token-toast" id="tokenToast" />
+            </aside>
+        </div>
     );
 }
