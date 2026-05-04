@@ -1,8 +1,32 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DesignSystemPage() {
+    const [menuOpen, setMenuOpen] = useState(true);
+
+    // collapse the sidebar by default on small screens; respect persisted choice otherwise
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('n.ds.menu');
+            if (saved === 'true' || saved === 'false') {
+                setMenuOpen(saved === 'true');
+                return;
+            }
+        } catch {}
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setMenuOpen(false);
+        }
+    }, []);
+
+    const toggleMenu = () => {
+        setMenuOpen((v) => {
+            const next = !v;
+            try { localStorage.setItem('n.ds.menu', String(next)); } catch {}
+            return next;
+        });
+    };
+
     useEffect(() => {
         const root = document.documentElement;
 
@@ -555,7 +579,7 @@ export default function DesignSystemPage() {
     }, []);
 
     return (
-        <div className="ds-root">
+        <div className="ds-root" data-menu-open={menuOpen ? 'true' : 'false'}>
             {/* DS topbar — sits below the site header */}
             <div className="ds-topbar">
                 <div className="ds-topbar__crumbs">
@@ -1243,10 +1267,23 @@ export default function DesignSystemPage() {
                 </main>
             </div>
 
-            {/* TOKEN INSPECTOR DRAWER */}
-            <button className="token-tab" id="tokenTab" type="button" aria-label="Open tokens panel">
-                <span className="token-tab__glyph">{'{ }'}</span>
-                <span className="token-tab__label">TOKENS</span>
+            {/* LEFT EDGE — menu toggle */}
+            <button
+                className="ds-edge-tab menu-tab"
+                type="button"
+                aria-label={menuOpen ? 'Hide menu' : 'Show menu'}
+                aria-pressed={menuOpen}
+                data-open={menuOpen ? 'true' : 'false'}
+                onClick={toggleMenu}
+            >
+                <span className="ds-edge-tab__glyph">{menuOpen ? '◀' : '▶'}</span>
+                <span className="ds-edge-tab__label">MENU</span>
+            </button>
+
+            {/* RIGHT EDGE — tokens drawer toggle */}
+            <button className="ds-edge-tab token-tab" id="tokenTab" type="button" aria-label="Open tokens panel">
+                <span className="ds-edge-tab__glyph">{'{ }'}</span>
+                <span className="ds-edge-tab__label">TOKENS</span>
             </button>
             <aside className="token-drawer" id="tokenDrawer" aria-hidden="true">
                 <div className="token-drawer__head">
