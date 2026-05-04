@@ -506,6 +506,23 @@ export default function DesignSystemPage() {
         }
         refreshLabels();
 
+        /* ---------- LOGO COPY SVG ---------- */
+        const logoCopyButtons = document.querySelectorAll<HTMLButtonElement>('.logo-copy');
+        const logoCopyHandlers: Array<() => void> = [];
+        logoCopyButtons.forEach((btn) => {
+            const handler = () => {
+                const svg = btn.dataset.copy;
+                if (!svg) return;
+                navigator.clipboard?.writeText(svg).then(() => {
+                    const orig = btn.textContent;
+                    btn.textContent = 'COPIED ✓';
+                    setTimeout(() => { btn.textContent = orig; }, 1100);
+                });
+            };
+            logoCopyHandlers.push(handler);
+            btn.addEventListener('click', handler);
+        });
+
         /* ---------- SIDEBAR SCROLL-SPY ---------- */
         const links = document.querySelectorAll<HTMLAnchorElement>('.ds-sidebar__link');
         const sections = document.querySelectorAll<HTMLElement>('.ds-section');
@@ -528,6 +545,7 @@ export default function DesignSystemPage() {
             shareBtn?.removeEventListener('click', shareHandler);
             editToggleEl?.removeEventListener('click', editToggleHandler);
             document.removeEventListener('click', inlineClickHandler);
+            logoCopyButtons.forEach((b, i) => b.removeEventListener('click', logoCopyHandlers[i]));
             themeMo.disconnect();
             io.disconnect();
             closeEditor();
@@ -567,7 +585,7 @@ export default function DesignSystemPage() {
                     </div>
                     <div className="ds-sidebar__nav">
                         <div className="ds-sidebar__nav-section">FOUNDATIONS</div>
-                        <a className="ds-sidebar__link" href="#color"  data-active="true"><span>00 / COLOR</span><span>11+6</span></a>
+                        <a className="ds-sidebar__link" href="#color"  data-active="true"><span>00 / COLOR</span><span>11+5+6</span></a>
                         <a className="ds-sidebar__link" href="#type"><span>01 / TYPE</span><span>3+10</span></a>
                         <a className="ds-sidebar__link" href="#scale"><span>02 / SCALE</span><span>11</span></a>
                         <a className="ds-sidebar__link" href="#radius"><span>03 / RADIUS</span><span>3</span></a>
@@ -585,7 +603,7 @@ export default function DesignSystemPage() {
                         <a className="ds-sidebar__link" href="#bars"><span>13 / BARS</span><span>5</span></a>
                         <div className="ds-sidebar__nav-section">BRAND</div>
                         <a className="ds-sidebar__link" href="#voice"><span>14 / VOICE</span><span /></a>
-                        <a className="ds-sidebar__link" href="#logo" style={{ color: 'var(--fg-quiet)' }}><span>15 / LOGO</span><span>TBD</span></a>
+                        <a className="ds-sidebar__link" href="#logo"><span>15 / LOGO</span><span>2</span></a>
                     </div>
                 </aside>
 
@@ -631,6 +649,25 @@ export default function DesignSystemPage() {
                                      data-edit-var={v}
                                      style={{ background: `var(${v})`, color: `var(--${fg})` }}>
                                     <span className="swatch__step">{i === 10 ? '0' : v.split('-')[2]}</span>
+                                    <span className="swatch__hex" data-show-var={v}>{hex}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '24px 0 8px' }}>PAPER · 5 STEPS · LIGHT-MODE INK</div>
+                        <div className="swatch-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+                            {[
+                                ['--paper-1000', '#F7F5F0', '1000'],
+                                ['--paper-900',  '#F3F1EC', '900'],
+                                ['--paper-800',  '#E8E5DD', '800'],
+                                ['--paper-700',  '#D8D5CC', '700'],
+                                ['--paper-600',  '#C0BDB4', '600'],
+                            ].map(([v, hex, step]) => (
+                                <div key={v}
+                                     className="swatch"
+                                     data-edit-var={v}
+                                     style={{ background: `var(${v})`, color: 'var(--ink-900)' }}>
+                                    <span className="swatch__step">{step}</span>
                                     <span className="swatch__hex" data-show-var={v}>{hex}</span>
                                 </div>
                             ))}
@@ -1047,6 +1084,137 @@ export default function DesignSystemPage() {
                         </div>
                     </section>
 
+                    {/* 15 LOGO */}
+                    <section className="ds-section" id="logo">
+                        <div className="ds-section__head">
+                            <div><div className="num">15 / LOGO</div></div>
+                            <div>
+                                <div className="title">LOGO.</div>
+                                <div className="desc">SF Mono Regular 12. Square-bracketed n. The mark is small, technical, copy-pasteable. Wordmark is the same letterform extended. No custom drawing — the logo is a glyph, not an illustration.</div>
+                            </div>
+                        </div>
+
+                        <div className="logo-row">
+                            <div className="logo-card">
+                                <div className="logo-card__head">
+                                    <span className="t-eyebrow fg-quiet">MARK · n.<span className="fg-accent">[n]</span></span>
+                                    <span className="t-mono fg-quiet">12 / regular</span>
+                                </div>
+                                <div className="logo-card__stage">
+                                    <svg className="logo-svg" width="36" height="14" viewBox="0 0 36 14" xmlns="http://www.w3.org/2000/svg">
+                                        <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor" letterSpacing="0">[n]</text>
+                                    </svg>
+                                </div>
+                                <div className="logo-card__foot">
+                                    <span className="t-mono fg-quiet">3 GLYPHS · 36 × 14 PX</span>
+                                    <button
+                                        className="logo-copy"
+                                        data-copy={`<svg width="36" height="14" viewBox="0 0 36 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="12" fill="currentColor">[n]</text></svg>`}
+                                    >COPY SVG</button>
+                                </div>
+                            </div>
+
+                            <div className="logo-card">
+                                <div className="logo-card__head">
+                                    <span className="t-eyebrow fg-quiet">WORDMARK · <span className="fg-accent">[n]</span>ertia</span>
+                                    <span className="t-mono fg-quiet">12 / regular</span>
+                                </div>
+                                <div className="logo-card__stage">
+                                    <svg className="logo-svg" width="64" height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg">
+                                        <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor" letterSpacing="0">[n]ertia</text>
+                                    </svg>
+                                </div>
+                                <div className="logo-card__foot">
+                                    <span className="t-mono fg-quiet">7 GLYPHS · 64 × 14 PX</span>
+                                    <button
+                                        className="logo-copy"
+                                        data-copy={`<svg width="64" height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="12" fill="currentColor">[n]ertia</text></svg>`}
+                                    >COPY SVG</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>SCALE · NATIVE × 1 · 2 · 4 · 8 · 16</div>
+                        <div className="logo-scale">
+                            {[
+                                [14, '×1', '12 PT'],
+                                [28, '×2', '24 PT'],
+                                [56, '×4', '48 PT'],
+                                [112, '×8', '96 PT'],
+                                [224, '×16', '192 PT'],
+                            ].map(([h, mul, pt]) => (
+                                <div className="logo-scale__cell" key={mul as string}>
+                                    <div className="logo-scale__stage">
+                                        <svg height={h} viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg">
+                                            <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor">[n]ertia</text>
+                                        </svg>
+                                    </div>
+                                    <div className="logo-scale__label">
+                                        <span className="t-mono">{mul}</span>
+                                        <span className="t-mono fg-quiet">{pt}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>COLOR · 6 PERMITTED CONTEXTS</div>
+                        <div className="logo-treat">
+                            <div className="logo-treat__cell" style={{ background: 'var(--bg)', color: 'var(--fg)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <span className="t-mono fg-quiet">ON · BG</span>
+                            </div>
+                            <div className="logo-treat__cell" style={{ background: 'var(--surface)', color: 'var(--fg)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <span className="t-mono fg-quiet">ON · SURFACE</span>
+                            </div>
+                            <div className="logo-treat__cell" style={{ background: 'var(--ink-1000)', color: 'var(--paper-900)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 40%, transparent)' }}>ON · INK·1000</span>
+                            </div>
+                            <div className="logo-treat__cell" style={{ background: 'var(--paper-900)', color: 'var(--ink-1000)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 40%, transparent)' }}>ON · PAPER·900</span>
+                            </div>
+                            <div className="logo-treat__cell" style={{ background: 'var(--accent)', color: 'var(--paper-900)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 50%, transparent)' }}>ON · ACCENT</span>
+                            </div>
+                            <div className="logo-treat__cell logo-treat__cell--bad" style={{ background: 'var(--surface)', color: 'var(--fg-quiet)' }}>
+                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor" opacity="0.4">[n]ertia</text></svg>
+                                <span className="t-mono" style={{ color: 'var(--signal-red)' }}>DO NOT · MUTE</span>
+                            </div>
+                        </div>
+
+                        <div className="logo-rules">
+                            <div className="logo-rules__cell">
+                                <div className="t-eyebrow fg-quiet" style={{ marginBottom: 12 }}>CLEAR SPACE · 1 GLYPH ON ALL SIDES</div>
+                                <div className="logo-clear">
+                                    <div className="logo-clear__inner">
+                                        <svg height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                    </div>
+                                </div>
+                                <div className="t-mono fg-quiet" style={{ marginTop: 12 }}>MIN MARGIN = 7.2 PX (1 EM AT 12)</div>
+                            </div>
+                            <div className="logo-rules__cell">
+                                <div className="t-eyebrow fg-quiet" style={{ marginBottom: 12 }}>MISUSE · 4 PROHIBITED</div>
+                                <div className="logo-dont">
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontStyle: 'italic' }}>[n]ertia</span><span className="t-mono fg-quiet">NO ITALIC</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontWeight: 700 }}>[n]ertia</span><span className="t-mono fg-quiet">NO BOLD</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ letterSpacing: '0.2em' }}>[n]ertia</span><span className="t-mono fg-quiet">NO TRACKING</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontFamily: 'var(--f-display)', fontWeight: 700 }}>[n]ertia</span><span className="t-mono fg-quiet">NO RESET FONT</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>FILES · 4 SHIPPED</div>
+                        <div className="logo-files">
+                            <div className="logo-files__row"><span className="t-mono">nertia-mark.svg</span><span className="t-mono fg-quiet">36 × 14</span><span className="t-mono fg-quiet">[n]</span><span className="t-mono fg-quiet">currentColor</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-wordmark.svg</span><span className="t-mono fg-quiet">64 × 14</span><span className="t-mono fg-quiet">[n]ertia</span><span className="t-mono fg-quiet">currentColor</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-mark@dark.svg</span><span className="t-mono fg-quiet">36 × 14</span><span className="t-mono fg-quiet">[n]</span><span className="t-mono fg-quiet">paper-900</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-wordmark@dark.svg</span><span className="t-mono fg-quiet">64 × 14</span><span className="t-mono fg-quiet">[n]ertia</span><span className="t-mono fg-quiet">paper-900</span></div>
+                        </div>
+                    </section>
+
                     {/* FOOTER */}
                     <div className="ds-foot">
                         <div>
@@ -1066,9 +1234,9 @@ export default function DesignSystemPage() {
                         <div>
                             <div className="t-label">NEXT</div>
                             <div style={{ marginTop: 16, lineHeight: 1.8, color: 'var(--fg)' }}>
-                                <div>15 / LOGO — n.[n] explorations</div>
                                 <div>16 / PATTERNS — page templates</div>
                                 <div>17 / DARK / LIGHT MODE PARITY</div>
+                                <div>18 / MOTION TOKENS</div>
                             </div>
                         </div>
                     </div>
