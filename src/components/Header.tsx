@@ -4,220 +4,141 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { navItems } from '@/lib/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { getNavMode, getNavItems, type NavItem } from '@/lib/navigation';
+import { BrandWordmark } from '@/components/Brand';
 
 export default function Header() {
-  const pathname = usePathname();
-  const { user, signOut } = useAuth();
-  const [showHeader, setShowHeader] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+    const { user, signOut } = useAuth();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Always show header on all pages
-  useEffect(() => {
-    setShowHeader(true);
-  }, [pathname]);
+    useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+    useEffect(() => {
+        document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [mobileMenuOpen]);
 
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    // User-generated subdomain sites bring their own chrome.
+    if (pathname.startsWith('/hosted/') || pathname.startsWith('/preview/')) {
+        return null;
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
 
-  // Generated user sites (hosted + preview) are not "the nertia site" —
-  // they render their own chrome. Don't overlay our global header on them.
-  const isUserSiteRoute =
-    pathname.startsWith("/hosted/") || pathname.startsWith("/preview/");
-  if (isUserSiteRoute) return null;
+    const mode = getNavMode(pathname, !!user);
+    const items: NavItem[] = getNavItems(mode);
+    const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href + '/'));
 
-  const isActiveItem = (href: string) => pathname === href;
-
-  const shouldShowHeader = showHeader;
-
-  return (
-    <>
-      {/* Header - Desktop and Mobile */}
-      {shouldShowHeader && (
-        <header
-          className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 lg:px-12 py-4 lg:py-6 bg-[var(--background)]/60 backdrop-blur-[36px] border-b border-[var(--card-border)] transition-opacity duration-300 ${
-            showHeader ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/logo-light.svg"
-              alt="nertia.ai"
-              width={40}
-              height={26}
-              className="hidden dark:block lg:w-[50px] lg:h-[32px]"
-            />
-            <Image
-              src="/logo-dark.svg"
-              alt="nertia.ai"
-              width={40}
-              height={26}
-              className="block dark:hidden lg:w-[50px] lg:h-[32px]"
-            />
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActiveItem(item.href)
-                    ? 'text-[var(--accent)]'
-                    : 'text-muted hover:text-[var(--foreground)]'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* User Auth Section - Desktop */}
-          <div className="hidden lg:flex items-center gap-4">
-            {user ? (
-              <>
-                <Link
-                  href="/generator"
-                  className="text-sm font-medium text-muted hover:text-[var(--foreground)] transition-colors"
-                >
-                  Generator
+    return (
+        <>
+            <header className="ds-header">
+                <Link href={mode === 'authed' ? '/zero-point' : '/'} className="ds-header__brand" aria-label="nertia home">
+                    <BrandWordmark size={16} />
                 </Link>
-                {user.photoURL && (
-                  <Image
-                    src={user.photoURL}
-                    alt={user.displayName || 'User'}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
+
+                {/* Desktop nav */}
+                {mode !== 'in_tool' && (
+                    <nav className="ds-header__nav" aria-label="Primary">
+                        {items.map((item) => (
+                            <Link
+                                key={item.id}
+                                href={item.href}
+                                className="ds-header__link"
+                                data-active={isActive(item.href) ? 'true' : 'false'}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
                 )}
-                <button
-                  onClick={signOut}
-                  className="text-sm text-muted hover:text-[var(--foreground)] transition-colors"
-                >
-                  Sign out
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="text-sm font-medium px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
 
-          {/* Mobile Hamburger Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5"
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
-          >
-            <span
-              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-transform duration-300 ${
-                mobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-              }`}
-            />
-            <span
-              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-opacity duration-300 ${
-                mobileMenuOpen ? 'opacity-0' : ''
-              }`}
-            />
-            <span
-              className={`block w-6 h-0.5 bg-[var(--foreground)] transition-transform duration-300 ${
-                mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-              }`}
-            />
-          </button>
-        </header>
-      )}
+                {/* In-tool: show route as breadcrumb */}
+                {mode === 'in_tool' && (
+                    <div className="ds-header__crumb" aria-label="Current tool">
+                        <span>{pathname.split('/').filter(Boolean).slice(0, 2).join(' / ').toUpperCase()}</span>
+                    </div>
+                )}
 
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`lg:hidden fixed inset-0 z-40 bg-[var(--background)] transition-transform duration-300 ease-out ${
-          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <nav className="flex flex-col items-center justify-center h-full gap-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-medium transition-colors ${
-                isActiveItem(item.href)
-                  ? 'text-[var(--accent)]'
-                  : 'text-[var(--foreground)] hover:text-[var(--accent)]'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-
-          {/* Mobile Auth Section */}
-          <div className="mt-4 pt-4 border-t border-[var(--card-border)] flex flex-col items-center gap-4">
-            {user ? (
-              <>
-                <div className="flex items-center gap-3">
-                  {user.photoURL && (
-                    <Image
-                      src={user.photoURL}
-                      alt={user.displayName || 'User'}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                  )}
-                  <span className="text-sm text-muted">{user.displayName || user.email}</span>
+                <div className="ds-header__cta">
+                    {user ? (
+                        <>
+                            {user.photoURL && (
+                                <Image
+                                    src={user.photoURL}
+                                    alt={user.displayName || 'User'}
+                                    width={28}
+                                    height={28}
+                                    className="ds-header__avatar"
+                                />
+                            )}
+                            {mode === 'in_tool' ? (
+                                <Link href="/" className="ds-header__btn" aria-label="Exit tool">
+                                    EXIT ✕
+                                </Link>
+                            ) : (
+                                <button onClick={signOut} className="ds-header__btn" type="button">
+                                    SIGN OUT
+                                </button>
+                            )}
+                        </>
+                    ) : (
+                        <Link href="/login" className="ds-header__btn" data-tone="accent">
+                            LOG IN ↗
+                        </Link>
+                    )}
                 </div>
-                <Link
-                  href="/generator"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-xl font-medium text-[var(--accent)]"
-                >
-                  Generator
-                </Link>
+
+                {/* Mobile hamburger */}
                 <button
-                  onClick={() => {
-                    signOut();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-lg text-muted hover:text-[var(--foreground)] transition-colors"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="ds-header__hamburger"
+                    aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                    aria-expanded={mobileMenuOpen}
+                    type="button"
                 >
-                  Sign out
+                    <span data-line="1" data-open={mobileMenuOpen} />
+                    <span data-line="2" data-open={mobileMenuOpen} />
+                    <span data-line="3" data-open={mobileMenuOpen} />
                 </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-6 py-3 bg-[var(--accent)] text-white font-medium text-lg rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-        </nav>
-      </div>
-    </>
-  );
+            </header>
+
+            {/* Mobile drawer */}
+            <div className="ds-header__mobile" data-open={mobileMenuOpen}>
+                <nav aria-label="Mobile primary">
+                    {items.map((item) => (
+                        <Link
+                            key={item.id}
+                            href={item.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="ds-header__mobile-link"
+                            data-active={isActive(item.href) ? 'true' : 'false'}
+                        >
+                            <span className="ds-header__mobile-num">0{items.indexOf(item) + 1}</span>
+                            <span>{item.label}</span>
+                        </Link>
+                    ))}
+                </nav>
+                <div className="ds-header__mobile-foot">
+                    {user ? (
+                        <button
+                            onClick={() => { signOut(); setMobileMenuOpen(false); }}
+                            className="ds-header__btn"
+                            type="button"
+                        >
+                            SIGN OUT
+                        </button>
+                    ) : (
+                        <Link
+                            href="/login"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="ds-header__btn"
+                            data-tone="accent"
+                        >
+                            LOG IN ↗
+                        </Link>
+                    )}
+                </div>
+            </div>
+        </>
+    );
 }
