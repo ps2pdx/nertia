@@ -636,9 +636,9 @@ export default function DesignSystemPage() {
                         <h1 className="ds-hero__title">SYSTEMS<br />FOR<em>.</em><br />SCALE.</h1>
                         <div className="ds-hero__meta">
                             <div className="ds-hero__meta-row"><span className="k">DOC</span><span className="v">n.[ds] / industrial v1.0.0</span></div>
-                            <div className="ds-hero__meta-row"><span className="k">DATE</span><span className="v">2026.05.04 // BROOKLYN</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">DATE</span><span className="v">2026.05.04 // PORTLAND</span></div>
                             <div className="ds-hero__meta-row"><span className="k">AUTHOR</span><span className="v">scott campbell</span></div>
-                            <div className="ds-hero__meta-row"><span className="k">TONE</span><span className="v">technical · dense · declarative</span></div>
+                            <div className="ds-hero__meta-row"><span className="k">TONE</span><span className="v">propulsion · applied ai · declarative</span></div>
                             <div className="ds-hero__meta-row"><span className="k">SEED</span><span className="v">crusoe · vercel · o-p-e-n</span></div>
                             <div className="ds-hero__meta-row"><span className="k">STATUS</span><span className="v" style={{ color: 'var(--signal-green)' }}>● LIVE — TOKENS LOCKED</span></div>
                         </div>
@@ -751,7 +751,7 @@ export default function DesignSystemPage() {
                         <div className="type-stack">
                             <div className="type-row"><span className="k">DISPLAY 1</span><span className="v t-display-1">PROPULSION.</span><span className="meta">96 / 0.92 / -3%</span></div>
                             <div className="type-row"><span className="k">DISPLAY 2</span><span className="v t-display-2">FOR SCALE.</span><span className="meta">72 / 0.94 / -2.5%</span></div>
-                            <div className="type-row"><span className="k">DISPLAY 3</span><span className="v t-display-3">Built in Brooklyn.</span><span className="meta">48 / 0.98 / -2%</span></div>
+                            <div className="type-row"><span className="k">DISPLAY 3</span><span className="v t-display-3">Built in Portland.</span><span className="meta">48 / 0.98 / -2%</span></div>
                             <div className="type-row"><span className="k">H1</span><span className="v t-h1">Industrial systems reference.</span><span className="meta">36 / 1.05 / -2%</span></div>
                             <div className="type-row"><span className="k">H2</span><span className="v t-h2">Tokens. Primitives. Patterns.</span><span className="meta">28 / 1.1 / -1.5%</span></div>
                             <div className="type-row"><span className="k">H3</span><span className="v t-h3">Technical neutrals · one signal.</span><span className="meta">20 / 1.2 / -1%</span></div>
@@ -1085,7 +1085,7 @@ export default function DesignSystemPage() {
                             <div><div className="num">14 / VOICE</div></div>
                             <div>
                                 <div className="title">VOICE.</div>
-                                <div className="desc">Confident. Declarative. Technical. Few adjectives. Numbers when possible. Active voice. No SaaS clichés.</div>
+                                <div className="desc">Propulsion-driven. Declarative. Technical. Applied AI GTM, not generative buzzwords. Numbers when possible. Active voice. No SaaS clichés.</div>
                             </div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, border: '1px solid var(--line)' }}>
@@ -1096,6 +1096,9 @@ export default function DesignSystemPage() {
                                 <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
                                 <div className="t-h3" style={{ marginBottom: 16 }}>&ldquo;4 systems emerged. Pick one.&rdquo;</div>
                                 <div className="t-body fg-muted">Imperative. Numbers. Trusts the user to act.</div>
+                                <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
+                                <div className="t-h3" style={{ marginBottom: 16 }}>&ldquo;Applied AI GTM pipelines.&rdquo;</div>
+                                <div className="t-body fg-muted">Names the work, not the trend. Pipelines, not motions.</div>
                             </div>
                             <div style={{ padding: 32 }}>
                                 <div className="t-eyebrow fg-quiet" style={{ marginBottom: 8, color: 'var(--signal-red)' }}>DON&apos;T ✕</div>
@@ -1104,6 +1107,9 @@ export default function DesignSystemPage() {
                                 <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
                                 <div className="t-h3 fg-quiet" style={{ marginBottom: 16, textDecoration: 'line-through' }}>&ldquo;We&apos;ve crafted a delightful experience.&rdquo;</div>
                                 <div className="t-body fg-muted">Adjective stack. First-person plural. Marketing voice.</div>
+                                <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '24px 0' }} />
+                                <div className="t-h3 fg-quiet" style={{ marginBottom: 16, textDecoration: 'line-through' }}>&ldquo;Synergize your go-to-market motion.&rdquo;</div>
+                                <div className="t-body fg-muted">SaaS speak. &ldquo;Motion&rdquo; is filler. Pretends activity equals output.</div>
                             </div>
                         </div>
                     </section>

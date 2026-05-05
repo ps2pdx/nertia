@@ -611,7 +611,7 @@ code, pre, kbd, samp {
 /* TOKEN + MENU EDGE TABS — both flush to edge, stacked just under topbar */
 .ds-edge-tab {
   position: fixed;
-  top: calc(var(--header-height) + 40px);
+  top: calc(var(--header-height) + 80px);
   z-index: 20;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding: 12px 8px;
@@ -1052,7 +1052,7 @@ body[data-edit-mode="true"] [data-edit-var]:hover::before { opacity: 1; }
   .token-drawer { width: min(360px, 90vw); }
   .token-tab[data-open="true"] { right: min(360px, 90vw); }
   .menu-tab[data-open="true"] { left: 200px; }
-  .ds-edge-tab { top: calc(var(--header-height) + 60px); }
+  .ds-edge-tab { top: calc(var(--header-height) + 100px); }
 }
 
 @media (max-width: 480px) {
