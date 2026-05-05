@@ -41,13 +41,27 @@ export default function OpenGraphImage() {
             color: QUIET,
           }}
         >
-          <div style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 22, color: PAPER, letterSpacing: -0.5, textTransform: "none" }}>
-            <span>n</span>
-            <span style={{ color: ACCENT }}>.</span>
-            <span style={{ color: QUIET }}>[</span>
-            <span>n</span>
-            <span style={{ color: QUIET }}>]</span>
-            <span>ertia</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* Trending-up arrow — same path as Brand component */}
+            <svg
+              width="40"
+              height="40"
+              viewBox="-1.5 -1.5 12 15"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ display: "flex" }}
+            >
+              <path
+                d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0"
+                fill="none"
+                stroke={PAPER}
+                strokeWidth="1.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span style={{ display: "flex", fontSize: 26, color: PAPER, letterSpacing: -0.5, textTransform: "none" }}>
+              nertia<span style={{ color: ACCENT }}>.</span>ai
+            </span>
           </div>
           <span>v1 · 2026</span>
         </div>

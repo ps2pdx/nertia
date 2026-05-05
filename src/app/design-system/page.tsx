@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { BrandIcon, BrandWordmark, BrandStack } from '@/components/Brand';
 
 export default function DesignSystemPage() {
     const { user } = useAuth();
@@ -1116,64 +1117,78 @@ export default function DesignSystemPage() {
                             <div><div className="num">15 / LOGO</div></div>
                             <div>
                                 <div className="title">LOGO.</div>
-                                <div className="desc">SF Mono Regular 12. Square-bracketed n. The mark is small, technical, copy-pasteable. Wordmark is the same letterform extended. No custom drawing — the logo is a glyph, not an illustration.</div>
+                                <div className="desc">A trending-up arrow whose dip-and-peak silhouette reads as the &ldquo;n&rdquo; in nertia. SF Mono Regular 12 for the wordmark. Period rendered in the seafoam accent.</div>
                             </div>
                         </div>
 
                         <div className="logo-row">
                             <div className="logo-card">
                                 <div className="logo-card__head">
-                                    <span className="t-eyebrow fg-quiet">MARK · n.<span className="fg-accent">[n]</span></span>
+                                    <span className="t-eyebrow fg-quiet">ICON · ↗</span>
                                     <span className="t-mono fg-quiet">12 / regular</span>
                                 </div>
                                 <div className="logo-card__stage">
-                                    <svg className="logo-svg" width="36" height="14" viewBox="0 0 36 14" xmlns="http://www.w3.org/2000/svg">
-                                        <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor" letterSpacing="0">[n]</text>
-                                    </svg>
+                                    <BrandIcon size={48} />
                                 </div>
                                 <div className="logo-card__foot">
-                                    <span className="t-mono fg-quiet">3 GLYPHS · 36 × 14 PX</span>
+                                    <span className="t-mono fg-quiet">7.2 × 12 UNITS · CURRENTCOLOR</span>
                                     <button
                                         className="logo-copy"
-                                        data-copy={`<svg width="36" height="14" viewBox="0 0 36 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="12" fill="currentColor">[n]</text></svg>`}
+                                        data-copy={`<svg width="14" height="14" viewBox="-2.4 -1.5 12 15" xmlns="http://www.w3.org/2000/svg"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                                     >COPY SVG</button>
                                 </div>
                             </div>
 
                             <div className="logo-card">
                                 <div className="logo-card__head">
-                                    <span className="t-eyebrow fg-quiet">WORDMARK · <span className="fg-accent">[n]</span>ertia</span>
-                                    <span className="t-mono fg-quiet">12 / regular</span>
+                                    <span className="t-eyebrow fg-quiet">WORDMARK · ↗ nertia<span className="fg-accent">.</span>ai</span>
+                                    <span className="t-mono fg-quiet">inline lockup</span>
                                 </div>
                                 <div className="logo-card__stage">
-                                    <svg className="logo-svg" width="64" height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg">
-                                        <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor" letterSpacing="0">[n]ertia</text>
-                                    </svg>
+                                    <BrandWordmark size={28} />
                                 </div>
                                 <div className="logo-card__foot">
-                                    <span className="t-mono fg-quiet">7 GLYPHS · 64 × 14 PX</span>
+                                    <span className="t-mono fg-quiet">76 × 12 UNITS · 9 GLYPHS + ICON</span>
                                     <button
                                         className="logo-copy"
-                                        data-copy={`<svg width="64" height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="12" fill="currentColor">[n]ertia</text></svg>`}
+                                        data-copy={`<svg width="76" height="12" viewBox="0 0 76 12" overflow="visible" xmlns="http://www.w3.org/2000/svg"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><text x="11.2" y="9.4" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#15ef89">.</tspan>ai</text></svg>`}
                                     >COPY SVG</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>SCALE · NATIVE × 1 · 2 · 4 · 8 · 16</div>
+                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>STACKED LOCKUP · ICON ABOVE WORDMARK</div>
+                        <div className="logo-row" style={{ gridTemplateColumns: '1fr' }}>
+                            <div className="logo-card">
+                                <div className="logo-card__head">
+                                    <span className="t-eyebrow fg-quiet">STACK · CENTERED</span>
+                                    <span className="t-mono fg-quiet">80 × 28 UNITS</span>
+                                </div>
+                                <div className="logo-card__stage" style={{ minHeight: 240, padding: '64px 32px' }}>
+                                    <BrandStack size={120} />
+                                </div>
+                                <div className="logo-card__foot">
+                                    <span className="t-mono fg-quiet">USE FOR HERO · MARKETING · OG IMAGES</span>
+                                    <button
+                                        className="logo-copy"
+                                        data-copy={`<svg width="80" height="28" viewBox="-40 0 80 28" overflow="visible" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-3.6, 0)"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/></g><text x="0" y="26" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#15ef89">.</tspan>ai</text></svg>`}
+                                    >COPY SVG</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>SCALE · WORDMARK × 1 · 2 · 4 · 8</div>
                         <div className="logo-scale">
                             {[
                                 [14, '×1', '12 PT'],
                                 [28, '×2', '24 PT'],
                                 [56, '×4', '48 PT'],
                                 [112, '×8', '96 PT'],
-                                [224, '×16', '192 PT'],
+                                [180, '×13', '160 PT'],
                             ].map(([h, mul, pt]) => (
                                 <div className="logo-scale__cell" key={mul as string}>
                                     <div className="logo-scale__stage">
-                                        <svg height={h} viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg">
-                                            <text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fontWeight="400" fill="currentColor">[n]ertia</text>
-                                        </svg>
+                                        <BrandWordmark size={h as number} />
                                     </div>
                                     <div className="logo-scale__label">
                                         <span className="t-mono">{mul}</span>
@@ -1186,27 +1201,27 @@ export default function DesignSystemPage() {
                         <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>COLOR · 6 PERMITTED CONTEXTS</div>
                         <div className="logo-treat">
                             <div className="logo-treat__cell" style={{ background: 'var(--bg)', color: 'var(--fg)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <BrandWordmark size={20} />
                                 <span className="t-mono fg-quiet">ON · BG</span>
                             </div>
                             <div className="logo-treat__cell" style={{ background: 'var(--surface)', color: 'var(--fg)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <BrandWordmark size={20} />
                                 <span className="t-mono fg-quiet">ON · SURFACE</span>
                             </div>
                             <div className="logo-treat__cell" style={{ background: 'var(--ink-1000)', color: 'var(--paper-900)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <BrandWordmark size={20} />
                                 <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 40%, transparent)' }}>ON · INK·1000</span>
                             </div>
                             <div className="logo-treat__cell" style={{ background: 'var(--paper-900)', color: 'var(--ink-1000)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <BrandWordmark size={20} />
                                 <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 40%, transparent)' }}>ON · PAPER·900</span>
                             </div>
                             <div className="logo-treat__cell" style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                <BrandWordmark size={20} accentColor="var(--accent-fg)" />
                                 <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 60%, transparent)' }}>ON · ACCENT</span>
                             </div>
                             <div className="logo-treat__cell logo-treat__cell--bad" style={{ background: 'var(--surface)', color: 'var(--fg-quiet)' }}>
-                                <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor" opacity="0.4">[n]ertia</text></svg>
+                                <BrandWordmark size={20} accentColor="var(--fg-quiet)" style={{ opacity: 0.4 }} />
                                 <span className="t-mono" style={{ color: 'var(--signal-red)' }}>DO NOT · MUTE</span>
                             </div>
                         </div>
@@ -1216,28 +1231,28 @@ export default function DesignSystemPage() {
                                 <div className="t-eyebrow fg-quiet" style={{ marginBottom: 12 }}>CLEAR SPACE · 1 GLYPH ON ALL SIDES</div>
                                 <div className="logo-clear">
                                     <div className="logo-clear__inner">
-                                        <svg height="14" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
+                                        <BrandWordmark size={20} />
                                     </div>
                                 </div>
-                                <div className="t-mono fg-quiet" style={{ marginTop: 12 }}>MIN MARGIN = 7.2 PX (1 EM AT 12)</div>
+                                <div className="t-mono fg-quiet" style={{ marginTop: 12 }}>MIN MARGIN = 1 EM (≈ 12 PX AT 12 PT)</div>
                             </div>
                             <div className="logo-rules__cell">
                                 <div className="t-eyebrow fg-quiet" style={{ marginBottom: 12 }}>MISUSE · 4 PROHIBITED</div>
                                 <div className="logo-dont">
-                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontStyle: 'italic' }}>[n]ertia</span><span className="t-mono fg-quiet">NO ITALIC</span></div>
-                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontWeight: 700 }}>[n]ertia</span><span className="t-mono fg-quiet">NO BOLD</span></div>
-                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ letterSpacing: '0.2em' }}>[n]ertia</span><span className="t-mono fg-quiet">NO TRACKING</span></div>
-                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontFamily: 'var(--f-display)', fontWeight: 700 }}>[n]ertia</span><span className="t-mono fg-quiet">NO RESET FONT</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontStyle: 'italic' }}>↗ nertia.ai</span><span className="t-mono fg-quiet">NO ITALIC</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontWeight: 700 }}>↗ nertia.ai</span><span className="t-mono fg-quiet">NO BOLD</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ letterSpacing: '0.2em' }}>↗ nertia.ai</span><span className="t-mono fg-quiet">NO TRACKING</span></div>
+                                    <div className="logo-dont__cell"><span className="logo-dont__sample" style={{ fontFamily: 'var(--f-display)', fontWeight: 700 }}>↗ nertia.ai</span><span className="t-mono fg-quiet">NO RESET FONT</span></div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="t-eyebrow" style={{ margin: '32px 0 8px' }}>FILES · 4 SHIPPED</div>
                         <div className="logo-files">
-                            <div className="logo-files__row"><span className="t-mono">nertia-mark.svg</span><span className="t-mono fg-quiet">36 × 14</span><span className="t-mono fg-quiet">[n]</span><span className="t-mono fg-quiet">currentColor</span></div>
-                            <div className="logo-files__row"><span className="t-mono">nertia-wordmark.svg</span><span className="t-mono fg-quiet">64 × 14</span><span className="t-mono fg-quiet">[n]ertia</span><span className="t-mono fg-quiet">currentColor</span></div>
-                            <div className="logo-files__row"><span className="t-mono">nertia-mark@dark.svg</span><span className="t-mono fg-quiet">36 × 14</span><span className="t-mono fg-quiet">[n]</span><span className="t-mono fg-quiet">paper-900</span></div>
-                            <div className="logo-files__row"><span className="t-mono">nertia-wordmark@dark.svg</span><span className="t-mono fg-quiet">64 × 14</span><span className="t-mono fg-quiet">[n]ertia</span><span className="t-mono fg-quiet">paper-900</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-icon.svg</span><span className="t-mono fg-quiet">14 × 14</span><span className="t-mono fg-quiet">↗</span><span className="t-mono fg-quiet">currentColor</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-wordmark.svg</span><span className="t-mono fg-quiet">76 × 12</span><span className="t-mono fg-quiet">↗ nertia.ai</span><span className="t-mono fg-quiet">currentColor</span></div>
+                            <div className="logo-files__row"><span className="t-mono">nertia-stack.svg</span><span className="t-mono fg-quiet">80 × 28</span><span className="t-mono fg-quiet">stacked</span><span className="t-mono fg-quiet">currentColor</span></div>
+                            <div className="logo-files__row"><span className="t-mono">favicon.svg</span><span className="t-mono fg-quiet">32 × 32</span><span className="t-mono fg-quiet">↗ + dot</span><span className="t-mono fg-quiet">paper-900 + accent</span></div>
                         </div>
                     </section>
 
