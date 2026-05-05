@@ -149,7 +149,7 @@ export default function ZeroPointPage() {
                             </div>
                             <div className="zp-card__foot">
                                 <span className="zp-card__route">
-                                    {t.href ? <span>{t.href}</span> : <span className="fg-quiet">// not yet</span>}
+                                    {t.href ? <span>{t.href}</span> : <span className="fg-quiet">{'// not yet'}</span>}
                                 </span>
                                 <span className="zp-card__arrow" aria-hidden>{t.href ? '↗' : '·'}</span>
                             </div>
