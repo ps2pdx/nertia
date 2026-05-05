@@ -1848,6 +1848,19 @@ code, pre, kbd, samp {
   display: flex; justify-content: space-between; align-items: center;
 }
 
+/* Drawer footer note shown to signed-out viewers — read-only mode */
+.token-drawer__locked {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-3) var(--s-4);
+  border-top: var(--w-hair) solid var(--line);
+  background: var(--surface);
+}
+.token-drawer__locked-link {
+  color: var(--accent); font-weight: 600; letter-spacing: 0.16em;
+  transition: color var(--d-1) var(--e-out);
+}
+.token-drawer__locked-link:hover { color: var(--fg); }
+
 .token-toast {
   position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%) translateY(8px);
   background: var(--fg); color: var(--bg);

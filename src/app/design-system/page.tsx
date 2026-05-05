@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 
 export default function DesignSystemPage() {
+    const { user } = useAuth();
+    const canEdit = !!user;
     const [menuOpen, setMenuOpen] = useState(true);
 
     // collapse the sidebar by default on small screens; respect persisted choice otherwise
@@ -71,31 +74,22 @@ export default function DesignSystemPage() {
             return 'color';
         }
 
-        /* ---------- OVERRIDES ---------- */
-        const STORE_OVR = 'n.ds.overrides';
+        /* ---------- OVERRIDES ----------
+         * In-memory only. Token edits live for the current page-load session
+         * and reset on reload / navigation away. No localStorage, no URL hash.
+         */
         let overrides: Record<string, string> = {};
-        try { overrides = JSON.parse(localStorage.getItem(STORE_OVR) || '{}'); } catch { overrides = {}; }
-        try {
-            if (location.hash.startsWith('#t=')) {
-                const decoded = JSON.parse(atob(decodeURIComponent(location.hash.slice(3))));
-                if (decoded && typeof decoded === 'object') overrides = decoded;
-            }
-        } catch {}
-        function applyOverrides() {
-            Object.entries(overrides).forEach(([k, v]) => root.style.setProperty(k, v));
-        }
         function persistOverrides() {
-            try { localStorage.setItem(STORE_OVR, JSON.stringify(overrides)); } catch {}
+            // session-only — nothing to write. Just refresh the edited counter.
             updateEditedCount();
         }
         function updateEditedCount() {
             const n = Object.keys(overrides).length;
             const el = document.getElementById('tokenEditedCount');
-            if (el) el.textContent = n ? `${n} EDITED` : 'DEFAULTS';
+            if (el) el.textContent = n ? `${n} EDITED · SESSION ONLY` : 'DEFAULTS';
             const reset = document.getElementById('tokenReset') as HTMLButtonElement | null;
             if (reset) reset.disabled = !n;
         }
-        applyOverrides();
 
         function isColor(val: string) { return /^(#|rgb|hsl|oklch|oklab|color\()/.test(val.trim()); }
         function readVar(name: string) {
@@ -153,17 +147,23 @@ export default function DesignSystemPage() {
                     const swatch = isColor(val)
                         ? `<span class="tk-swatch" style="background:${val}"></span>`
                         : `<span class="tk-swatch tk-swatch--empty"></span>`;
+                    // Edit + reset affordances only render when signed in.
+                    // Read-only viewers always get the copy button.
+                    const editButtons = canEdit
+                        ? `<button class="tk-act" data-act="edit" title="Edit">&#10000;</button>
+                           <button class="tk-act" data-act="copy" title="Copy var()">&#9133;</button>
+                           <button class="tk-act tk-act--reset" data-act="reset" title="Reset">&#8634;</button>`
+                        : `<button class="tk-act" data-act="copy" title="Copy var()">&#9133;</button>`;
                     row.innerHTML = `
                         ${swatch}
                         <span class="tk-key">${v}</span>
                         <span class="tk-val">${val}</span>
-                        <button class="tk-act" data-act="edit" title="Edit">&#10000;</button>
-                        <button class="tk-act" data-act="copy" title="Copy var()">&#9133;</button>
-                        <button class="tk-act tk-act--reset" data-act="reset" title="Reset">&#8634;</button>
+                        ${editButtons}
                     `;
                     row.addEventListener('click', (e) => {
                         const act = (e.target as HTMLElement).closest<HTMLElement>('[data-act]')?.dataset.act;
                         if (act === 'copy') return copyToken(v, readVar(v), row);
+                        if (!canEdit) return;
                         if (act === 'reset') return clearVar(v);
                         openEditor(v, row);
                     });
@@ -438,24 +438,13 @@ export default function DesignSystemPage() {
             buildTokens();
             refreshLabels();
             showToast('RESET · DEFAULTS RESTORED');
-            history.replaceState(null, '', location.pathname + location.search);
         };
         resetBtn?.addEventListener('click', resetHandler);
 
-        const shareBtn = document.getElementById('tokenShare');
-        const shareHandler = () => {
-            const n = Object.keys(overrides).length;
-            const hash = n ? '#t=' + encodeURIComponent(btoa(JSON.stringify(overrides))) : '';
-            const url = location.origin + location.pathname + location.search + hash;
-            history.replaceState(null, '', url);
-            navigator.clipboard?.writeText(url).then(() => showToast(`LINK COPIED · ${n} TOKENS`));
-        };
-        shareBtn?.addEventListener('click', shareHandler);
-
-        /* ---------- INLINE PAGE EDITING ---------- */
-        const STORE_EDIT = 'n.ds.editmode';
+        /* ---------- INLINE PAGE EDITING ----------
+         * Edit mode is session-only too — defaults to off on every page load.
+         */
         let editMode = false;
-        try { editMode = localStorage.getItem(STORE_EDIT) === 'true'; } catch {}
         const editToggleEl = document.getElementById('editToggle');
         let popover: HTMLElement | null = null;
         function closePopover() { if (popover) { popover.remove(); popover = null; } }
@@ -463,12 +452,11 @@ export default function DesignSystemPage() {
             editMode = on;
             document.body.dataset.editMode = on ? 'true' : 'false';
             if (editToggleEl) editToggleEl.dataset.active = on ? 'true' : 'false';
-            try { localStorage.setItem(STORE_EDIT, String(on)); } catch {}
             if (!on) closePopover();
         }
         const editToggleHandler = () => setEditMode(!editMode);
         editToggleEl?.addEventListener('click', editToggleHandler);
-        setEditMode(editMode);
+        setEditMode(false);
 
         function openPopover(el: HTMLElement, name: string) {
             closePopover();
@@ -499,7 +487,7 @@ export default function DesignSystemPage() {
         }
 
         const inlineClickHandler = (e: MouseEvent) => {
-            if (!editMode) return;
+            if (!canEdit || !editMode) return;
             const target = (e.target as HTMLElement).closest<HTMLElement>('[data-edit-var]');
             if (!target) return;
             if (target.closest('#tokenDrawer')) return;
@@ -570,7 +558,6 @@ export default function DesignSystemPage() {
             filter?.removeEventListener('input', filterHandler);
             exportButtons.forEach((b, i) => b.removeEventListener('click', exportHandlers[i]));
             resetBtn?.removeEventListener('click', resetHandler);
-            shareBtn?.removeEventListener('click', shareHandler);
             editToggleEl?.removeEventListener('click', editToggleHandler);
             document.removeEventListener('click', inlineClickHandler);
             logoCopyButtons.forEach((b, i) => b.removeEventListener('click', logoCopyHandlers[i]));
@@ -580,7 +567,7 @@ export default function DesignSystemPage() {
             closePopover();
             document.body.dataset.editMode = 'false';
         };
-    }, []);
+    }, [canEdit]);
 
     return (
         <div className="ds-root" data-menu-open={menuOpen ? 'true' : 'false'}>
@@ -597,10 +584,12 @@ export default function DesignSystemPage() {
                         <span className="theme-toggle__seg" data-mode="light">LIGHT</span>
                         <span className="theme-toggle__seg" data-mode="auto">AUTO</span>
                     </button>
-                    <button className="edit-toggle" id="editToggle" type="button" aria-label="Toggle inline editing">
-                        <span className="edit-toggle__dot" />
-                        <span className="edit-toggle__label">EDIT</span>
-                    </button>
+                    {canEdit && (
+                        <button className="edit-toggle" id="editToggle" type="button" aria-label="Toggle inline editing">
+                            <span className="edit-toggle__dot" />
+                            <span className="edit-toggle__label">EDIT</span>
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -1316,12 +1305,19 @@ export default function DesignSystemPage() {
                 <div className="token-drawer__foot">
                     <span className="t-mono fg-quiet" id="tokenEditedCount">DEFAULTS</span>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                        <button className="btn-ds" data-size="sm" data-tone="ghost" id="tokenReset" disabled>RESET</button>
-                        <button className="btn-ds" data-size="sm" data-tone="ghost" id="tokenShare">LINK</button>
+                        {canEdit && (
+                            <button className="btn-ds" data-size="sm" data-tone="ghost" id="tokenReset" disabled>RESET</button>
+                        )}
                         <button className="btn-ds" data-size="sm" data-tone="ghost" data-export="css">CSS</button>
                         <button className="btn-ds" data-size="sm" data-tone="ghost" data-export="json">JSON</button>
                     </div>
                 </div>
+                {!canEdit && (
+                    <div className="token-drawer__locked">
+                        <span className="t-mono fg-quiet">{'// editing is signed-in only.'}</span>
+                        <a href="/login" className="t-mono token-drawer__locked-link">LOG IN ↗</a>
+                    </div>
+                )}
                 <div className="token-toast" id="tokenToast" />
             </aside>
         </div>
