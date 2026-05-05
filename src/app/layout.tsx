@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Space_Mono } from "next/font/google";
+import { Archivo, Geist, Space_Mono } from "next/font/google";
 import Script from "next/script";
 import { headers } from "next/headers";
 import Header from "@/components/Header";
 import Providers from "@/components/Providers";
 import "./globals.css";
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,7 +96,7 @@ export default async function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${spaceMono.variable} antialiased`}
+        className={`${archivo.variable} ${geistSans.variable} ${spaceMono.variable} antialiased`}
         style={onHostedSite ? { paddingTop: 0 } : undefined}
       >
         <Providers>
