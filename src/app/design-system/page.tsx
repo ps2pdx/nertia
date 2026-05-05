@@ -1151,7 +1151,7 @@ export default function DesignSystemPage() {
                                     <span className="t-mono fg-quiet">76 × 12 UNITS · 9 GLYPHS + ICON</span>
                                     <button
                                         className="logo-copy"
-                                        data-copy={`<svg width="76" height="12" viewBox="0 0 76 12" overflow="visible" xmlns="http://www.w3.org/2000/svg"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><text x="11.2" y="9.4" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#15ef89">.</tspan>ai</text></svg>`}
+                                        data-copy={`<svg width="76" height="12" viewBox="0 0 76 12" overflow="visible" xmlns="http://www.w3.org/2000/svg"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><text x="11.2" y="9.4" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#1fb573">.</tspan>ai</text></svg>`}
                                     >COPY SVG</button>
                                 </div>
                             </div>
@@ -1171,7 +1171,7 @@ export default function DesignSystemPage() {
                                     <span className="t-mono fg-quiet">USE FOR HERO · MARKETING · OG IMAGES</span>
                                     <button
                                         className="logo-copy"
-                                        data-copy={`<svg width="80" height="28" viewBox="-40 0 80 28" overflow="visible" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-3.6, 0)"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/></g><text x="0" y="26" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#15ef89">.</tspan>ai</text></svg>`}
+                                        data-copy={`<svg width="80" height="28" viewBox="-40 0 80 28" overflow="visible" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-3.6, 0)"><path d="M0.6,9.4 L2.5,5.6 L4.0,7.2 L6.6,3.0 L4.6,3.0 M6.6,3.0 L6.6,5.0" fill="none" stroke="currentColor" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/></g><text x="0" y="26" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="9.6" font-weight="400" fill="currentColor">nertia<tspan fill="#1fb573">.</tspan>ai</text></svg>`}
                                     >COPY SVG</button>
                                 </div>
                             </div>

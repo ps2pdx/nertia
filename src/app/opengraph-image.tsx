@@ -7,7 +7,7 @@ export const alt = "nertia — frameworks for propulsion";
 
 const INK = "#0c0c0c";
 const PAPER = "#f3f1ec";
-const ACCENT = "#15ef89";
+const ACCENT = "#1fb573";
 const QUIET = "#80807a";
 const MUTED = "#a8a8a0";
 

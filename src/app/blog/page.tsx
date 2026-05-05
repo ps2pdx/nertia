@@ -37,13 +37,38 @@ export default async function BlogIndex() {
                         return (
                             <li key={post.slug} className="blog-ticker__row">
                                 <Link href={`/blog/${post.slug}`} className="blog-ticker__link">
-                                    <span className="blog-ticker__num">{num}</span>
-                                    <span className="blog-ticker__title">{post.title}</span>
-                                    <span className="blog-ticker__excerpt">{post.excerpt || ''}</span>
-                                    <span className="blog-ticker__route">
-                                        <span className="blog-ticker__date">{fmtDate(post.date)}</span>
-                                        <span className="blog-ticker__arrow" aria-hidden>↗</span>
-                                    </span>
+                                    <div className="blog-ticker__compact">
+                                        <span className="blog-ticker__num">{num}</span>
+                                        <span className="blog-ticker__title">{post.title}</span>
+                                        <span className="blog-ticker__excerpt">{post.excerpt || ''}</span>
+                                        <span className="blog-ticker__route">
+                                            <span className="blog-ticker__date">{fmtDate(post.date)}</span>
+                                            <span className="blog-ticker__arrow" aria-hidden>↗</span>
+                                        </span>
+                                    </div>
+                                    <div className="blog-ticker__detail" aria-hidden="true">
+                                        {post.hero ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={post.hero} alt="" className="blog-ticker__hero" loading="lazy" />
+                                        ) : (
+                                            <div className="blog-ticker__hero blog-ticker__hero--placeholder">
+                                                <span className="t-mono fg-quiet">{`// no hero`}</span>
+                                            </div>
+                                        )}
+                                        <div className="blog-ticker__summary">
+                                            <p>{post.excerpt || 'Field notes — no summary yet.'}</p>
+                                            {post.tags?.length > 0 && (
+                                                <div className="blog-ticker__tags">
+                                                    {post.tags.slice(0, 3).map((tag) => (
+                                                        <span key={tag} className="blog-ticker__tag">{tag}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="blog-ticker__cta">
+                                            READ MORE <span aria-hidden>↗</span>
+                                        </span>
+                                    </div>
                                 </Link>
                             </li>
                         );
