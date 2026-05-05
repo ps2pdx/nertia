@@ -48,7 +48,12 @@
   --fg-quiet:    var(--ink-300);
   --accent:      var(--signal-red);
 
-  /* type */
+  /* type — next/font sets --font-* on <body>; these root fallbacks make
+     the var() chain resolve when read from root (e.g. computed style
+     lookups for the live edit-mode font-name labels). */
+  --font-archivo:    "Archivo";
+  --font-geist-sans: "Geist";
+  --font-space-mono: "Space Mono";
   --f-display: var(--font-archivo), "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --f-body:    var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:    "SF Mono", ui-monospace, "Menlo", "Cascadia Mono", "Roboto Mono", monospace;

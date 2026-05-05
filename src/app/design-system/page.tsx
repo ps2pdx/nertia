@@ -524,7 +524,11 @@ export default function DesignSystemPage() {
             });
             document.querySelectorAll<HTMLElement>('[data-show-font]').forEach((el) => {
                 const stack = readVar(el.dataset.showFont!);
-                const first = stack.split(',')[0].replace(/['"]/g, '').trim();
+                // Skip CSS-var tokens (e.g. var(--font-archivo)) and pick the first
+                // human-readable family name from the stack.
+                const first = stack.split(',')
+                    .map((p) => p.replace(/['"]/g, '').trim())
+                    .find((p) => p && !p.startsWith('var(') && !p.startsWith('ui-') && !p.startsWith('-apple-system') && p !== 'system-ui' && p !== 'sans-serif' && p !== 'monospace') || stack.split(',')[0].replace(/['"]/g, '').trim();
                 el.textContent = first;
             });
         }
