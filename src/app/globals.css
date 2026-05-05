@@ -630,7 +630,7 @@ code, pre, kbd, samp {
               left var(--d-3) var(--e-in-out), right var(--d-3) var(--e-in-out);
 }
 .ds-edge-tab:hover { background: var(--fg); color: var(--bg); }
-.ds-edge-tab__glyph { font-family: var(--f-mono); font-weight: 700; font-size: 14px; letter-spacing: 0.04em; }
+.ds-edge-tab__glyph { font-family: var(--f-mono); font-weight: 700; font-size: 14px; letter-spacing: 0.04em; white-space: nowrap; }
 .ds-edge-tab__label {
   font-family: var(--f-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.18em;
   writing-mode: vertical-rl; transform: rotate(180deg);
