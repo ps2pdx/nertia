@@ -55,7 +55,7 @@ export default function DesignSystemPage() {
         const TOKEN_GROUPS = [
             { name: 'INK',      kind: 'color',  vars: ['--ink-1000','--ink-900','--ink-800','--ink-700','--ink-600','--ink-500','--ink-400','--ink-300','--ink-200','--ink-100'] },
             { name: 'PAPER',    kind: 'color',  vars: ['--paper-1000','--paper-900','--paper-800','--paper-700','--paper-600'] },
-            { name: 'SIGNAL',   kind: 'color',  vars: ['--signal-red','--signal-red-2','--signal-amber','--signal-green','--signal-blue','--signal-violet'] },
+            { name: 'SIGNAL',   kind: 'color',  vars: ['--signal-seafoam','--signal-seafoam-2','--signal-seafoam-deep','--signal-red','--signal-red-2','--signal-amber','--signal-green','--signal-blue','--signal-violet'] },
             { name: 'SEMANTIC', kind: 'mixed',  vars: ['--bg','--surface','--surface-2','--line','--line-soft','--fg','--fg-muted','--fg-quiet','--accent'] },
             { name: 'TYPE',     kind: 'font',   vars: ['--f-display','--f-body','--f-mono'] },
             { name: 'SPACING',  kind: 'size',   vars: ['--s-0','--s-1','--s-2','--s-3','--s-4','--s-6','--s-8','--s-12','--s-16','--s-24','--s-32'] },
@@ -613,7 +613,7 @@ export default function DesignSystemPage() {
                     </div>
                     <div className="ds-sidebar__nav">
                         <div className="ds-sidebar__nav-section">FOUNDATIONS</div>
-                        <a className="ds-sidebar__link" href="#color"  data-active="true"><span>00 / COLOR</span><span>11+5+6</span></a>
+                        <a className="ds-sidebar__link" href="#color"  data-active="true"><span>00 / COLOR</span><span>11+5+9</span></a>
                         <a className="ds-sidebar__link" href="#type"><span>01 / TYPE</span><span>3+10</span></a>
                         <a className="ds-sidebar__link" href="#scale"><span>02 / SCALE</span><span>11</span></a>
                         <a className="ds-sidebar__link" href="#radius"><span>03 / RADIUS</span><span>3</span></a>
@@ -701,15 +701,18 @@ export default function DesignSystemPage() {
                             ))}
                         </div>
 
-                        <div className="t-eyebrow" style={{ margin: '24px 0 8px' }}>SIGNAL · 6 ACCENTS · USE SPARINGLY</div>
-                        <div className="semantic-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                        <div className="t-eyebrow" style={{ margin: '24px 0 8px' }}>SIGNAL · 9 TOKENS · USE SPARINGLY</div>
+                        <div className="semantic-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                             {[
-                                ['--signal-red',    'RED · PRIMARY'],
-                                ['--signal-red-2',  'RED·2'],
-                                ['--signal-amber',  'AMBER'],
-                                ['--signal-green',  'GREEN'],
-                                ['--signal-blue',   'BLUE'],
-                                ['--signal-violet', 'VIOLET'],
+                                ['--signal-seafoam',      'SEAFOAM · PRIMARY'],
+                                ['--signal-seafoam-2',    'SEAFOAM · 2'],
+                                ['--signal-seafoam-deep', 'SEAFOAM · DEEP'],
+                                ['--signal-red',          'RED · DANGER'],
+                                ['--signal-red-2',        'RED · 2'],
+                                ['--signal-amber',        'AMBER · WARN'],
+                                ['--signal-green',        'GREEN · SUCCESS'],
+                                ['--signal-blue',         'BLUE · INFO'],
+                                ['--signal-violet',       'VIOLET'],
                             ].map(([v, name]) => (
                                 <div className="semantic" key={v}>
                                     <div className="semantic__chip" data-edit-var={v} style={{ background: `var(${v})` }} />
@@ -1209,9 +1212,9 @@ export default function DesignSystemPage() {
                                 <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
                                 <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 40%, transparent)' }}>ON · PAPER·900</span>
                             </div>
-                            <div className="logo-treat__cell" style={{ background: 'var(--accent)', color: 'var(--paper-900)' }}>
+                            <div className="logo-treat__cell" style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}>
                                 <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor">[n]ertia</text></svg>
-                                <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 50%, transparent)' }}>ON · ACCENT</span>
+                                <span className="t-mono" style={{ color: 'color-mix(in oklab, currentColor 60%, transparent)' }}>ON · ACCENT</span>
                             </div>
                             <div className="logo-treat__cell logo-treat__cell--bad" style={{ background: 'var(--surface)', color: 'var(--fg-quiet)' }}>
                                 <svg height="16" viewBox="0 0 64 14" xmlns="http://www.w3.org/2000/svg"><text x="0" y="11" fontFamily="ui-monospace, 'SF Mono', Menlo, monospace" fontSize="12" fill="currentColor" opacity="0.4">[n]ertia</text></svg>

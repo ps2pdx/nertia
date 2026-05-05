@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <title>Nertia</title>
-  <rect width="32" height="32" fill="#0a0a0a"/>
-  <path d="M8 24V8h3.2l7.4 9.6V8H22v16h-3.2l-7.6-9.6V24H8Z" fill="#22ff00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>nertia</title>
+  <rect width="32" height="32" fill="#0c0c0c"/>
+  <text x="2" y="22" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" font-weight="500" fill="#f3f1ec">n<tspan fill="#15ef89">.</tspan><tspan fill="#80807a">[</tspan>n<tspan fill="#80807a">]</tspan></text>
 </svg>

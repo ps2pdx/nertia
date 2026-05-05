@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/butterfly-test',
+        destination: '/lab',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

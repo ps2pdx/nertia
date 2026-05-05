@@ -1,40 +1,67 @@
 import Link from 'next/link';
 import { getAllPosts } from '@/lib/blog';
-import PageTemplate from '@/components/PageTemplate';
+import Footer from '@/components/sections/Footer';
 
 export const revalidate = 60;
 
 export const metadata = {
-  title: 'Blog | Nertia',
-  description: 'Field notes and writing from Scott Campbell at Nertia.',
+    title: 'Field Notes — nertia',
+    description: 'Writing on applied AI GTM, brand systems, and propulsion-driven product work.',
 };
 
+function fmtDate(iso: string) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toISOString().slice(0, 10);
+}
+
 export default async function BlogIndex() {
-  const posts = await getAllPosts();
-  return (
-    <PageTemplate>
-      <div className="max-w-3xl mx-auto px-6 py-24">
-        <h1 className="text-5xl font-bold mb-4">Field Notes</h1>
-        <p className="text-[var(--muted-foreground)] mb-12">Raw writing from the workbench.</p>
-        <div className="flex flex-col gap-8">
-          {posts.map(post => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className="group block rounded-lg border border-[var(--card-border)] hover:border-[var(--accent)] transition overflow-hidden">
-              {post.hero && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={post.hero} alt={post.title} className="w-full aspect-video object-cover" />
-              )}
-              <div className="p-6">
-                <div className="text-sm text-[var(--muted-foreground)] mb-2">
-                  {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-                <h2 className="text-2xl font-semibold mb-2 group-hover:text-[var(--accent)] transition">{post.title}</h2>
-                <p className="text-[var(--muted-foreground)]">{post.excerpt}</p>
-              </div>
-            </Link>
-          ))}
-          {posts.length === 0 && <p className="text-[var(--muted-foreground)]">No posts yet.</p>}
-        </div>
-      </div>
-    </PageTemplate>
-  );
+    const posts = await getAllPosts();
+
+    return (
+        <>
+            <main className="blog-root">
+                <header className="blog-head">
+                    <div className="blog-head__eyebrow t-eyebrow">FIELD NOTES</div>
+                    <h1 className="blog-head__title">
+                        WRITING<span style={{ color: 'var(--accent)' }}>.</span>
+                    </h1>
+                    <p className="blog-head__sub">
+                        Raw output from the workbench. Applied AI GTM, brand systems, and the propulsion problems they solve.
+                    </p>
+                </header>
+
+                <ol className="blog-ticker" role="list">
+                    {posts.map((post, i) => {
+                        const num = String(i + 1).padStart(2, '0');
+                        return (
+                            <li key={post.slug} className="blog-ticker__row">
+                                <Link href={`/blog/${post.slug}`} className="blog-ticker__link">
+                                    <span className="blog-ticker__num">{num}</span>
+                                    <span className="blog-ticker__title">{post.title}</span>
+                                    <span className="blog-ticker__excerpt">{post.excerpt || ''}</span>
+                                    <span className="blog-ticker__route">
+                                        <span className="blog-ticker__date">{fmtDate(post.date)}</span>
+                                        <span className="blog-ticker__arrow" aria-hidden>↗</span>
+                                    </span>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ol>
+
+                {posts.length === 0 && (
+                    <div className="blog-empty">
+                        <span className="t-mono fg-quiet">{'// no posts yet — drafts brewing in /admin/notepad'}</span>
+                    </div>
+                )}
+
+                <footer className="blog-foot">
+                    <span className="blog-foot__bracket">[ FOR EDUCATIONAL PURPOSES ]</span>
+                    <span className="t-mono fg-quiet">{posts.length} entries · n.[ai] · portland</span>
+                </footer>
+            </main>
+            <Footer />
+        </>
+    );
 }

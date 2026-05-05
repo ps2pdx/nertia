@@ -1,90 +1,54 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { footerNavItems } from '@/lib/navigation';
+import { BrandWordmark } from '@/components/Brand';
+import { footerLinks } from '@/lib/navigation';
 
 export default function Footer() {
     return (
-        <footer className="w-full border-t border-[var(--card-border)]">
-            {/* Full-width grid layout - 3/9 to match other sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-12">
+        <footer className="ds-foot-global">
+            <div className="ds-foot-global__col">
+                <BrandWordmark size={20} />
+                <span className="t-mono fg-quiet">v1 · 2026 · PORTLAND, OR</span>
+                <span className="ds-foot-global__tag">FRAMEWORKS FOR PROPULSION.</span>
+            </div>
 
-                {/* Left column - Brand */}
-                <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--card-border)] p-8 pt-24 lg:p-12 lg:pt-24">
-                    <div className="lg:sticky lg:top-24">
-                        {/* Wordmark */}
-                        <div className="mb-8">
-                            <Image
-                                src="/wordmark-light.svg"
-                                alt="nertia.ai"
-                                width={90}
-                                height={18}
-                                className="hidden dark:block"
-                            />
-                            <Image
-                                src="/wordmark-dark.svg"
-                                alt="nertia.ai"
-                                width={90}
-                                height={18}
-                                className="block dark:hidden"
-                            />
-                        </div>
+            <div className="ds-foot-global__col">
+                <span className="t-eyebrow">LINKS</span>
+                <nav aria-label="Footer">
+                    {footerLinks.map((l) => (
+                        <Link key={l.id} href={l.href} className="ds-foot-global__link">
+                            {l.label}
+                        </Link>
+                    ))}
+                </nav>
+            </div>
 
-                        {/* Tagline */}
-                        <p className="text-xs tracking-[0.2em] uppercase text-muted">
-                            Identity in Motion
-                        </p>
-                    </div>
-                </div>
+            <div className="ds-foot-global__col">
+                <span className="t-eyebrow">CONNECT</span>
+                <a href="mailto:ps2pdx@gmail.com" className="ds-foot-global__link">ps2pdx@gmail.com</a>
+                <a
+                    href="https://linkedin.com/in/scottsuper"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ds-foot-global__link"
+                >
+                    LinkedIn ↗
+                </a>
+                <a
+                    href="https://github.com/ps2pdx"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ds-foot-global__link"
+                >
+                    GitHub ↗
+                </a>
+                <span className="t-mono fg-quiet ds-foot-global__rec">FT · contract · consult</span>
+            </div>
 
-                {/* Right column - Content */}
-                <div className="lg:col-span-9">
-
-                    {/* Navigation row */}
-                    <div className="border-b border-[var(--card-border)] p-8 lg:p-12">
-                        <span className="text-xs tracking-[0.2em] uppercase text-muted mb-6 block">Navigation</span>
-                        <nav className="flex flex-wrap gap-x-12 gap-y-4">
-                            {footerNavItems.map((link) => (
-                                <Link
-                                    key={link.label}
-                                    href={link.href}
-                                    className="text-sm tracking-wide transition-colors hover:text-muted"
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
-                        </nav>
-                    </div>
-
-                    {/* Contact & Social row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2">
-                        {/* Contact */}
-                        <div className="border-b sm:border-b-0 sm:border-r border-[var(--card-border)] p-8 lg:p-12">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted mb-6 block">Contact</span>
-                            <a
-                                href="mailto:ps2pdx@gmail.com"
-                                className="text-sm hover:text-muted transition-colors"
-                            >
-                                ps2pdx@gmail.com
-                            </a>
-                        </div>
-
-                        {/* Social & Copyright */}
-                        <div className="p-8 lg:p-12">
-                            <span className="text-xs tracking-[0.2em] uppercase text-muted mb-6 block">Connect</span>
-                            <div className="flex items-center justify-between">
-                                <a
-                                    href="https://linkedin.com/in/scottsuper"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm hover:text-muted transition-colors"
-                                >
-                                    LinkedIn ↗
-                                </a>
-                                <span className="text-xs text-muted">© 2026</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="ds-foot-global__bar">
+                <span className="t-mono fg-quiet">© 2026 Scott Campbell · n.[ertia]</span>
+                <Link href="/design-system" className="t-mono ds-foot-global__bar-link">
+                    DESIGN SYSTEM ↗
+                </Link>
             </div>
         </footer>
     );
