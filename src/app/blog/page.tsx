@@ -47,21 +47,23 @@ export default async function BlogIndex() {
                                         </span>
                                     </div>
                                     <div className="blog-ticker__detail" aria-hidden="true">
-                                        {post.hero ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img src={post.hero} alt="" className="blog-ticker__hero" loading="lazy" />
-                                        ) : (
-                                            <div className="blog-ticker__hero blog-ticker__hero--placeholder">
-                                                <span className="t-mono fg-quiet">{`// no hero`}</span>
-                                            </div>
-                                        )}
-                                        <div className="blog-ticker__summary">
-                                            <p>{post.excerpt || 'Field notes — no summary yet.'}</p>
+                                        <div className="blog-ticker__detail-pad" />
+                                        <div className="blog-ticker__tags-cell">
                                             {post.tags?.length > 0 && (
                                                 <div className="blog-ticker__tags">
                                                     {post.tags.slice(0, 3).map((tag) => (
                                                         <span key={tag} className="blog-ticker__tag">{tag}</span>
                                                     ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="blog-ticker__image-cell">
+                                            {post.hero ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={post.hero} alt="" className="blog-ticker__hero" loading="lazy" />
+                                            ) : (
+                                                <div className="blog-ticker__hero blog-ticker__hero--placeholder">
+                                                    <span className="t-mono fg-quiet">{`// no hero`}</span>
                                                 </div>
                                             )}
                                         </div>

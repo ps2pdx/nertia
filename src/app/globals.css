@@ -343,32 +343,34 @@ code, pre, kbd, samp {
   color: var(--accent);
 }
 
-/* Hover-reveal detail panel — image + summary + read-more.
-   Uses grid-template-rows 0fr -> 1fr for animatable height without
-   measuring content. Inner element clips overflow to keep the
-   reveal smooth. */
+/* Hover-reveal detail panel — tags + hero image + read-more.
+   Mirrors the compact row's grid so each cell aligns with the column
+   above it (tags under title, image under excerpt, CTA under date).
+   No divider between compact + detail — the parent link's hover bg
+   covers both, so they read as one expanded card. */
 .blog-ticker__detail {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr) auto;
-  align-items: center;
+  grid-template-columns: 64px minmax(0, 1.4fr) minmax(0, 1.6fr) auto;
+  align-items: start;
   gap: var(--s-6);
-  padding: 0 var(--s-4);
   max-height: 0;
   opacity: 0;
   overflow: hidden;
+  padding: 0 0;
   transition: max-height var(--d-3) var(--e-in-out), opacity var(--d-2) var(--e-out), padding var(--d-3) var(--e-in-out);
-  border-top: var(--w-hair) solid transparent;
-  background: color-mix(in oklab, var(--accent) 3%, transparent);
 }
 .blog-ticker__link:hover .blog-ticker__detail,
 .blog-ticker__link:focus-visible .blog-ticker__detail {
-  max-height: 220px;
+  max-height: 200px;
   opacity: 1;
-  padding: var(--s-4);
-  border-top-color: var(--line);
+  padding: 0 0 var(--s-6) 0;
 }
+.blog-ticker__detail-pad { /* fills column 1 (under num) */ }
+.blog-ticker__tags-cell { display: flex; align-items: flex-start; min-width: 0; }
+.blog-ticker__image-cell { display: flex; align-items: flex-start; min-width: 0; }
 .blog-ticker__hero {
-  width: 200px; height: 120px;
+  display: block;
+  width: 240px; height: 140px;
   object-fit: cover;
   border: var(--w-hair) solid var(--line);
   background: var(--surface);
@@ -379,19 +381,6 @@ code, pre, kbd, samp {
     linear-gradient(to right, var(--line-soft) 1px, transparent 1px) 0 0 / 16px 16px,
     linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px) 0 0 / 16px 16px,
     var(--surface);
-}
-.blog-ticker__summary {
-  display: flex; flex-direction: column; gap: var(--s-3);
-  min-width: 0;
-}
-.blog-ticker__summary p {
-  margin: 0;
-  font-family: var(--f-body); font-size: 14px; line-height: 1.55;
-  color: var(--fg-muted);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 .blog-ticker__tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .blog-ticker__tag {
@@ -410,6 +399,7 @@ code, pre, kbd, samp {
   border: var(--w-struct) solid var(--accent);
   white-space: nowrap;
   transition: background var(--d-1) var(--e-out), color var(--d-1) var(--e-out);
+  align-self: center;
 }
 .blog-ticker__link:hover .blog-ticker__cta {
   background: transparent;
@@ -442,13 +432,17 @@ code, pre, kbd, samp {
   .blog-ticker__num { grid-row: span 2; }
   .blog-ticker__excerpt { grid-column: 2 / -1; -webkit-line-clamp: 1; }
   .blog-ticker__detail {
-    grid-template-columns: 160px minmax(0, 1fr);
+    grid-template-columns: 40px minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
+    gap: var(--s-3) var(--s-4);
   }
-  .blog-ticker__hero { width: 160px; height: 100px; }
-  .blog-ticker__cta { grid-column: 2; justify-self: start; }
+  .blog-ticker__detail-pad { grid-row: span 2; }
+  .blog-ticker__tags-cell { grid-column: 2; grid-row: 1; }
+  .blog-ticker__image-cell { grid-column: 2 / -1; grid-row: 2; }
+  .blog-ticker__cta { grid-column: 3; grid-row: 1; }
+  .blog-ticker__hero { width: 200px; height: 120px; }
   .blog-ticker__link:hover .blog-ticker__detail,
-  .blog-ticker__link:focus-visible .blog-ticker__detail { max-height: 280px; }
+  .blog-ticker__link:focus-visible .blog-ticker__detail { max-height: 240px; }
 }
 @media (max-width: 768px) {
   .blog-root { padding: var(--s-6) var(--s-4); }
@@ -457,12 +451,18 @@ code, pre, kbd, samp {
   .blog-ticker__title { font-size: clamp(22px, 6vw, 32px); }
   .blog-ticker__excerpt { font-size: 11px; }
   .blog-ticker__route { font-size: 10px; gap: 8px; }
-  /* On phone, hover doesn't really exist — keep the detail compact and
-     skip the image. Use :focus-within so tap-and-hold still reveals. */
-  .blog-ticker__detail { grid-template-columns: 1fr; gap: var(--s-3); }
-  .blog-ticker__hero { display: none; }
+  /* Phone — hover doesn't really exist; keep the reveal compact: skip
+     the image, just show tags + READ MORE under the row. */
+  .blog-ticker__detail {
+    grid-template-columns: 32px 1fr auto;
+    gap: var(--s-2) var(--s-3);
+  }
+  .blog-ticker__detail-pad { display: none; }
+  .blog-ticker__tags-cell { grid-column: 2; }
+  .blog-ticker__image-cell { display: none; }
+  .blog-ticker__cta { grid-column: 3; padding: 6px 10px; font-size: 10px; }
   .blog-ticker__link:hover .blog-ticker__detail,
-  .blog-ticker__link:focus-visible .blog-ticker__detail { max-height: 200px; }
+  .blog-ticker__link:focus-visible .blog-ticker__detail { max-height: 80px; padding-bottom: var(--s-3); }
 }
 
 /* ============= FAQ — TERMINAL / CONSOLE ============= */
