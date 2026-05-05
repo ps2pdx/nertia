@@ -49,8 +49,12 @@
   --fg:          var(--paper-900);
   --fg-muted:    var(--ink-200);
   --fg-quiet:    var(--ink-300);
-  --accent:      var(--signal-seafoam);
-  --accent-fg:   var(--ink-1000);              /* paint that sits on var(--accent) */
+  --accent:      var(--signal-red);            /* primary brand accent */
+  --accent-fg:   var(--paper-900);             /* paint that sits on var(--accent) */
+  /* Seafoam stays in the system as the "live / go / propulsion" semantic —
+     wordmark period, success/live indicators, in-motion status. Reach for it
+     when the meaning is forward motion, not when the meaning is "this is
+     interactive / branded". */
 
   /* type — next/font sets --font-* on <body>; these root fallbacks make
      the var() chain resolve when read from root (e.g. computed style
@@ -98,7 +102,7 @@
   --background:   var(--bg);
   --foreground:   var(--fg);
   --muted:        var(--fg-muted);
-  --accent-hover: var(--signal-seafoam-2);
+  --accent-hover: var(--signal-red-2);
   --card-bg:      var(--surface);
   --card-border:  var(--line);
   --font-heading: var(--f-display);
@@ -106,7 +110,8 @@
   --header-height: 88px;
 }
 
-/* LIGHT MODE — invert ink/paper roles, swap accent to deeper seafoam for contrast */
+/* LIGHT MODE — invert ink/paper roles. Red accent works the same in both
+   modes (~5:1 on dark, ~4.5:1 on paper) so no two-variant gymnastics. */
 :root[data-theme="light"] {
   --bg:        var(--paper-900);
   --surface:   var(--paper-1000);
@@ -116,7 +121,7 @@
   --fg:        var(--ink-900);
   --fg-muted:  var(--ink-500);
   --fg-quiet:  var(--ink-400);
-  --accent:    var(--signal-seafoam-deep);
+  --accent:    var(--signal-red);
   --accent-fg: var(--paper-1000);
 }
 
@@ -131,7 +136,7 @@
     --fg:        var(--ink-900);
     --fg-muted:  var(--ink-500);
     --fg-quiet:  var(--ink-400);
-    --accent:    var(--signal-seafoam-deep);
+    --accent:    var(--signal-red);
     --accent-fg: var(--paper-1000);
   }
 }

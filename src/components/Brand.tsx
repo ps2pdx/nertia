@@ -75,7 +75,7 @@ export function BrandIcon({
 
 export function BrandWordmark({
     size = 14,
-    accentColor = 'var(--accent)',
+    accentColor = 'var(--signal-seafoam)',
     title = 'nertia.ai',
     style,
     className,
@@ -120,7 +120,7 @@ export function BrandWordmark({
 
 export function BrandStack({
     size = 32,
-    accentColor = 'var(--accent)',
+    accentColor = 'var(--signal-seafoam)',
     title = 'nertia.ai',
     style,
     className,
