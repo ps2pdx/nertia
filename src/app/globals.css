@@ -992,7 +992,7 @@ code, pre, kbd, samp {
 /* Inline per-slide CTA — small mono link below the caption. */
 .hero-slide__cta {
   display: inline-block;
-  margin-top: var(--s-4);
+  margin-top: var(--s-8);
   font-family: var(--f-mono);
   font-size: 11px;
   letter-spacing: 0.16em;
