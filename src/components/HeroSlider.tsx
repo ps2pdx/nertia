@@ -70,11 +70,17 @@ export default function HeroSlider() {
     useEffect(() => {
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduce) return;
+        // Restart the auto-advance timer whenever `active` changes,
+        // including manual clicks — gives the user a fresh full
+        // SLIDE_DURATION_MS to read after navigating.
         const id = window.setInterval(() => {
             setActive((a) => (a + 1) % SLIDES.length);
         }, SLIDE_DURATION_MS);
         return () => window.clearInterval(id);
-    }, []);
+    }, [active]);
+
+    const goPrev = () => setActive((a) => (a - 1 + SLIDES.length) % SLIDES.length);
+    const goNext = () => setActive((a) => (a + 1) % SLIDES.length);
 
     const slide = SLIDES[active];
 
@@ -139,16 +145,34 @@ export default function HeroSlider() {
                 );
             })}
 
-            <div className="hero-slider__dots" aria-hidden>
-                {SLIDES.map((s, i) => (
-                    <button
-                        key={s.id}
-                        type="button"
-                        className={`hero-slider__dot ${i === active ? 'is-active' : ''}`}
-                        onClick={() => setActive(i)}
-                        aria-label={`Show slide ${i + 1}`}
-                    />
-                ))}
+            <div className="hero-slider__controls" role="group" aria-label="Slide navigation">
+                <button
+                    type="button"
+                    className="hero-slider__arrow"
+                    onClick={goPrev}
+                    aria-label="Previous slide"
+                >
+                    ←
+                </button>
+                <div className="hero-slider__dots">
+                    {SLIDES.map((s, i) => (
+                        <button
+                            key={s.id}
+                            type="button"
+                            className={`hero-slider__dot ${i === active ? 'is-active' : ''}`}
+                            onClick={() => setActive(i)}
+                            aria-label={`Show slide ${i + 1}`}
+                        />
+                    ))}
+                </div>
+                <button
+                    type="button"
+                    className="hero-slider__arrow"
+                    onClick={goNext}
+                    aria-label="Next slide"
+                >
+                    →
+                </button>
             </div>
         </section>
     );
