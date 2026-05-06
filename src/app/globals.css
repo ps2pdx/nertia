@@ -864,24 +864,45 @@ code, pre, kbd, samp {
   z-index: 2;
 }
 
-/* Copy slide-in/slide-out. The active slide's content sits center;
-   the slide that just left has its content parked off-left ('past');
-   future slides wait off-right ('future'). The cubic-bezier is a
-   strong ease-out — motion starts fast and decelerates into place,
-   reading as fast → slowmo. Backgrounds keep their opacity crossfade
-   only; the slide motion is text-only. */
-.hero-slide__content {
+/* Copy slide-in/slide-out. Headline + CTA come in from the right and
+   exit left; caption goes the opposite way, with a slightly slower /
+   delayed timing so the two motions feel layered rather than synced.
+   Both use strong ease-out curves so each motion starts fast and
+   decelerates into place — reads as fast → slowmo. Backgrounds keep
+   their opacity crossfade only; the slide motion is text-only. */
+.hero-slide__content .home-hero__title,
+.hero-slide__content .hero-slide__cta {
   transition: transform 640ms cubic-bezier(0.16, 0.84, 0.24, 1);
   will-change: transform;
 }
-.hero-slide[data-state="active"] .hero-slide__content {
+.hero-slide[data-state="active"] .home-hero__title,
+.hero-slide[data-state="active"] .hero-slide__cta {
   transform: translateX(0);
 }
-.hero-slide[data-state="past"] .hero-slide__content {
+.hero-slide[data-state="past"] .home-hero__title,
+.hero-slide[data-state="past"] .hero-slide__cta {
   transform: translateX(-100%);
 }
-.hero-slide[data-state="future"] .hero-slide__content {
+.hero-slide[data-state="future"] .home-hero__title,
+.hero-slide[data-state="future"] .hero-slide__cta {
   transform: translateX(100%);
+}
+
+/* Caption goes the opposite direction (enters from left, exits right)
+   with a slightly slower duration and a small starting delay, so it
+   counters the headline rather than tracking it. */
+.hero-slide__content .home-hero__sub {
+  transition: transform 800ms cubic-bezier(0.12, 0.88, 0.22, 1) 80ms;
+  will-change: transform;
+}
+.hero-slide[data-state="active"] .home-hero__sub {
+  transform: translateX(0);
+}
+.hero-slide[data-state="past"] .home-hero__sub {
+  transform: translateX(100%);
+}
+.hero-slide[data-state="future"] .home-hero__sub {
+  transform: translateX(-100%);
 }
 .hero-slide__bg {
   position: absolute;
