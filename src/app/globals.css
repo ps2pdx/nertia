@@ -748,12 +748,219 @@ code, pre, kbd, samp {
   min-height: calc(100vh - var(--header-height));
   display: flex; flex-direction: column;
   overflow-x: clip;
+  position: relative;
+}
+
+.double-slit-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.double-slit-field canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.home-hero,
+.home-fork,
+.home-ticker {
+  position: relative;
+  z-index: 1;
 }
 
 .home-hero {
   padding: var(--s-16) var(--s-8) var(--s-12);
   border-bottom: var(--w-hair) solid var(--line);
   position: relative;
+}
+
+/* ── Splash double-slit (one-shot intro) ──────────────────────── */
+.splash-hero {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 800ms var(--e-out, cubic-bezier(0.2, 0, 0.2, 1));
+  overflow: hidden;
+  isolation: isolate;
+}
+.splash-hero.is-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.splash-hero__content {
+  position: relative;
+  z-index: 2;
+  padding: var(--s-16) var(--s-8) var(--s-12);
+  pointer-events: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.splash-hero__skip {
+  position: absolute;
+  bottom: var(--s-6);
+  right: var(--s-8);
+  z-index: 3;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 6px 14px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--d-1) var(--e-out), color var(--d-1) var(--e-out);
+}
+.splash-hero__skip:hover {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+/* Marker class on the I — no visual style, just a query target. */
+.home-hero__title-i { color: inherit; }
+
+@media (max-width: 768px) {
+  .splash-hero__content { padding: var(--s-8) var(--s-4); }
+  .splash-hero__skip { bottom: var(--s-4); right: var(--s-4); }
+}
+
+/* ── Hero auto-slider ─────────────────────────────────────────── */
+.hero-slider {
+  position: relative;
+  border-bottom: var(--w-hair) solid var(--line);
+  overflow: hidden;
+  isolation: isolate;
+  /* Reserve hero height even with all slides absolute. */
+  min-height: clamp(420px, 75vh, 880px);
+  display: flex;
+  flex-direction: column;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--d-3, 600ms) var(--e-out, ease);
+}
+.hero-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+.hero-slide__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.hero-slide__bg .hero-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero-slide__content {
+  position: relative;
+  z-index: 2;
+  /* Top padding accommodates the extracted eyebrow that sits above each
+     slide (eyebrow row ≈ 20px + var(--s-6) margin gap = ~44px), so we
+     bump from var(--s-16) (64px) to var(--s-24) (96px). */
+  padding: var(--s-24) var(--s-8) var(--s-12);
+  pointer-events: none;
+}
+.hero-slide__content > * { pointer-events: auto; }
+
+/* Shared eyebrow lifted out of individual slides so a single role span
+   can collapse-out / expand-in across slide changes. */
+.hero-slider__eyebrow {
+  position: absolute;
+  top: var(--s-16);
+  left: var(--s-8);
+  right: var(--s-8);
+  z-index: 4;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+.hero-slider__eyebrow > * { pointer-events: auto; }
+
+/* Split-flap / rotary-flipper eyebrow animation. Each character is a
+   .eyebrow-flap span that rotates around its horizontal axis with a
+   stagger delay, giving the line a mechanical solari-board flip feel
+   on slide change. */
+.home-hero__role {
+  display: inline-block;
+  white-space: nowrap;
+  perspective: 600px;
+}
+.eyebrow-flap {
+  display: inline-block;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  white-space: pre;
+}
+.hero-eyebrow-role-flipping-out .eyebrow-flap {
+  animation: heroEyebrowFlapOut 280ms cubic-bezier(0.55, 0, 0.7, 0.95) both;
+}
+.hero-eyebrow-role-flipping-in .eyebrow-flap {
+  animation: heroEyebrowFlapIn 320ms cubic-bezier(0.25, 0.55, 0.3, 1) both;
+}
+@keyframes heroEyebrowFlapOut {
+  from { transform: rotateX(0deg);   opacity: 1; }
+  to   { transform: rotateX(-90deg); opacity: 0; }
+}
+@keyframes heroEyebrowFlapIn {
+  from { transform: rotateX(90deg); opacity: 0; }
+  to   { transform: rotateX(0deg);  opacity: 1; }
+}
+
+.hero-slider__dots {
+  position: absolute;
+  bottom: var(--s-4);
+  right: var(--s-8);
+  z-index: 3;
+  display: flex;
+  gap: var(--s-2);
+}
+.hero-slider__dot {
+  appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--fg) 30%, transparent);
+  width: 8px; height: 8px;
+  padding: 0;
+  cursor: pointer;
+  transition: background var(--d-1) var(--e-out), border-color var(--d-1) var(--e-out);
+}
+.hero-slider__dot.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.hero-slider__dot:hover {
+  border-color: var(--accent);
+}
+
+@media (max-width: 1024px) {
+  /* var(--s-12) + ~36px → ~84px ≈ var(--s-16) + var(--s-3) */
+  .hero-slide__content { padding: calc(var(--s-16) + var(--s-3)) var(--s-6) var(--s-12); }
+  .hero-slider__eyebrow { top: var(--s-12); left: var(--s-6); right: var(--s-6); }
+}
+@media (max-width: 768px) {
+  .hero-slider { min-height: 60vh; }
+  /* var(--s-8) + ~36px → ~68px ≈ var(--s-16) + var(--s-1) */
+  .hero-slide__content { padding: calc(var(--s-16) + var(--s-1)) var(--s-4) var(--s-8); }
+  .hero-slider__eyebrow { top: var(--s-8); left: var(--s-4); right: var(--s-4); }
+  .hero-slider__dots { right: var(--s-4); bottom: var(--s-3); }
 }
 .home-hero__eyebrow {
   display: flex; align-items: center; gap: var(--s-3);
@@ -782,11 +989,32 @@ code, pre, kbd, samp {
   color: var(--fg-muted); letter-spacing: 0.02em;
 }
 
+/* Inline per-slide CTA — small mono link below the caption. */
+.hero-slide__cta {
+  display: inline-block;
+  margin-top: var(--s-8);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+  padding-bottom: 2px;
+  transition: opacity var(--d-1, 120ms) var(--e-out, ease),
+              border-color var(--d-1, 120ms) var(--e-out, ease);
+}
+.hero-slide__cta:hover {
+  opacity: 0.85;
+  border-color: var(--accent);
+}
+
 .home-fork {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
   border-bottom: var(--w-hair) solid var(--line);
+  flex: 1 1 auto;
 }
 .home-fork__card {
   display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-6);
@@ -809,7 +1037,7 @@ code, pre, kbd, samp {
 .home-fork__card[data-tone="accent"] {
   background: var(--bg);
   color: var(--fg);
-  border-left: var(--w-loud) solid var(--accent);
+  border-left: var(--w-loud) solid #facc15;
 }
 .home-fork__card[data-tone="accent"]:hover {
   background: color-mix(in oklab, var(--accent) 8%, var(--bg));
