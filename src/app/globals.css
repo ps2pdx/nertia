@@ -1011,22 +1011,30 @@ code, pre, kbd, samp {
   display: block;
 }
 
+/* The figure is the SVG silhouette rendered as a CSS mask. The fill
+   color comes from background-color (= var(--accent)), so the figure
+   tracks the theme automatically and we avoid the XML/innerHTML
+   pitfalls of inlining a potrace SVG. Positioned to the right ~half
+   of the slide so the headline reads cleanly. */
 .portrait-bg__figure {
   position: absolute;
-  inset: 0;
+  top: 4%;
+  right: var(--s-8, 32px);
+  bottom: 4%;
+  width: 50%;
+  max-width: 720px;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  background-color: var(--accent);
+  -webkit-mask-image: url('/scott-portrait-blueprint.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-position: right center;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: url('/scott-portrait-blueprint.svg');
+  mask-size: contain;
+  mask-position: right center;
+  mask-repeat: no-repeat;
+  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 28%, transparent));
   animation: portraitBreathe 7s var(--e-in-out, ease-in-out) infinite;
-}
-.portrait-bg__figure svg {
-  display: block;
-  height: 96%;
-  width: auto;
-  max-width: 52%;
-  margin-right: var(--s-8, 32px);
-  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 30%, transparent));
 }
 @keyframes portraitBreathe {
   0%, 100% { opacity: 0.92; transform: translateY(0); }
@@ -1034,8 +1042,11 @@ code, pre, kbd, samp {
 }
 
 @media (max-width: 768px) {
-  .portrait-bg__figure svg { max-width: 80%; margin-right: 0; }
-  .portrait-bg__figure { justify-content: center; }
+  .portrait-bg__figure {
+    width: 80%;
+    right: 10%;
+    left: 10%;
+  }
   .portrait-bg { opacity: 0.18; }
 }
 
