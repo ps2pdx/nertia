@@ -842,7 +842,9 @@ code, pre, kbd, samp {
 .hero-slider {
   position: relative;
   border-bottom: var(--w-hair) solid var(--line);
-  overflow: hidden;
+  /* No overflow clipping — slide-1 portrait deliberately overhangs
+     the bottom edge so it pops out over the fork section below. */
+  overflow: visible;
   isolation: isolate;
   /* Reserve hero height even with all slides absolute. */
   min-height: clamp(420px, 75vh, 880px);
@@ -864,7 +866,9 @@ code, pre, kbd, samp {
 .hero-slide__bg {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  /* No z-index here — let inner figures choose their own stacking
+     order vs. the .hero-slide__content text. */
+  overflow: visible;
 }
 .hero-slide__bg .hero-bg {
   display: block;
@@ -1013,30 +1017,35 @@ code, pre, kbd, samp {
 
 /* The figure is the SVG silhouette rendered as a CSS mask. Two stacked
    copies: a colored base (var(--accent)) and a white highlight nudged
-   slightly up-left so the line drawing reads as offset-printed —
-   gives the figure visual punch and depth. */
+   slightly up-left so the line drawing reads as offset-printed.
+   Anchored flush bottom-right and oversized so it overhangs the
+   slider's bottom border, layering on top of the section below.
+   z-index above .hero-slide__content (z: 2) so the figure pops over
+   the headline. */
 .portrait-bg__figure {
   position: absolute;
-  top: 4%;
-  right: var(--s-8, 32px);
-  bottom: 4%;
-  width: 50%;
-  max-width: 720px;
-  z-index: 2;
+  top: auto;
+  right: 0;
+  bottom: -8%;
+  left: auto;
+  width: 62%;
+  height: 110%;
+  max-width: 880px;
+  z-index: 5;
   background-color: var(--accent);
   -webkit-mask-image: url('/scott-portrait-blueprint.svg');
   -webkit-mask-size: contain;
-  -webkit-mask-position: right center;
+  -webkit-mask-position: bottom right;
   -webkit-mask-repeat: no-repeat;
   mask-image: url('/scott-portrait-blueprint.svg');
   mask-size: contain;
-  mask-position: right center;
+  mask-position: bottom right;
   mask-repeat: no-repeat;
   filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 28%, transparent));
   animation: portraitBreathe 7s var(--e-in-out, ease-in-out) infinite;
 }
 .portrait-bg__figure--top {
-  z-index: 3;
+  z-index: 6;
   background-color: #f3f1ec; /* paper-900 — off-white highlight */
   /* `translate` is a composited transform property — composes with
      the keyframe's transform without overriding it, so the breathe
@@ -1051,12 +1060,13 @@ code, pre, kbd, samp {
 
 @media (max-width: 768px) {
   .portrait-bg__figure {
-    width: 80%;
-    right: 10%;
-    left: 10%;
+    width: 78%;
+    height: 105%;
+    bottom: -6%;
   }
   .portrait-bg__figure--top { translate: -4px -3px; }
-  .portrait-bg { opacity: 0.18; }
+  /* Mobile keeps the figure visible so it still pops; the headline
+     reads down-left of it. */
 }
 
 /* Inline per-slide CTA — small mono link below the caption. */
