@@ -36,8 +36,9 @@ const SLIDES: Slide[] = [
 ];
 
 const SLIDE_DURATION_MS = 12000;
-const COLLAPSE_MS = 320;
-const EXPAND_MS = 450;
+const FLIP_OUT_MS = 280;
+const FLIP_IN_MS = 320;
+const FLIP_STAGGER_MS = 12;
 
 export default function HeroSlider() {
     const [active, setActive] = useState(0);
@@ -108,8 +109,11 @@ export default function HeroSlider() {
     );
 }
 
-type Phase = 'idle' | 'collapsing' | 'expanding';
+type Phase = 'idle' | 'flipping-out' | 'flipping-in';
 
+// Split-flap / solari-board style flip animation. Each character flips
+// independently around its horizontal axis with a staggered delay across
+// the line, like a mechanical rotary display.
 function EyebrowRole({ value }: { value: string }) {
     const [displayed, setDisplayed] = useState(value);
     const [phase, setPhase] = useState<Phase>('idle');
@@ -125,17 +129,20 @@ function EyebrowRole({ value }: { value: string }) {
             return;
         }
 
-        // Cancel any in-flight transition before starting a new one.
         timersRef.current.forEach((id) => window.clearTimeout(id));
         timersRef.current = [];
 
-        setPhase('collapsing');
+        // Stage 1: flip the existing chars out. Total length includes the
+        // last char's stagger delay.
+        setPhase('flipping-out');
+        const outTotal = FLIP_OUT_MS + Math.max(displayed.length - 1, 0) * FLIP_STAGGER_MS;
         const swapId = window.setTimeout(() => {
             setDisplayed(value);
-            setPhase('expanding');
-            const settleId = window.setTimeout(() => setPhase('idle'), EXPAND_MS);
+            setPhase('flipping-in');
+            const inTotal = FLIP_IN_MS + Math.max(value.length - 1, 0) * FLIP_STAGGER_MS;
+            const settleId = window.setTimeout(() => setPhase('idle'), inTotal);
             timersRef.current.push(settleId);
-        }, COLLAPSE_MS);
+        }, outTotal);
         timersRef.current.push(swapId);
 
         return () => {
@@ -146,7 +153,15 @@ function EyebrowRole({ value }: { value: string }) {
 
     return (
         <span className={`home-hero__role hero-eyebrow-role-${phase}`}>
-            {displayed}
+            {[...displayed].map((c, i) => (
+                <span
+                    key={i}
+                    className="eyebrow-flap"
+                    style={{ animationDelay: `${i * FLIP_STAGGER_MS}ms` }}
+                >
+                    {c === ' ' ? ' ' : c}
+                </span>
+            ))}
         </span>
     );
 }
