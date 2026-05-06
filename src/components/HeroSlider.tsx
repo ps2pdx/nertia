@@ -20,7 +20,7 @@ const SLIDES: Slide[] = [
     },
     {
         id: 'topo',
-        headline: { line1: 'SIGNAL', line2: 'FROM THE', line3: 'VOID', line3Mark: '.' },
+        headline: { line1: 'ZERO-POINT GEN', line2: 'WEB &', line3: 'DESIGN SYS', line3Mark: '.' },
         Background: TopoBackground,
     },
 ];
