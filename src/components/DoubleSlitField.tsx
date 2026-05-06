@@ -10,8 +10,9 @@ type Particle = {
     r: number;
     life: number;
     decay: number;
-    phase: 'fall' | 'through' | 'blocked';
+    phase: 'fall' | 'through' | 'blocked' | 'settled';
     targetX: number | null;
+    bucket?: number;
 };
 
 const SLIT_W = 36;
@@ -20,8 +21,11 @@ const SLIT_W = 36;
 const SLIT_OFFSET_PX = 32;
 const TARGET_LEFT_FRAC = 0.22;
 const TARGET_RIGHT_FRAC = 0.78;
-const MAX_PARTICLES = 350;
+const MAX_PARTICLES = 600;
 const MOBILE_BREAKPOINT = 768;
+const BUCKET_W = 4;
+// Each settled particle adds this much to its bucket's pile height.
+const PILE_INCREMENT = 1.6;
 
 export default function DoubleSlitField() {
     const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -40,6 +44,7 @@ export default function DoubleSlitField() {
         if (!root) return;
 
         const hero = root.querySelector<HTMLElement>('.home-hero');
+        const fork = root.querySelector<HTMLElement>('.home-fork');
         heroRef.current = hero;
 
         const reduceMotionMql = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -67,10 +72,13 @@ export default function DoubleSlitField() {
         let H = 0;
         let dpr = Math.min(window.devicePixelRatio || 1, 2);
         let lineY = 0;
+        let floorY = 0;
         let slit1cx = 0;
         let slit2cx = 0;
+        let maxPileHeight = 0;
         const slitHw = SLIT_W / 2;
         let particles: Particle[] = [];
+        let heightField = new Float32Array(0);
         let frameCount = 0;
         let raf = 0;
         let mouseX = -9999;
@@ -96,9 +104,22 @@ export default function DoubleSlitField() {
                 lineY = H * 0.55;
             }
 
+            // Floor = bottom of the fork section so piles build inside the CTAs.
+            if (fork) {
+                const forkRect = fork.getBoundingClientRect();
+                floorY = forkRect.bottom - rect.top;
+            } else {
+                floorY = H;
+            }
+
+            // Cap pile height at ~70% of the CTA panel height so piles stay
+            // visually bounded and don't reach back up to the slit line.
+            maxPileHeight = Math.max(60, (floorY - lineY) * 0.7);
+
             slit1cx = W / 2 - SLIT_OFFSET_PX;
             slit2cx = W / 2 + SLIT_OFFSET_PX;
             particles = [];
+            heightField = new Float32Array(Math.ceil(W / BUCKET_W));
         };
 
         const onMove = (e: MouseEvent) => {
@@ -170,7 +191,15 @@ export default function DoubleSlitField() {
             const alive: Particle[] = [];
             for (const p of particles) {
                 p.life -= p.decay;
-                if (p.life <= 0.01 || p.y > H + 30) continue;
+                if (p.life <= 0.01 || p.y > H + 30) {
+                    if (p.bucket !== undefined && heightField.length > p.bucket) {
+                        heightField[p.bucket] = Math.max(
+                            0,
+                            heightField[p.bucket] - PILE_INCREMENT,
+                        );
+                    }
+                    continue;
+                }
 
                 if (p.phase === 'fall') {
                     p.vy = Math.min(p.vy + 0.012, 2.0);
@@ -197,8 +226,27 @@ export default function DoubleSlitField() {
                     p.vy = Math.min(p.vy + 0.025, 3);
                     p.x += p.vx;
                     p.y += p.vy;
+
+                    // Pile settling: land on top of whatever's already at this x.
+                    const bucket = Math.max(
+                        0,
+                        Math.min(heightField.length - 1, Math.floor(p.x / BUCKET_W)),
+                    );
+                    const pileTopY = floorY - heightField[bucket];
+                    if (p.y >= pileTopY) {
+                        p.y = pileTopY;
+                        p.vx = 0;
+                        p.vy = 0;
+                        p.phase = 'settled';
+                        p.bucket = bucket;
+                        // Slow fade so the pile breathes rather than freezing.
+                        p.decay = 0.0008 + Math.random() * 0.0008;
+                        if (heightField[bucket] < maxPileHeight) {
+                            heightField[bucket] += PILE_INCREMENT;
+                        }
+                    }
                 }
-                // 'blocked' particles just sit and fade
+                // 'blocked' and 'settled' particles hold position and fade.
 
                 alive.push(p);
             }

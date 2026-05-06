@@ -56,14 +56,6 @@ export default function HomeDiptych() {
                 </Link>
             </section>
 
-            <section className="home-ticker" aria-label="Status">
-                <span className="home-ticker__pulse" aria-hidden />
-                <span>n.[ertia] · v1 · 2026.05 · live · portland</span>
-                <span className="home-ticker__rule" aria-hidden />
-                <Link href="/services" className="home-ticker__link">SERVICES ↗</Link>
-                <Link href="/resume" className="home-ticker__link">RESUME ↗</Link>
-                <Link href="/lab" className="home-ticker__link">LAB ↗</Link>
-            </section>
         </main>
     );
 }

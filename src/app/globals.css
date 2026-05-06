@@ -774,6 +774,7 @@ code, pre, kbd, samp {
   padding: var(--s-16) var(--s-8) var(--s-12);
   border-bottom: var(--w-hair) solid var(--line);
   position: relative;
+  cursor: crosshair;
 }
 .home-hero__eyebrow {
   display: flex; align-items: center; gap: var(--s-3);
@@ -807,6 +808,7 @@ code, pre, kbd, samp {
   grid-template-columns: 1fr 1fr;
   gap: 0;
   border-bottom: var(--w-hair) solid var(--line);
+  flex: 1 1 auto;
 }
 .home-fork__card {
   display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-6);
