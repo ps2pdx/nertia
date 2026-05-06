@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import GridBackground from '@/components/hero-bg/GridBackground';
 import TopoBackground from '@/components/hero-bg/TopoBackground';
+import EyeBackground from '@/components/hero-bg/EyeBackground';
 
-type SlideId = 'grid' | 'topo';
+type SlideId = 'grid' | 'topo' | 'eye';
 
 type Slide = {
     id: SlideId;
@@ -25,6 +26,12 @@ const SLIDES: Slide[] = [
         headline: { line1: 'ZERO-POINT', line2: 'WEB &', line3: 'TOKENS', line3Mark: '.' },
         eyebrowRole: 'FULL-STACK · DESIGN SYSTEMS · AI-NATIVE',
         Background: TopoBackground,
+    },
+    {
+        id: 'eye',
+        headline: { line1: 'SYNCHRONIZE', line2: 'THE', line3: 'OBSERVATION', line3Mark: '.' },
+        eyebrowRole: 'PARTICLE · WAVE · ENTANGLEMENT',
+        Background: EyeBackground,
     },
 ];
 
