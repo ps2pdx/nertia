@@ -126,7 +126,90 @@ export default function PortraitBackground({ active }: Props) {
             ctx.strokeStyle = `rgba(${strokeRgb}, 0.12)`;
             ctx.stroke();
 
+            // Floating waypoint marker — wireframe square bipyramid in
+            // gold, hovering above the head of the figure. Spins around
+            // its vertical axis and bobs gently. GTA-style.
+            drawWaypoint();
+
             raf = requestAnimationFrame(loop);
+        };
+
+        // Square bipyramid (8-sided diamond) wireframe — 6 vertices in
+        // unit space: top, bottom, and four equator points. Spinning
+        // around the vertical axis with a simple perspective divide so
+        // the equator quad reads as a 3D diamond, not a flat one.
+        const drawWaypoint = () => {
+            // Anchor above the figure's head. Figure sits flush bottom-
+            // right at width 62%, so the head appears around x ≈ 70-78%
+            // of the slide and y ≈ 12-25% from the top.
+            const cx = W * 0.70;
+            const cy = H * 0.16;
+            const size = Math.min(W, H) * 0.045;
+
+            const rotY = t * 0.55;
+            const bob = Math.sin(t * 1.3) * size * 0.10;
+
+            const verts3 = [
+                [0,   1.4, 0],   // 0 top apex
+                [0,  -1.4, 0],   // 1 bottom apex
+                [0.55, 0,  0],   // 2 east
+                [-0.55, 0, 0],   // 3 west
+                [0,   0,  0.55], // 4 north
+                [0,   0, -0.55], // 5 south
+            ];
+            const cosY = Math.cos(rotY);
+            const sinY = Math.sin(rotY);
+            const proj = verts3.map(([x, y, z]) => {
+                const x1 = x * cosY + z * sinY;
+                const z1 = -x * sinY + z * cosY;
+                const persp = 1 / (1 + z1 * 0.32);
+                return {
+                    x: cx + x1 * size * persp,
+                    y: cy + y * size * persp + bob,
+                    depth: z1,
+                };
+            });
+
+            const edges: [number, number][] = [
+                [0, 2], [0, 3], [0, 4], [0, 5],   // top apex → equator
+                [1, 2], [1, 3], [1, 4], [1, 5],   // bottom apex → equator
+                [2, 4], [4, 3], [3, 5], [5, 2],   // equator quad
+            ];
+
+            ctx.save();
+            // Outer glow halo first
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.18)';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            for (const [a, b] of edges) {
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+            }
+            ctx.stroke();
+
+            // Solid edge stroke on top
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.95)';
+            ctx.lineWidth = 1.6;
+            ctx.shadowColor = 'rgba(250, 204, 21, 0.7)';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            for (const [a, b] of edges) {
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+            }
+            ctx.stroke();
+
+            // Tiny vertex dots for the apexes (top + bottom only — the
+            // equator vertices are already implied by the edge meets)
+            ctx.shadowBlur = 4;
+            ctx.fillStyle = 'rgba(250, 204, 21, 1)';
+            for (const i of [0, 1]) {
+                ctx.beginPath();
+                ctx.arc(proj[i].x, proj[i].y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
         };
 
         const ro = new ResizeObserver(resize);
