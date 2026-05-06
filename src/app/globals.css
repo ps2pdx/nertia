@@ -970,6 +970,35 @@ code, pre, kbd, samp {
   to   { transform: rotateX(0deg);  opacity: 1; }
 }
 
+/* Slide progress bar — fills 0% → 100% over the slide duration, then
+   resets when the active slide changes (parent uses key={active} to
+   remount the bar and restart the CSS animation). */
+.hero-slider__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 7;
+  background: color-mix(in oklab, var(--fg) 8%, transparent);
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-slider__progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--accent) 60%, transparent);
+  animation: heroProgressFill 12000ms linear forwards;
+}
+@keyframes heroProgressFill {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-slider__progress-bar { animation: none; width: 0; }
+}
+
 /* Centered control bar — prev arrow · dots · next arrow */
 .hero-slider__controls {
   position: absolute;

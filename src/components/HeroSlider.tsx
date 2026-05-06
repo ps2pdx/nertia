@@ -145,6 +145,12 @@ export default function HeroSlider() {
                 );
             })}
 
+            <div className="hero-slider__progress" aria-hidden>
+                {/* key={active} forces a remount so the CSS fill animation
+                    restarts from 0% on every slide change. */}
+                <div key={active} className="hero-slider__progress-bar" />
+            </div>
+
             <div className="hero-slider__controls" role="group" aria-label="Slide navigation">
                 <button
                     type="button"
