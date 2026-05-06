@@ -131,10 +131,12 @@ export default function EyeBackground({ active }: Props) {
         const sphere = buildSphere(8, 12, 36);
 
         // ── camera / projection ──────────────────────────────────
-        // Camera placed in front-of-and-above the central pyramid,
-        // looking down a bit toward the grid plane.
-        const camPos: V3 = { x: 0, y: 2.0, z: -7.5 };
-        const camPitch = -0.18;          // radians; negative = look down
+        // Tightly framed on the central pyramid + eye-cap. Camera sits
+        // close, slightly to the left, roughly cap-level — places the
+        // cap (and the eye inside) in the upper-right of the canvas
+        // while the rest of the grid extends off into the distance.
+        const camPos: V3 = { x: -0.9, y: 1.45, z: -3.4 };
+        const camPitch = -0.05;          // mostly horizontal, slight down
         const fov = 4.6;                 // perspective scale
 
         // Project a world point to canvas coords, returning null if it's
@@ -149,7 +151,7 @@ export default function EyeBackground({ active }: Props) {
             const sp = Math.sin(camPitch);
             const ry = ty * cp - tz * sp;
             const rz = ty * sp + tz * cp;
-            if (rz < 0.4) return null;
+            if (rz < 0.25) return null;
             const persp = fov / rz;
             return {
                 x: W / 2 + tx * persp * (W / 4),
