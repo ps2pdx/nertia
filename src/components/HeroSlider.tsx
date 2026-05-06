@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import GridBackground from '@/components/hero-bg/GridBackground';
+import PortraitBackground from '@/components/hero-bg/PortraitBackground';
 import TopoBackground from '@/components/hero-bg/TopoBackground';
 import EyeBackground from '@/components/hero-bg/EyeBackground';
 
@@ -34,7 +34,7 @@ const SLIDES: Slide[] = [
         caption:
             'Product marketing operator with full-stack chops. Available for IC, lead, and contract roles.',
         cta: { label: '→ SEE THE RESUME', href: '/resume' },
-        Background: GridBackground,
+        Background: PortraitBackground,
     },
     {
         id: 'topo',
