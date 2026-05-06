@@ -134,17 +134,17 @@ export default function PortraitBackground({ active }: Props) {
             raf = requestAnimationFrame(loop);
         };
 
-        // Square bipyramid (8-sided diamond) wireframe — 6 vertices in
-        // unit space: top, bottom, and four equator points. Spinning
-        // around the vertical axis with a simple perspective divide so
-        // the equator quad reads as a 3D diamond, not a flat one.
+        // Square bipyramid (8-sided diamond) — 6 vertices in unit space:
+        // top, bottom, and four equator points. Faces filled with
+        // translucent yellow (sorted back-to-front so overlapping faces
+        // composite correctly), edges stroked over the top with a glow.
         const drawWaypoint = () => {
-            // Anchor above the figure's head. Figure sits flush bottom-
-            // right at width 62%, so the head appears around x ≈ 70-78%
-            // of the slide and y ≈ 12-25% from the top.
-            const cx = W * 0.70;
-            const cy = H * 0.16;
-            const size = Math.min(W, H) * 0.045;
+            // Anchor above the figure's head. Figure is flush bottom-
+            // right at width 62%, so head sits around 80-85% across and
+            // ~50-55% down. Marker hovers at 82% / 18% — directly above.
+            const cx = W * 0.82;
+            const cy = H * 0.18;
+            const size = Math.min(W, H) * 0.075;
 
             const rotY = t * 0.55;
             const bob = Math.sin(t * 1.3) * size * 0.10;
@@ -170,16 +170,49 @@ export default function PortraitBackground({ active }: Props) {
                 };
             });
 
-            const edges: [number, number][] = [
-                [0, 2], [0, 3], [0, 4], [0, 5],   // top apex → equator
-                [1, 2], [1, 3], [1, 4], [1, 5],   // bottom apex → equator
-                [2, 4], [4, 3], [3, 5], [5, 2],   // equator quad
+            // 8 triangle faces — 4 around the top apex, 4 around the
+            // bottom apex.
+            const faces: [number, number, number][] = [
+                [0, 2, 4], [0, 4, 3], [0, 3, 5], [0, 5, 2],
+                [1, 4, 2], [1, 3, 4], [1, 5, 3], [1, 2, 5],
             ];
 
+            // Sort back-to-front so transparent fills layer correctly.
+            // Larger depth (z1) = farther; render those first.
+            const sorted = [...faces].sort((a, b) => {
+                const da = (proj[a[0]].depth + proj[a[1]].depth + proj[a[2]].depth) / 3;
+                const db = (proj[b[0]].depth + proj[b[1]].depth + proj[b[2]].depth) / 3;
+                return db - da;
+            });
+
             ctx.save();
-            // Outer glow halo first
-            ctx.strokeStyle = 'rgba(250, 204, 21, 0.18)';
-            ctx.lineWidth = 5;
+
+            // Translucent face fills — back-to-front. Nearer faces get
+            // a slightly higher alpha so they "front-light".
+            for (const [a, b, c] of sorted) {
+                const avgDepth =
+                    (proj[a].depth + proj[b].depth + proj[c].depth) / 3;
+                // depth in [-0.55, 0.55] roughly; map to alpha.
+                const alpha = 0.14 + Math.max(0, -avgDepth) * 0.12;
+                ctx.fillStyle = `rgba(250, 204, 21, ${alpha})`;
+                ctx.beginPath();
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+                ctx.lineTo(proj[c].x, proj[c].y);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Edges
+            const edges: [number, number][] = [
+                [0, 2], [0, 3], [0, 4], [0, 5],
+                [1, 2], [1, 3], [1, 4], [1, 5],
+                [2, 4], [4, 3], [3, 5], [5, 2],
+            ];
+
+            // Outer glow halo
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.20)';
+            ctx.lineWidth = 6;
             ctx.lineCap = 'round';
             ctx.beginPath();
             for (const [a, b] of edges) {
@@ -188,11 +221,11 @@ export default function PortraitBackground({ active }: Props) {
             }
             ctx.stroke();
 
-            // Solid edge stroke on top
-            ctx.strokeStyle = 'rgba(250, 204, 21, 0.95)';
-            ctx.lineWidth = 1.6;
-            ctx.shadowColor = 'rgba(250, 204, 21, 0.7)';
-            ctx.shadowBlur = 8;
+            // Solid bright edges with shadow glow
+            ctx.strokeStyle = 'rgba(250, 204, 21, 1)';
+            ctx.lineWidth = 1.8;
+            ctx.shadowColor = 'rgba(250, 204, 21, 0.75)';
+            ctx.shadowBlur = 10;
             ctx.beginPath();
             for (const [a, b] of edges) {
                 ctx.moveTo(proj[a].x, proj[a].y);
@@ -200,13 +233,12 @@ export default function PortraitBackground({ active }: Props) {
             }
             ctx.stroke();
 
-            // Tiny vertex dots for the apexes (top + bottom only — the
-            // equator vertices are already implied by the edge meets)
-            ctx.shadowBlur = 4;
-            ctx.fillStyle = 'rgba(250, 204, 21, 1)';
+            // Apex dots
+            ctx.shadowBlur = 5;
+            ctx.fillStyle = 'rgba(255, 230, 100, 1)';
             for (const i of [0, 1]) {
                 ctx.beginPath();
-                ctx.arc(proj[i].x, proj[i].y, 1.5, 0, Math.PI * 2);
+                ctx.arc(proj[i].x, proj[i].y, 2, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
