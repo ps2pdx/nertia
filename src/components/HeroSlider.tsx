@@ -32,7 +32,7 @@ const SLIDES: Slide[] = [
     {
         id: 'topo',
         eyebrowBracket: '[ FREE ENERGY TOOLING ]',
-        eyebrowRole: 'HOSTED · BUILT IN-HOUSE',
+        eyebrowRole: 'WEBSITES & TOKENIZED DESIGN SYSTEMS',
         headline: { line1: 'ZERO-POINT', line2: 'WEB &', line3: 'TOKENS', line3Mark: '.' },
         caption:
             'AI-FREE, AI-generated. Zero API calls, zero token costs at runtime — sites stay free because nothing’s running. Hosted at {slug}.nertia.ai.',
