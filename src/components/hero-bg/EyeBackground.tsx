@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { attachThemeStrokeListener } from '@/components/hero-bg/themeColor';
 
 type Props = { active: boolean };
 
@@ -25,11 +26,15 @@ export default function EyeBackground({ active }: Props) {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Monochrome palette — same family as the topo slide so the slider
-        // reads as a coherent set.
-        const STROKE_BASE = 'rgba(180, 220, 230, 0.55)';
-        const STROKE_FAINT = 'rgba(180, 220, 230, 0.18)';
-        const STROKE_BRIGHT = 'rgba(230, 245, 250, 0.95)';
+        // Theme-reactive monochrome palette derived from --fg, so the
+        // strokes flip to dark on light mode without losing contrast.
+        let strokeRgb = '180, 220, 230';
+        const detachTheme = attachThemeStrokeListener('--fg', '180, 220, 230', (rgb) => {
+            strokeRgb = rgb;
+        });
+        const STROKE_BASE = () => `rgba(${strokeRgb}, 0.55)`;
+        const STROKE_FAINT = () => `rgba(${strokeRgb}, 0.18)`;
+        const STROKE_BRIGHT = () => `rgba(${strokeRgb}, 0.95)`;
 
         let W = 0;
         let H = 0;
@@ -132,13 +137,13 @@ export default function EyeBackground({ active }: Props) {
             ctx.scale(scaleX, 1);
 
             // Outer triangle
-            ctx.strokeStyle = STROKE_BASE;
+            ctx.strokeStyle = STROKE_BASE();
             ctx.lineWidth = 1.5;
             trianglePath(r);
             ctx.stroke();
 
             // Concentric inner triangles for depth (line-drawing schematic)
-            ctx.strokeStyle = STROKE_FAINT;
+            ctx.strokeStyle = STROKE_FAINT();
             ctx.lineWidth = 1;
             trianglePath(r * 0.78);
             ctx.stroke();
@@ -146,7 +151,7 @@ export default function EyeBackground({ active }: Props) {
             ctx.stroke();
 
             // Vertex markers — tiny perpendicular ticks at each corner
-            ctx.strokeStyle = STROKE_BASE;
+            ctx.strokeStyle = STROKE_BASE();
             ctx.lineWidth = 1;
             for (let i = 0; i < 3; i++) {
                 const a = (i / 3) * Math.PI * 2 - Math.PI / 2;
@@ -167,7 +172,7 @@ export default function EyeBackground({ active }: Props) {
             const lidH = eyeHeight * Math.max(0.02, blinkPhase);
 
             // Almond outline
-            ctx.strokeStyle = STROKE_BASE;
+            ctx.strokeStyle = STROKE_BASE();
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.ellipse(0, 0, eyeWidth, lidH, 0, 0, Math.PI * 2);
@@ -185,14 +190,14 @@ export default function EyeBackground({ active }: Props) {
                 ctx.ellipse(0, 0, eyeWidth - 1, lidH - 1, 0, 0, Math.PI * 2);
                 ctx.clip();
 
-                ctx.strokeStyle = STROKE_BASE;
+                ctx.strokeStyle = STROKE_BASE();
                 ctx.lineWidth = 1.2;
                 ctx.beginPath();
                 ctx.arc(px, py, irisR, 0, Math.PI * 2);
                 ctx.stroke();
 
                 // Concentric inner ring
-                ctx.strokeStyle = STROKE_FAINT;
+                ctx.strokeStyle = STROKE_FAINT();
                 ctx.lineWidth = 0.8;
                 ctx.beginPath();
                 ctx.arc(px, py, irisR * 0.6, 0, Math.PI * 2);
@@ -201,7 +206,7 @@ export default function EyeBackground({ active }: Props) {
                 // Pupil — solid dot
                 ctx.beginPath();
                 ctx.arc(px, py, irisR * 0.32, 0, Math.PI * 2);
-                ctx.fillStyle = STROKE_BRIGHT;
+                ctx.fillStyle = STROKE_BRIGHT();
                 ctx.fill();
 
                 ctx.restore();
@@ -209,7 +214,7 @@ export default function EyeBackground({ active }: Props) {
 
             // Sight line (horizontal axis through the eye) — schematic touch
             if (blinkPhase > 0.6) {
-                ctx.strokeStyle = STROKE_FAINT;
+                ctx.strokeStyle = STROKE_FAINT();
                 ctx.lineWidth = 0.6;
                 ctx.beginPath();
                 ctx.moveTo(-eyeWidth * 1.4, 0);
@@ -276,6 +281,7 @@ export default function EyeBackground({ active }: Props) {
         return () => {
             cancelAnimationFrame(raf);
             ro.disconnect();
+            detachTheme();
         };
     }, []);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { attachThemeStrokeListener } from '@/components/hero-bg/themeColor';
 
 type Props = { active: boolean };
 
@@ -41,6 +42,10 @@ export default function TopoBackground({ active }: Props) {
         let raf = 0;
         let t = 0;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let strokeRgb = '140, 210, 220';
+        const detachTheme = attachThemeStrokeListener('--fg', '140, 210, 220', (rgb) => {
+            strokeRgb = rgb;
+        });
 
         const peaks: Peak[] = [
             { nx: 0.22, ny: 0.34, vx: 0.00010, vy: 0.00006, h: 3.6, radius: 220 },
@@ -104,7 +109,7 @@ export default function TopoBackground({ active }: Props) {
 
             for (const th of thresholds) {
                 const intensity = th < 0 ? 0.05 : Math.min(0.22, 0.08 + th * 0.012);
-                ctx.strokeStyle = `rgba(140, 210, 220, ${intensity})`;
+                ctx.strokeStyle = `rgba(${strokeRgb}, ${intensity})`;
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 for (let r = 0; r < rows - 1; r++) {
@@ -171,6 +176,7 @@ export default function TopoBackground({ active }: Props) {
         return () => {
             cancelAnimationFrame(raf);
             ro.disconnect();
+            detachTheme();
         };
     }, []);
 

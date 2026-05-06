@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { attachThemeStrokeListener } from '@/components/hero-bg/themeColor';
 
 type Props = { active: boolean };
 
@@ -25,6 +26,10 @@ export default function GridBackground({ active }: Props) {
         let raf = 0;
         let t = 0;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let strokeRgb = '255, 255, 255';
+        const detachTheme = attachThemeStrokeListener('--fg', '255, 255, 255', (rgb) => {
+            strokeRgb = rgb;
+        });
 
         const resize = () => {
             const rect = parent.getBoundingClientRect();
@@ -45,7 +50,7 @@ export default function GridBackground({ active }: Props) {
             const offset = (t * 18) % cell;
 
             // Base grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.045)';
+            ctx.strokeStyle = `rgba(${strokeRgb}, 0.07)`;
             ctx.lineWidth = 1;
             for (let x = -offset; x < W + cell; x += cell) {
                 ctx.beginPath();
@@ -61,7 +66,7 @@ export default function GridBackground({ active }: Props) {
             }
 
             // Sub-grid (denser, fainter)
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.018)';
+            ctx.strokeStyle = `rgba(${strokeRgb}, 0.028)`;
             const subCell = cell / 4;
             const subOffset = offset / 4;
             for (let x = -subOffset; x < W + subCell; x += subCell) {
@@ -109,6 +114,7 @@ export default function GridBackground({ active }: Props) {
         return () => {
             cancelAnimationFrame(raf);
             ro.disconnect();
+            detachTheme();
         };
     }, []);
 
