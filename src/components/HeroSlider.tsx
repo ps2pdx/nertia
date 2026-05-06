@@ -55,7 +55,7 @@ export default function HeroSlider() {
     return (
         <section className="hero-slider" aria-label="Featured">
             <div className="hero-slider__eyebrow home-hero__eyebrow">
-                <span className="home-hero__bracket">[ SCOTT CAMPBELL ]</span>
+                <span className="home-hero__bracket">[ CAMPBELL, DOUGLAS SCOTT ]</span>
                 <span className="home-hero__rule" aria-hidden />
                 <EyebrowRole value={SLIDES[active].eyebrowRole} />
             </div>
