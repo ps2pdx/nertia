@@ -989,22 +989,38 @@ code, pre, kbd, samp {
   color: var(--fg-muted); letter-spacing: 0.02em;
 }
 
-/* Slide 1 portrait blueprint — vector edge trace of the source photo,
-   colored via currentColor so it inherits --accent. Right-aligned so
-   the figure sits beside the headline rather than under it. */
+/* Slide 1 portrait — vector edge trace of the source photo over a
+   canvas atmosphere (faint blueprint grid, drifting motes, slow scan
+   line sweep). Figure colored via currentColor so it inherits --accent. */
 .portrait-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
   opacity: 0.88;
   transition: opacity var(--d-3, 600ms) var(--e-out, ease);
 }
 .portrait-bg.is-active { opacity: 0.95; }
-.portrait-bg svg {
+
+.portrait-bg__atmosphere {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
+}
+
+.portrait-bg__figure {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  animation: portraitBreathe 7s var(--e-in-out, ease-in-out) infinite;
+}
+.portrait-bg__figure svg {
   display: block;
   height: 96%;
   width: auto;
@@ -1012,9 +1028,15 @@ code, pre, kbd, samp {
   margin-right: var(--s-8, 32px);
   filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 30%, transparent));
 }
+@keyframes portraitBreathe {
+  0%, 100% { opacity: 0.92; transform: translateY(0); }
+  50%      { opacity: 1.0;  transform: translateY(-3px); }
+}
+
 @media (max-width: 768px) {
-  .portrait-bg svg { max-width: 80%; margin-right: 0; }
-  .portrait-bg { justify-content: center; opacity: 0.18; }
+  .portrait-bg__figure svg { max-width: 80%; margin-right: 0; }
+  .portrait-bg__figure { justify-content: center; }
+  .portrait-bg { opacity: 0.18; }
 }
 
 /* Inline per-slide CTA — small mono link below the caption. */
