@@ -65,17 +65,36 @@ const FLIP_STAGGER_MS = 12;
 
 export default function HeroSlider() {
     const [active, setActive] = useState(0);
+    const prevActive = usePrevious(active);
 
     useEffect(() => {
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduce) return;
+        // Restart the auto-advance timer whenever `active` changes,
+        // including manual clicks — gives the user a fresh full
+        // SLIDE_DURATION_MS to read after navigating.
         const id = window.setInterval(() => {
             setActive((a) => (a + 1) % SLIDES.length);
         }, SLIDE_DURATION_MS);
         return () => window.clearInterval(id);
-    }, []);
+    }, [active]);
+
+    const goPrev = () => setActive((a) => (a - 1 + SLIDES.length) % SLIDES.length);
+    const goNext = () => setActive((a) => (a + 1) % SLIDES.length);
 
     const slide = SLIDES[active];
+
+    // Slide-state machine for the slide-in/slide-out transition. The
+    // active slide sits center; the slide that just left is "past"
+    // (translated off-left); everything else is "future" (waiting
+    // off-right). Only state changes trigger CSS transitions, so a
+    // slide that's been parked in 'future' for a while doesn't animate
+    // on every render.
+    const stateFor = (i: number): 'active' | 'past' | 'future' => {
+        if (i === active) return 'active';
+        if (i === prevActive) return 'past';
+        return 'future';
+    };
 
     return (
         <section className="hero-slider" aria-label="Featured">
@@ -87,12 +106,14 @@ export default function HeroSlider() {
 
             {SLIDES.map((s, i) => {
                 const isActive = i === active;
+                const slideState = stateFor(i);
                 const { Background } = s;
                 return (
                     <article
                         key={s.id}
-                        className={`hero-slide ${isActive ? 'is-active' : ''}`}
+                        className="hero-slide"
                         data-slide={s.id}
+                        data-state={slideState}
                         aria-hidden={!isActive}
                     >
                         <div className="hero-slide__bg">
@@ -124,16 +145,40 @@ export default function HeroSlider() {
                 );
             })}
 
-            <div className="hero-slider__dots" aria-hidden>
-                {SLIDES.map((s, i) => (
-                    <button
-                        key={s.id}
-                        type="button"
-                        className={`hero-slider__dot ${i === active ? 'is-active' : ''}`}
-                        onClick={() => setActive(i)}
-                        aria-label={`Show slide ${i + 1}`}
-                    />
-                ))}
+            <div className="hero-slider__progress" aria-hidden>
+                {/* key={active} forces a remount so the CSS fill animation
+                    restarts from 0% on every slide change. */}
+                <div key={active} className="hero-slider__progress-bar" />
+            </div>
+
+            <div className="hero-slider__controls" role="group" aria-label="Slide navigation">
+                <button
+                    type="button"
+                    className="hero-slider__arrow"
+                    onClick={goPrev}
+                    aria-label="Previous slide"
+                >
+                    ←
+                </button>
+                <div className="hero-slider__dots">
+                    {SLIDES.map((s, i) => (
+                        <button
+                            key={s.id}
+                            type="button"
+                            className={`hero-slider__dot ${i === active ? 'is-active' : ''}`}
+                            onClick={() => setActive(i)}
+                            aria-label={`Show slide ${i + 1}`}
+                        />
+                    ))}
+                </div>
+                <button
+                    type="button"
+                    className="hero-slider__arrow"
+                    onClick={goNext}
+                    aria-label="Next slide"
+                >
+                    →
+                </button>
             </div>
         </section>
     );
@@ -193,4 +238,15 @@ function FlapText({ value, className = '' }: { value: string; className?: string
             ))}
         </span>
     );
+}
+
+// Returns the value of the previous render — used to track which slide
+// just transitioned out so we can park it on the left while the new
+// active slide enters from the right.
+function usePrevious<T>(value: T): T | undefined {
+    const ref = useRef<T | undefined>(undefined);
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
+    return ref.current;
 }

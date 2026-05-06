@@ -5,11 +5,18 @@ import { attachThemeStrokeListener } from '@/components/hero-bg/themeColor';
 
 type Props = { active: boolean };
 
-// All-seeing eye floating inside a triangle — rendered as a monochrome
-// line drawing with subtle 3D rotation, matching the wireframe aesthetic
-// of the grid and topo slides. Strokes only (no fills) except for the
-// pupil dot. Triangle gently tumbles around its Y axis; the eye drifts
-// inside and the pupil saccades to new directions.
+type V3 = { x: number; y: number; z: number };
+
+// 3D scene for slide 3:
+//   • A grid of wireframe tetrahedra on a plane, fading into the distance
+//   • The central pyramid is split horizontally near the top — the cap
+//     hovers above, revealing a wireframe sphere (the eye) inside
+//   • Eye is mouse-tracked: pupil follows the cursor; sphere drifts slowly
+//   • Eyelid layer wraps the entire sphere (two latitude rings) and
+//     blinks periodically by closing toward the equator
+//
+// All rendering is monochrome line work, --fg-derived so it reads in
+// both light and dark themes.
 export default function EyeBackground({ active }: Props) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const activeRef = useRef(active);
@@ -26,15 +33,16 @@ export default function EyeBackground({ active }: Props) {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Theme-reactive monochrome palette derived from --fg, so the
-        // strokes flip to dark on light mode without losing contrast.
-        let strokeRgb = '180, 220, 230';
-        const detachTheme = attachThemeStrokeListener('--fg', '180, 220, 230', (rgb) => {
-            strokeRgb = rgb;
+        // Two-color palette: white-ish (--fg) for the pyramid grid,
+        // accent-green for the eye + iris.
+        let pyramidRgb = '243, 241, 236';
+        let eyeRgb = '34, 197, 94';
+        const detachPyramid = attachThemeStrokeListener('--fg', '243, 241, 236', (rgb) => {
+            pyramidRgb = rgb;
         });
-        const STROKE_BASE = () => `rgba(${strokeRgb}, 0.55)`;
-        const STROKE_FAINT = () => `rgba(${strokeRgb}, 0.18)`;
-        const STROKE_BRIGHT = () => `rgba(${strokeRgb}, 0.95)`;
+        const detachEye = attachThemeStrokeListener('--accent', '34, 197, 94', (rgb) => {
+            eyeRgb = rgb;
+        });
 
         let W = 0;
         let H = 0;
@@ -42,31 +50,152 @@ export default function EyeBackground({ active }: Props) {
         let t = 0;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-        // Triangle
-        let triCx = 0;
-        let triCy = 0;
-        let triSize = 0;
+        // Mouse position in normalized canvas coords (-1..1)
+        let mouseNx = 0;
+        let mouseNy = 0;
+        let mouseSmoothNx = 0;
+        let mouseSmoothNy = 0;
 
-        // Eye drift inside the triangle
-        let eyeX = 0;
-        let eyeY = 0;
-        let eyeTargetX = 0;
-        let eyeTargetY = 0;
-        let nextEyeMove = 0;
-        let eyeWidth = 90;
-        let eyeHeight = 50;
+        // ── 3D primitives ────────────────────────────────────────
+        // Regular tetrahedron with apex at +Y, base in the XZ plane at y=-0.5
+        const TET_APEX: V3 = { x: 0, y: 1, z: 0 };
+        const TET_BASE: V3[] = [
+            { x: Math.cos(0) * 1.0, y: -0.5, z: Math.sin(0) * 1.0 },
+            { x: Math.cos(2 * Math.PI / 3) * 1.0, y: -0.5, z: Math.sin(2 * Math.PI / 3) * 1.0 },
+            { x: Math.cos(4 * Math.PI / 3) * 1.0, y: -0.5, z: Math.sin(4 * Math.PI / 3) * 1.0 },
+        ];
 
-        // Pupil saccade
-        let pupilOffX = 0;
-        let pupilOffY = 0;
-        let pupilTargetX = 0;
-        let pupilTargetY = 0;
-        let nextPupilMove = 0;
+        // Cut the tetrahedron at parameter `t` along the apex→base edge
+        // (t = 0 cuts at the apex, t = 1 cuts at the base). Returns the
+        // frustum vertices, the cap vertices (= apex + the 3 cut points),
+        // and edge lists for each.
+        const buildSplitTet = (cutT: number) => {
+            const lerp = (a: V3, b: V3, k: number): V3 => ({
+                x: a.x + (b.x - a.x) * k,
+                y: a.y + (b.y - a.y) * k,
+                z: a.z + (b.z - a.z) * k,
+            });
+            const cuts = TET_BASE.map((b) => lerp(TET_APEX, b, 1 - cutT));
+            const frustumVerts: V3[] = [...TET_BASE, ...cuts]; // 0..2 base, 3..5 cut
+            const frustumEdges: [number, number][] = [
+                [0, 1], [1, 2], [2, 0],     // base triangle
+                [3, 4], [4, 5], [5, 3],     // top (cut) triangle
+                [0, 3], [1, 4], [2, 5],     // sides
+            ];
+            const capVerts: V3[] = [TET_APEX, ...cuts]; // 0 apex, 1..3 cut
+            const capEdges: [number, number][] = [
+                [0, 1], [0, 2], [0, 3],
+                [1, 2], [2, 3], [3, 1],
+            ];
+            return { frustumVerts, frustumEdges, capVerts, capEdges };
+        };
 
-        // Blink
-        let blinkPhase = 1;
-        let nextBlink = 4;
-        let blinkProgress = -1;
+        // Sphere wireframe: arrays of latitude rings and longitude arcs
+        // in unit-radius local space. Returns small re-usable geometry.
+        const buildSphere = (nLat: number, nLong: number, segPerLat: number) => {
+            const latitudes: V3[][] = [];
+            for (let i = 1; i < nLat; i++) {
+                const phi = (i / nLat) * Math.PI;
+                const y = Math.cos(phi);
+                const r = Math.sin(phi);
+                const ring: V3[] = [];
+                for (let j = 0; j <= segPerLat; j++) {
+                    const theta = (j / segPerLat) * Math.PI * 2;
+                    ring.push({ x: r * Math.cos(theta), y, z: r * Math.sin(theta) });
+                }
+                latitudes.push(ring);
+            }
+            const longitudes: V3[][] = [];
+            for (let k = 0; k < nLong; k++) {
+                const theta = (k / nLong) * Math.PI * 2;
+                const arc: V3[] = [];
+                for (let i = 0; i <= segPerLat; i++) {
+                    const phi = (i / segPerLat) * Math.PI;
+                    arc.push({
+                        x: Math.sin(phi) * Math.cos(theta),
+                        y: Math.cos(phi),
+                        z: Math.sin(phi) * Math.sin(theta),
+                    });
+                }
+                longitudes.push(arc);
+            }
+            return { latitudes, longitudes };
+        };
+
+        // Cut at 0.55 — keeps the lower frustum dominant (~55% of pyramid
+        // height) while leaving the floating cap big enough to enclose
+        // the eye sphere comfortably. Reads as the dollar-bill silhouette:
+        // wide pyramid base below, small triangular eye-cap floating
+        // detached at the top.
+        const split = buildSplitTet(0.55);
+        const sphere = buildSphere(8, 12, 36);
+
+        // ── camera / projection ──────────────────────────────────
+        // Close, slightly off-center, looking up-forward at the cap.
+        // Cam values picked so the central pyramid + eye sit in the
+        // upper-right of the canvas without overshooting the edge.
+        const camPos: V3 = { x: -0.5, y: 0.7, z: -2.5 };
+        const camPitch = -0.05;          // mostly horizontal, tiny down
+        const fov = 5.0;                 // moderately wide perspective
+        // Focal depth — where the camera is "in focus". Pyramids
+        // closer or further than this get progressively blurred.
+        const focalDepth = 2.5;
+
+        // Project a world point to canvas coords, returning null if it's
+        // behind the camera.
+        const project = (v: V3): { x: number; y: number; depth: number } | null => {
+            // Translate to camera-relative coords
+            const tx = v.x - camPos.x;
+            const ty = v.y - camPos.y;
+            const tz = v.z - camPos.z;
+            // Pitch (rotation around X axis)
+            const cp = Math.cos(camPitch);
+            const sp = Math.sin(camPitch);
+            const ry = ty * cp - tz * sp;
+            const rz = ty * sp + tz * cp;
+            if (rz < 0.25) return null;
+            const persp = fov / rz;
+            return {
+                x: W / 2 + tx * persp * (W / 4),
+                y: H / 2 - ry * persp * (W / 4),
+                depth: rz,
+            };
+        };
+
+        // ── grid layout ──────────────────────────────────────────
+        const GRID_RANGE = 2; // ±2 → 5×5 grid
+        const GRID_SPACING = 3.6;
+
+        type PyramidInstance = {
+            offset: V3;
+            scale: number;
+            isCenter: boolean;
+        };
+        const pyramids: PyramidInstance[] = [];
+        for (let xi = -GRID_RANGE; xi <= GRID_RANGE; xi++) {
+            for (let zi = -GRID_RANGE; zi <= GRID_RANGE; zi++) {
+                pyramids.push({
+                    offset: { x: xi * GRID_SPACING, y: 0, z: zi * GRID_SPACING },
+                    scale: 1,
+                    isCenter: xi === 0 && zi === 0,
+                });
+            }
+        }
+        // Sort back-to-front so depth painting reads correctly
+        pyramids.sort((a, b) => b.offset.z - a.offset.z);
+
+        // ── mouse tracking ────────────────────────────────────────
+        const onMove = (e: MouseEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseNx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouseNy = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+        };
+        const onLeave = () => {
+            mouseNx = 0;
+            mouseNy = 0;
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseleave', onLeave);
 
         const resize = () => {
             const rect = parent.getBoundingClientRect();
@@ -77,211 +206,280 @@ export default function EyeBackground({ active }: Props) {
             canvas.style.width = `${W}px`;
             canvas.style.height = `${H}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            triCx = W * 0.72;
-            triCy = H * 0.5;
-            triSize = Math.min(W * 0.5, H * 0.85);
-
-            eyeWidth = Math.min(110, triSize * 0.18);
-            eyeHeight = eyeWidth * 0.55;
-
-            eyeX = triCx;
-            eyeY = triCy;
-            eyeTargetX = triCx;
-            eyeTargetY = triCy;
-            nextEyeMove = 0;
-            nextPupilMove = 0;
-            nextBlink = t + 3;
         };
 
-        const pickEyeTarget = () => {
-            const drift = triSize * 0.15;
-            const angle = Math.random() * Math.PI * 2;
-            const dist = Math.random() * drift;
-            eyeTargetX = triCx + Math.cos(angle) * dist;
-            eyeTargetY = triCy + Math.sin(angle) * dist - drift * 0.1;
+        // ── draw helpers ─────────────────────────────────────────
+        const transformInstance = (v: V3, off: V3, scale: number, rotY: number): V3 => {
+            // Rotate around Y, then scale, then translate
+            const c = Math.cos(rotY);
+            const s = Math.sin(rotY);
+            const rx = v.x * c + v.z * s;
+            const rz = -v.x * s + v.z * c;
+            return {
+                x: rx * scale + off.x,
+                y: v.y * scale + off.y,
+                z: rz * scale + off.z,
+            };
         };
 
-        const pickPupilTarget = () => {
-            const max = eyeWidth * 0.20;
-            const angle = Math.random() * Math.PI * 2;
-            const r = (0.4 + Math.random() * 0.6) * max;
-            pupilTargetX = Math.cos(angle) * r;
-            pupilTargetY = Math.sin(angle) * r * 0.6;
-        };
-
-        // Draw a regular triangle (point up) of the given outer radius.
-        const trianglePath = (r: number) => {
+        const drawEdges = (
+            verts: V3[],
+            edges: [number, number][],
+            offset: V3,
+            scale: number,
+            rotY: number,
+            alpha: number,
+            lineWidth: number,
+            rgb: string = pyramidRgb,
+        ) => {
+            ctx.strokeStyle = `rgba(${rgb}, ${alpha})`;
+            ctx.lineWidth = lineWidth;
             ctx.beginPath();
-            for (let i = 0; i < 3; i++) {
-                const a = (i / 3) * Math.PI * 2 - Math.PI / 2;
-                const px = Math.cos(a) * r;
-                const py = Math.sin(a) * r;
-                if (i === 0) ctx.moveTo(px, py);
-                else ctx.lineTo(px, py);
+            for (const [a, b] of edges) {
+                const va = project(transformInstance(verts[a], offset, scale, rotY));
+                const vb = project(transformInstance(verts[b], offset, scale, rotY));
+                if (!va || !vb) continue;
+                ctx.moveTo(va.x, va.y);
+                ctx.lineTo(vb.x, vb.y);
             }
-            ctx.closePath();
+            ctx.stroke();
         };
 
-        const drawTriangle = () => {
-            // 3D feel: scaleX via cos of a slow Y-axis rotation. Never fully
-            // edge-on (clamped) so the triangle stays readable.
-            const rotY = Math.sin(t * 0.22) * 0.55;
-            const scaleX = Math.cos(rotY) * 0.85 + 0.15;
-            const tilt = Math.sin(t * 0.13) * 0.04;
-            const r = triSize / 2;
-
-            ctx.save();
-            ctx.translate(triCx, triCy);
-            ctx.rotate(tilt);
-            ctx.scale(scaleX, 1);
-
-            // Outer triangle
-            ctx.strokeStyle = STROKE_BASE();
-            ctx.lineWidth = 1.5;
-            trianglePath(r);
-            ctx.stroke();
-
-            // Concentric inner triangles for depth (line-drawing schematic)
-            ctx.strokeStyle = STROKE_FAINT();
-            ctx.lineWidth = 1;
-            trianglePath(r * 0.78);
-            ctx.stroke();
-            trianglePath(r * 0.56);
-            ctx.stroke();
-
-            // Vertex markers — tiny perpendicular ticks at each corner
-            ctx.strokeStyle = STROKE_BASE();
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 3; i++) {
-                const a = (i / 3) * Math.PI * 2 - Math.PI / 2;
-                const vx = Math.cos(a) * r;
-                const vy = Math.sin(a) * r;
-                ctx.beginPath();
-                ctx.arc(vx, vy, 2.5, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-
-            ctx.restore();
-        };
-
-        const drawEye = () => {
-            ctx.save();
-            ctx.translate(eyeX, eyeY);
-
-            const lidH = eyeHeight * Math.max(0.02, blinkPhase);
-
-            // Almond outline
-            ctx.strokeStyle = STROKE_BASE();
-            ctx.lineWidth = 1.5;
+        const drawPolyline = (
+            poly: V3[],
+            offset: V3,
+            scale: number,
+            rotY: number,
+            alpha: number,
+            lineWidth: number,
+            rgb: string = eyeRgb,
+        ) => {
+            ctx.strokeStyle = `rgba(${rgb}, ${alpha})`;
+            ctx.lineWidth = lineWidth;
             ctx.beginPath();
-            ctx.ellipse(0, 0, eyeWidth, lidH, 0, 0, Math.PI * 2);
+            let started = false;
+            for (const p of poly) {
+                const proj = project(transformInstance(p, offset, scale, rotY));
+                if (!proj) {
+                    started = false;
+                    continue;
+                }
+                if (!started) {
+                    ctx.moveTo(proj.x, proj.y);
+                    started = true;
+                } else {
+                    ctx.lineTo(proj.x, proj.y);
+                }
+            }
             ctx.stroke();
+        };
 
-            if (blinkPhase > 0.2) {
-                // Iris circle (line only)
-                const irisR = Math.min(eyeWidth * 0.32, lidH * 0.95);
-                const px = pupilOffX;
-                const py = pupilOffY;
+        // ── eye: sphere + eyelids + pupil ────────────────────────
+        // Eye sits inside the floating cap (the disconnected upper
+        // portion), like the Eye of Providence on the dollar bill.
+        // Cap occupies y ≈ 0.325 → 1.0 in local space; eye centered
+        // at y = 0.55 (lower-middle of cap) with r = 0.18 to fit
+        // inside the cap's interior cross-section without touching
+        // the wireframe walls.
+        const EYE_OFFSET: V3 = { x: 0, y: 0.55, z: 0 };
+        const EYE_RADIUS = 0.18;
 
-                ctx.save();
-                // Clip iris drawing to the lid so it doesn't escape on a blink
+        const drawEye = (instance: PyramidInstance, capHoverY: number) => {
+            // Eye floats with the cap so it always sits inside the
+            // disconnected upper portion regardless of hover state.
+            const eyeOffset: V3 = {
+                x: EYE_OFFSET.x + instance.offset.x,
+                y: EYE_OFFSET.y + instance.offset.y + capHoverY,
+                z: EYE_OFFSET.z + instance.offset.z,
+            };
+
+            // Slow auto-rotation around Y for visual life
+            const autoRot = t * 0.05;
+
+            // Sphere wireframe (eye uses accent-green)
+            for (const ring of sphere.latitudes) {
+                drawPolyline(ring, eyeOffset, EYE_RADIUS * instance.scale, autoRot, 0.45, 1, eyeRgb);
+            }
+            for (const arc of sphere.longitudes) {
+                drawPolyline(arc, eyeOffset, EYE_RADIUS * instance.scale, autoRot, 0.32, 0.9, eyeRgb);
+            }
+
+            // Blink: 0 = open, 1 = closed. Smoothly increases for ~250ms
+            // every ~5-9 seconds, then back.
+            const blinkPhase = (Math.sin(t * 0.6) + 1) / 2;
+            const blinkBurst =
+                blinkPhase > 0.985
+                    ? Math.sin((blinkPhase - 0.985) / 0.015 * Math.PI)
+                    : 0;
+            const lidOpening = 0.55 - blinkBurst * 0.5; // y span of eyelid opening
+
+            // Eyelid rings — two latitude rings at +lidOpening and
+            // -lidOpening, drawn brighter to read as the lid edge.
+            const lidRing = (yWorld: number, alpha: number) => {
+                const localY = yWorld; // already in unit sphere space
+                if (Math.abs(localY) > 1) return;
+                const r = Math.sqrt(1 - localY * localY);
+                const seg = 36;
+                const ring: V3[] = [];
+                for (let j = 0; j <= seg; j++) {
+                    const th = (j / seg) * Math.PI * 2;
+                    ring.push({ x: r * Math.cos(th), y: localY, z: r * Math.sin(th) });
+                }
+                drawPolyline(ring, eyeOffset, EYE_RADIUS * instance.scale, 0, alpha, 1.4, eyeRgb);
+            };
+            lidRing(lidOpening, 0.95);
+            lidRing(-lidOpening, 0.95);
+
+            // Iris/pupil — positioned on sphere surface in the direction
+            // the eye is "looking" (toward smoothed mouse). Constrained
+            // within the eyelid opening so it can't wander above/below.
+            const lookX = mouseSmoothNx;
+            const lookYRaw = -mouseSmoothNy * 0.7; // dampen vertical
+            const lookY = Math.max(
+                -lidOpening * 0.85,
+                Math.min(lidOpening * 0.85, lookYRaw),
+            );
+            // Project (lookX, lookY) onto unit sphere — solve for z so
+            // |(x,y,z)|=1, picking the front-facing solution (+z relative
+            // to camera, which after camera rotation is small +z in world).
+            const lensXY = lookX * lookX + lookY * lookY;
+            const lookZ = lensXY < 1 ? -Math.sqrt(1 - lensXY) : 0; // -z front
+            const irisLocal: V3 = { x: lookX, y: lookY, z: lookZ };
+            const irisWorld = transformInstance(
+                {
+                    x: irisLocal.x * EYE_RADIUS,
+                    y: irisLocal.y * EYE_RADIUS,
+                    z: irisLocal.z * EYE_RADIUS,
+                },
+                eyeOffset,
+                instance.scale,
+                0,
+            );
+            const irisProj = project(irisWorld);
+            if (irisProj && blinkBurst < 0.95) {
+                // Iris scales with the (smaller) eye sphere — was 18,
+                // now ~8 to stay proportional to EYE_RADIUS = 0.18.
+                const irisR = 8 * (fov / irisProj.depth) * instance.scale;
+                const pupilR = irisR * 0.45;
+
+                // Iris ring
+                ctx.strokeStyle = `rgba(${eyeRgb}, 0.95)`;
+                ctx.lineWidth = 1.4;
                 ctx.beginPath();
-                ctx.ellipse(0, 0, eyeWidth - 1, lidH - 1, 0, 0, Math.PI * 2);
-                ctx.clip();
-
-                ctx.strokeStyle = STROKE_BASE();
-                ctx.lineWidth = 1.2;
-                ctx.beginPath();
-                ctx.arc(px, py, irisR, 0, Math.PI * 2);
+                ctx.arc(irisProj.x, irisProj.y, irisR, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Concentric inner ring
-                ctx.strokeStyle = STROKE_FAINT();
-                ctx.lineWidth = 0.8;
+                // Iris striations — short ticks pointing inward
+                ctx.strokeStyle = `rgba(${eyeRgb}, 0.45)`;
+                ctx.lineWidth = 0.7;
                 ctx.beginPath();
-                ctx.arc(px, py, irisR * 0.6, 0, Math.PI * 2);
+                for (let i = 0; i < 16; i++) {
+                    const a = (i / 16) * Math.PI * 2;
+                    ctx.moveTo(
+                        irisProj.x + Math.cos(a) * (pupilR + 2),
+                        irisProj.y + Math.sin(a) * (pupilR + 2),
+                    );
+                    ctx.lineTo(
+                        irisProj.x + Math.cos(a) * (irisR - 1),
+                        irisProj.y + Math.sin(a) * (irisR - 1),
+                    );
+                }
                 ctx.stroke();
 
-                // Pupil — solid dot
+                // Pupil — solid dot (deeper green for contrast against iris)
                 ctx.beginPath();
-                ctx.arc(px, py, irisR * 0.32, 0, Math.PI * 2);
-                ctx.fillStyle = STROKE_BRIGHT();
+                ctx.arc(irisProj.x, irisProj.y, pupilR, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(8, 80, 40, 1)`;
                 ctx.fill();
 
-                ctx.restore();
-            }
-
-            // Sight line (horizontal axis through the eye) — schematic touch
-            if (blinkPhase > 0.6) {
-                ctx.strokeStyle = STROKE_FAINT();
-                ctx.lineWidth = 0.6;
+                // Catchlight
                 ctx.beginPath();
-                ctx.moveTo(-eyeWidth * 1.4, 0);
-                ctx.lineTo(-eyeWidth, 0);
-                ctx.moveTo(eyeWidth, 0);
-                ctx.lineTo(eyeWidth * 1.4, 0);
-                ctx.stroke();
+                ctx.arc(
+                    irisProj.x - pupilR * 0.4,
+                    irisProj.y - pupilR * 0.4,
+                    pupilR * 0.25,
+                    0, Math.PI * 2,
+                );
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.fill();
             }
-
-            ctx.restore();
         };
 
-        const draw = () => {
-            if (activeRef.current) t += 0.016;
+        // ── main loop ────────────────────────────────────────────
+        const loop = () => {
+            if (activeRef.current) t += 0.012;
 
-            // Transparent canvas — let the page background show through to
-            // match the grid/topo slides.
+            // Smooth mouse → eye look direction
+            mouseSmoothNx += (mouseNx - mouseSmoothNx) * 0.06;
+            mouseSmoothNy += (mouseNy - mouseSmoothNy) * 0.06;
+
             ctx.clearRect(0, 0, W, H);
 
-            // Eye drift
-            if (t > nextEyeMove) {
-                pickEyeTarget();
-                nextEyeMove = t + 2 + Math.random() * 2;
-            }
-            eyeX += (eyeTargetX - eyeX) * 0.022;
-            eyeY += (eyeTargetY - eyeY) * 0.022;
+            // Cap hover offset for the center pyramid — slow up/down
+            const capHoverY = 0.18 + Math.sin(t * 0.5) * 0.12;
 
-            // Pupil saccade
-            if (t > nextPupilMove) {
-                pickPupilTarget();
-                nextPupilMove = t + 0.6 + Math.random() * 1.2;
-            }
-            pupilOffX += (pupilTargetX - pupilOffX) * 0.22;
-            pupilOffY += (pupilTargetY - pupilOffY) * 0.22;
+            for (const inst of pyramids) {
+                // Distance fade — farther pyramids are dimmer
+                const depth = inst.offset.z - camPos.z;
+                const fade = Math.max(0.18, Math.min(0.95, 8 / depth));
 
-            // Blink
-            if (blinkProgress < 0 && t > nextBlink) {
-                blinkProgress = 0;
-                nextBlink = t + 4 + Math.random() * 4;
-            }
-            if (blinkProgress >= 0) {
-                blinkProgress += 0.07;
-                if (blinkProgress < 0.5) {
-                    blinkPhase = 1 - blinkProgress * 2;
-                } else if (blinkProgress < 1) {
-                    blinkPhase = (blinkProgress - 0.5) * 2;
+                if (inst.isCenter) {
+                    // Frustum (lower portion) — drawn first so it sits
+                    // behind the cap + eye in painter order.
+                    drawEdges(
+                        split.frustumVerts,
+                        split.frustumEdges,
+                        inst.offset,
+                        inst.scale,
+                        0,
+                        fade * 0.85,
+                        1.3,
+                    );
+                    // Eye inside the cap — drawn before the cap so the
+                    // cap's wireframe overlays the eye, reinforcing
+                    // "eye enclosed in cap" reading.
+                    drawEye(inst, capHoverY);
+                    // Cap (apex portion), hovering above the frustum
+                    const capOffset: V3 = {
+                        x: inst.offset.x,
+                        y: inst.offset.y + capHoverY,
+                        z: inst.offset.z,
+                    };
+                    drawEdges(
+                        split.capVerts,
+                        split.capEdges,
+                        capOffset,
+                        inst.scale,
+                        0,
+                        fade * 0.7,
+                        1.0,
+                    );
                 } else {
-                    blinkPhase = 1;
-                    blinkProgress = -1;
+                    // Surrounding pyramids: full tetrahedron, no split
+                    const verts: V3[] = [TET_APEX, ...TET_BASE];
+                    const edges: [number, number][] = [
+                        [0, 1], [0, 2], [0, 3],
+                        [1, 2], [2, 3], [3, 1],
+                    ];
+                    drawEdges(verts, edges, inst.offset, inst.scale, 0, fade * 0.6, 0.9);
                 }
             }
 
-            drawTriangle();
-            drawEye();
-
-            raf = requestAnimationFrame(draw);
+            raf = requestAnimationFrame(loop);
         };
 
         const ro = new ResizeObserver(resize);
         ro.observe(parent);
         resize();
-        raf = requestAnimationFrame(draw);
+        raf = requestAnimationFrame(loop);
 
         return () => {
             cancelAnimationFrame(raf);
             ro.disconnect();
-            detachTheme();
+            detachPyramid();
+            detachEye();
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseleave', onLeave);
         };
     }, []);
 

@@ -5,50 +5,14 @@ import { attachThemeStrokeListener } from '@/components/hero-bg/themeColor';
 
 type Props = { active: boolean };
 
-type Seed = {
-    /** Rest position in the working-buffer coordinate space. */
-    bx: number;
-    by: number;
-    /** 0..1 — drives alpha, radius, glow, shimmer amplitude. Higher
-     *  values are sharper edges; lower values are soft fill. */
-    intensity: number;
-    /** Per-particle phase offset for sinusoidal shimmer. */
-    phase: number;
-};
-
-const PORTRAIT_SRC = '/scott-portrait.png';
-
-// Working buffer for pixel sampling. Larger = more fidelity.
-const WORK_W = 600;
-const WORK_H = 800;
-
-// Sampling grid stride.
-const STRIDE = 3;
-
-// Luminance window for silhouette inclusion. Drops the bright wall
-// background and the deepest blacks.
-const LUM_LOW = 0.05;
-const LUM_HIGH = 0.78;
-
-// Sobel gradient magnitude that maps to intensity = 1 (saturated edge).
-const EDGE_NORM = 0.42;
-
-// Minimum probability of keeping a sampled pixel (applied to weakest
-// fills). Strong edges always kept.
-const FILL_KEEP_FLOOR = 0.45;
-
-// Particle motion.
-const BREATH_AMP = 4.5;
-const BREATH_SPEED = 0.18;
-
-// Right-half placement on the hero canvas. The portrait is composed
-// into the right ~55% of the slide so the left-aligned headline reads
-// without overlap.
-const PLACEMENT_X_FRAC = 0.50;  // left edge of the placement region
-const PLACEMENT_W_FRAC = 0.50;
-const PLACEMENT_Y_FRAC = 0.04;
-const PLACEMENT_H_FRAC = 0.92;
-
+// Slide 1 background — vector edge trace of the portrait laid over a
+// canvas of vanishing-point perspective lines. The "atmosphere" lines
+// radiate from a focal point behind the figure to anchor the subject
+// in space rather than floating on a flat plane.
+//
+// The figure is rendered as a CSS mask-image so the SVG fill is driven
+// by background-color (var(--accent)), avoiding the XML/innerHTML
+// fragility of dangerouslySetInnerHTML for potrace SVGs.
 export default function PortraitBackground({ active }: Props) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const activeRef = useRef(active);
@@ -72,98 +36,17 @@ export default function PortraitBackground({ active }: Props) {
 
         let W = 0;
         let H = 0;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         let raf = 0;
         let t = 0;
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        let seeds: Seed[] = [];
-        let placementOffsetX = 0;
-        let placementOffsetY = 0;
-        let placementScale = 1;
 
-        // ── one-shot pixel sampling ────────────────────────────────
-        const buildSeeds = (img: HTMLImageElement) => {
-            const off = document.createElement('canvas');
-            off.width = WORK_W;
-            off.height = WORK_H;
-            const offCtx = off.getContext('2d');
-            if (!offCtx) return;
-            // Horizontal flip — mirror the photo so the body faces the
-            // headline rather than away from it.
-            offCtx.translate(WORK_W, 0);
-            offCtx.scale(-1, 1);
-            offCtx.drawImage(img, 0, 0, WORK_W, WORK_H);
-            // Reset transform before reading pixels
-            offCtx.setTransform(1, 0, 0, 1, 0, 0);
-            const data = offCtx.getImageData(0, 0, WORK_W, WORK_H).data;
+        // Vanishing point — placed roughly behind the head of the
+        // mirrored figure (figure sits in the right ~half of the slide,
+        // head a bit below the top). Keeps the perspective consistent
+        // with where the subject is gazing.
+        let vpX = 0;
+        let vpY = 0;
 
-            // S-curve contrast boost — pushes midtones apart so the
-            // Sobel gradient picks up softer features (cheek shadow,
-            // shirt creases) that the original near-flat lighting
-            // doesn't surface on its own.
-            const sCurve = (v: number) => {
-                const k = 1.6;
-                return 0.5 + Math.tanh((v - 0.5) * k * 2) / Math.tanh(k * 2) * 0.5;
-            };
-
-            const rawLum = new Float32Array(WORK_W * WORK_H);
-            const lumBuf = new Float32Array(WORK_W * WORK_H);
-            for (let i = 0, j = 0; i < data.length; i += 4, j++) {
-                const v = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
-                rawLum[j] = v;
-                lumBuf[j] = sCurve(v);
-            }
-
-            const lumAt = (x: number, y: number) => lumBuf[y * WORK_W + x];
-            const rawAt = (x: number, y: number) => rawLum[y * WORK_W + x];
-
-            const newSeeds: Seed[] = [];
-            for (let y = 1; y < WORK_H - 1; y += STRIDE) {
-                for (let x = 1; x < WORK_W - 1; x += STRIDE) {
-                    // Use raw luminance for the silhouette window so we
-                    // exclude background regardless of contrast curve.
-                    const raw = rawAt(x, y);
-                    if (raw <= LUM_LOW || raw >= LUM_HIGH) continue;
-
-                    // Sobel 3×3 on contrast-boosted luminance
-                    const tl = lumAt(x - 1, y - 1);
-                    const tt = lumAt(x, y - 1);
-                    const tr = lumAt(x + 1, y - 1);
-                    const ml = lumAt(x - 1, y);
-                    const mr = lumAt(x + 1, y);
-                    const bl = lumAt(x - 1, y + 1);
-                    const bb = lumAt(x, y + 1);
-                    const br = lumAt(x + 1, y + 1);
-                    const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
-                    const gy = -tl - 2 * tt - tr + bl + 2 * bb + br;
-                    const mag = Math.hypot(gx, gy);
-
-                    // Continuous intensity instead of binary edge/fill —
-                    // particle alpha + radius + shimmer all scale with it.
-                    const intensity = Math.min(1, mag / EDGE_NORM);
-
-                    // Probabilistic keep — fills are sampled less often
-                    // than edges to keep particle count manageable while
-                    // preserving sharp outlines.
-                    const keepProb = FILL_KEEP_FLOOR + intensity * (1 - FILL_KEEP_FLOOR);
-                    if (Math.random() > keepProb) continue;
-
-                    newSeeds.push({
-                        bx: x,
-                        by: y,
-                        intensity,
-                        phase: Math.random() * Math.PI * 2,
-                    });
-                }
-            }
-            seeds = newSeeds;
-        };
-
-        const img = new Image();
-        img.src = PORTRAIT_SRC;
-        if (img.complete) buildSeeds(img);
-        else img.addEventListener('load', () => buildSeeds(img), { once: true });
-
-        // ── layout ────────────────────────────────────────────────
         const resize = () => {
             const rect = parent.getBoundingClientRect();
             W = rect.width;
@@ -173,89 +56,198 @@ export default function PortraitBackground({ active }: Props) {
             canvas.style.width = `${W}px`;
             canvas.style.height = `${H}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            // Compose the working buffer into the right portion of the
-            // hero, fit-contain style.
-            const regionW = W * PLACEMENT_W_FRAC;
-            const regionH = H * PLACEMENT_H_FRAC;
-            const regionX = W * PLACEMENT_X_FRAC;
-            const regionY = H * PLACEMENT_Y_FRAC;
-            const scaleX = regionW / WORK_W;
-            const scaleY = regionH / WORK_H;
-            placementScale = Math.min(scaleX, scaleY);
-            const renderedW = WORK_W * placementScale;
-            const renderedH = WORK_H * placementScale;
-            placementOffsetX = regionX + (regionW - renderedW) / 2;
-            placementOffsetY = regionY + (regionH - renderedH) / 2;
+            vpX = W * 0.74;
+            vpY = H * 0.30;
         };
 
-        // ── draw ──────────────────────────────────────────────────
-        const draw = () => {
+        // Draw a ray from the vanishing point to (or past) the canvas
+        // edge at the given angle. Alpha falls off near the vp so lines
+        // appear to emerge from depth rather than originating at a dot.
+        const drawRay = (angle: number, alpha: number, lineWidth: number) => {
+            const length = Math.hypot(W, H) * 1.2;
+            const x2 = vpX + Math.cos(angle) * length;
+            const y2 = vpY + Math.sin(angle) * length;
+            const grad = ctx.createLinearGradient(vpX, vpY, x2, y2);
+            grad.addColorStop(0, `rgba(${strokeRgb}, 0)`);
+            grad.addColorStop(0.18, `rgba(${strokeRgb}, ${alpha * 0.6})`);
+            grad.addColorStop(0.7, `rgba(${strokeRgb}, ${alpha})`);
+            grad.addColorStop(1, `rgba(${strokeRgb}, 0)`);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            ctx.moveTo(vpX, vpY);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        };
+
+        const loop = () => {
             if (activeRef.current) t += 0.012;
             ctx.clearRect(0, 0, W, H);
 
-            const breath = Math.sin(t * BREATH_SPEED) * BREATH_AMP;
+            // Static perspective rays — 16 evenly-spaced spokes around
+            // the vanishing point, alpha varying so some are emphasized.
+            const RAY_COUNT = 16;
+            for (let i = 0; i < RAY_COUNT; i++) {
+                const baseAngle = (i / RAY_COUNT) * Math.PI * 2;
+                // Slight per-ray drift so the field "breathes" rather
+                // than feeling locked-in static.
+                const drift = Math.sin(t * 0.4 + i * 1.13) * 0.012;
+                const angle = baseAngle + drift;
+                // Alternate emphasis — even-indexed rays brighter
+                const isEmphasis = i % 4 === 0;
+                const alpha = isEmphasis ? 0.18 : 0.07;
+                const w = isEmphasis ? 1.1 : 0.7;
+                drawRay(angle, alpha, w);
+            }
 
-            // Soft aura behind the figure — faint radial glow centered
-            // on the chest area, gives the silhouette some depth so
-            // particles don't read as floating in pure black.
-            const auraX = placementOffsetX + WORK_W * 0.50 * placementScale;
-            const auraY = placementOffsetY + WORK_H * 0.55 * placementScale;
-            const auraR = WORK_W * 0.55 * placementScale;
-            const aura = ctx.createRadialGradient(auraX, auraY, 0, auraX, auraY, auraR);
-            aura.addColorStop(0, `rgba(${strokeRgb}, 0.07)`);
-            aura.addColorStop(0.5, `rgba(${strokeRgb}, 0.02)`);
-            aura.addColorStop(1, `rgba(${strokeRgb}, 0)`);
-            ctx.fillStyle = aura;
-            ctx.fillRect(auraX - auraR, auraY - auraR, auraR * 2, auraR * 2);
+            // Horizon line — faint horizontal through the vp, suggests
+            // a ground/sky boundary the subject is grounded in.
+            const horizonGrad = ctx.createLinearGradient(0, vpY, W, vpY);
+            horizonGrad.addColorStop(0, `rgba(${strokeRgb}, 0)`);
+            horizonGrad.addColorStop(0.4, `rgba(${strokeRgb}, 0.16)`);
+            horizonGrad.addColorStop(0.6, `rgba(${strokeRgb}, 0.16)`);
+            horizonGrad.addColorStop(1, `rgba(${strokeRgb}, 0)`);
+            ctx.strokeStyle = horizonGrad;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, vpY);
+            ctx.lineTo(W, vpY);
+            ctx.stroke();
 
-            for (const s of seeds) {
-                // Intensity-driven render parameters
-                const alpha = 0.18 + s.intensity * 0.78;       // fills 0.18 → edges 0.96
-                const r = (0.7 + s.intensity * 1.0) * placementScale * 0.9;
-                const glow = 2.0 + s.intensity * 2.0;          // 2.0 → 4.0
-                const shimmer = 0.35 + s.intensity * 0.7;      // weak fills shimmer least
+            // Vanishing-point ring — a small circle marking the focal
+            // point. Subtle, just a graphic anchor.
+            ctx.strokeStyle = `rgba(${strokeRgb}, 0.35)`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(vpX, vpY, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(vpX, vpY, 14 + Math.sin(t * 1.2) * 2, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${strokeRgb}, 0.12)`;
+            ctx.stroke();
 
-                const sx = s.bx + Math.sin(t * 1.6 + s.phase) * shimmer;
-                const sy = s.by + Math.cos(t * 1.3 + s.phase * 1.7) * shimmer + breath;
-                const px = placementOffsetX + sx * placementScale;
-                const py = placementOffsetY + sy * placementScale;
+            // Floating waypoint marker — wireframe square bipyramid in
+            // gold, hovering above the head of the figure. Spins around
+            // its vertical axis and bobs gently. GTA-style.
+            drawWaypoint();
 
-                // Outer glow
-                const g = ctx.createRadialGradient(px, py, 0, px, py, r * glow);
-                g.addColorStop(0, `rgba(${strokeRgb}, ${alpha})`);
-                g.addColorStop(0.5, `rgba(${strokeRgb}, ${alpha * 0.25})`);
-                g.addColorStop(1, `rgba(${strokeRgb}, 0)`);
+            raf = requestAnimationFrame(loop);
+        };
+
+        // Square bipyramid (8-sided diamond) — 6 vertices in unit space:
+        // top, bottom, and four equator points. Faces filled with
+        // translucent yellow (sorted back-to-front so overlapping faces
+        // composite correctly), edges stroked over the top with a glow.
+        const drawWaypoint = () => {
+            // Anchor above the figure's head. Figure is flush bottom-
+            // right at width 62%, so head sits around 80-85% across and
+            // ~50-55% down. Marker hovers at 82% / 18% — directly above.
+            const cx = W * 0.82;
+            const cy = H * 0.18;
+            const size = Math.min(W, H) * 0.038;
+
+            const rotY = t * 0.55;
+            const bob = Math.sin(t * 1.3) * size * 0.10;
+
+            const verts3 = [
+                [0,   1.4, 0],   // 0 top apex
+                [0,  -1.4, 0],   // 1 bottom apex
+                [0.55, 0,  0],   // 2 east
+                [-0.55, 0, 0],   // 3 west
+                [0,   0,  0.55], // 4 north
+                [0,   0, -0.55], // 5 south
+            ];
+            const cosY = Math.cos(rotY);
+            const sinY = Math.sin(rotY);
+            const proj = verts3.map(([x, y, z]) => {
+                const x1 = x * cosY + z * sinY;
+                const z1 = -x * sinY + z * cosY;
+                const persp = 1 / (1 + z1 * 0.32);
+                return {
+                    x: cx + x1 * size * persp,
+                    y: cy + y * size * persp + bob,
+                    depth: z1,
+                };
+            });
+
+            // 8 triangle faces — 4 around the top apex, 4 around the
+            // bottom apex.
+            const faces: [number, number, number][] = [
+                [0, 2, 4], [0, 4, 3], [0, 3, 5], [0, 5, 2],
+                [1, 4, 2], [1, 3, 4], [1, 5, 3], [1, 2, 5],
+            ];
+
+            // Sort back-to-front so transparent fills layer correctly.
+            // Larger depth (z1) = farther; render those first.
+            const sorted = [...faces].sort((a, b) => {
+                const da = (proj[a[0]].depth + proj[a[1]].depth + proj[a[2]].depth) / 3;
+                const db = (proj[b[0]].depth + proj[b[1]].depth + proj[b[2]].depth) / 3;
+                return db - da;
+            });
+
+            ctx.save();
+
+            // Translucent face fills — dim, back-to-front. Front faces
+            // a touch brighter than back ones for the lit-side feel.
+            for (const [a, b, c] of sorted) {
+                const avgDepth =
+                    (proj[a].depth + proj[b].depth + proj[c].depth) / 3;
+                const alpha = 0.07 + Math.max(0, -avgDepth) * 0.07;
+                ctx.fillStyle = `rgba(250, 204, 21, ${alpha})`;
                 ctx.beginPath();
-                ctx.arc(px, py, r * glow, 0, Math.PI * 2);
-                ctx.fillStyle = g;
-                ctx.fill();
-
-                // Solid core
-                ctx.beginPath();
-                ctx.arc(px, py, Math.max(0.5, r * 0.6), 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${strokeRgb}, ${alpha})`;
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+                ctx.lineTo(proj[c].x, proj[c].y);
+                ctx.closePath();
                 ctx.fill();
             }
 
-            // ── 3D wireframe: hovering tetrahedron near the face ──
-            // After the horizontal flip the face center sits roughly
-            // at 0.50/0.27 of the working buffer. Tumbling tetrahedron
-            // hovers there as a "deconstructed reality" overlay.
-            const faceBufX = WORK_W * 0.50;
-            const faceBufY = WORK_H * 0.27;
-            const faceX = placementOffsetX + faceBufX * placementScale;
-            const faceY = placementOffsetY + faceBufY * placementScale + breath;
-            const tetSize = 30 * placementScale * 1.6;
-            drawTetrahedron(ctx, faceX, faceY, tetSize, t, strokeRgb);
+            // Edges
+            const edges: [number, number][] = [
+                [0, 2], [0, 3], [0, 4], [0, 5],
+                [1, 2], [1, 3], [1, 4], [1, 5],
+                [2, 4], [4, 3], [3, 5], [5, 2],
+            ];
 
-            raf = requestAnimationFrame(draw);
+            // Outer glow halo (dimmed)
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.10)';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            for (const [a, b] of edges) {
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+            }
+            ctx.stroke();
+
+            // Edge stroke — dimmed alpha so the marker reads as ambient
+            // rather than dominant.
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.60)';
+            ctx.lineWidth = 1.2;
+            ctx.shadowColor = 'rgba(250, 204, 21, 0.45)';
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            for (const [a, b] of edges) {
+                ctx.moveTo(proj[a].x, proj[a].y);
+                ctx.lineTo(proj[b].x, proj[b].y);
+            }
+            ctx.stroke();
+
+            // Apex dots (dim)
+            ctx.shadowBlur = 3;
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
+            for (const i of [0, 1]) {
+                ctx.beginPath();
+                ctx.arc(proj[i].x, proj[i].y, 1.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
         };
 
         const ro = new ResizeObserver(resize);
         ro.observe(parent);
         resize();
-        raf = requestAnimationFrame(draw);
+        raf = requestAnimationFrame(loop);
 
         return () => {
             cancelAnimationFrame(raf);
@@ -264,59 +256,11 @@ export default function PortraitBackground({ active }: Props) {
         };
     }, []);
 
-    return <canvas ref={canvasRef} className="hero-bg" aria-hidden />;
-}
-
-// Tumbling wireframe tetrahedron — 4 vertices in 3D, projected to 2D
-// with a simple perspective divide. Edges drawn as faint green lines.
-function drawTetrahedron(
-    ctx: CanvasRenderingContext2D,
-    cx: number,
-    cy: number,
-    size: number,
-    t: number,
-    rgb: string,
-) {
-    const verts3 = [
-        [0, -1, 0],
-        [Math.sqrt(8 / 9), 1 / 3, 0],
-        [-Math.sqrt(2 / 9), 1 / 3, Math.sqrt(2 / 3)],
-        [-Math.sqrt(2 / 9), 1 / 3, -Math.sqrt(2 / 3)],
-    ];
-    const angY = t * 0.4;
-    const angX = t * 0.25;
-    const cy2d = Math.cos(angY);
-    const sy2d = Math.sin(angY);
-    const cx2d = Math.cos(angX);
-    const sx2d = Math.sin(angX);
-    const proj = verts3.map(([x, y, z]) => {
-        const x1 = x * cy2d + z * sy2d;
-        const z1 = -x * sy2d + z * cy2d;
-        const y2 = y * cx2d - z1 * sx2d;
-        const z2 = y * sx2d + z1 * cx2d;
-        const persp = 1 / (1 + z2 * 0.18);
-        return { x: cx + x1 * size * persp, y: cy + y2 * size * persp };
-    });
-    const edges = [
-        [0, 1], [0, 2], [0, 3],
-        [1, 2], [2, 3], [3, 1],
-    ];
-    ctx.save();
-    ctx.strokeStyle = `rgba(${rgb}, 0.35)`;
-    ctx.lineWidth = 1;
-    ctx.shadowColor = `rgba(${rgb}, 0.3)`;
-    ctx.shadowBlur = 4;
-    ctx.beginPath();
-    for (const [a, b] of edges) {
-        ctx.moveTo(proj[a].x, proj[a].y);
-        ctx.lineTo(proj[b].x, proj[b].y);
-    }
-    ctx.stroke();
-    for (const v of proj) {
-        ctx.beginPath();
-        ctx.arc(v.x, v.y, 1.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${rgb}, 0.7)`;
-        ctx.fill();
-    }
-    ctx.restore();
+    return (
+        <div className={`portrait-bg ${active ? 'is-active' : ''}`} aria-hidden>
+            <canvas ref={canvasRef} className="portrait-bg__atmosphere" />
+            <div className="portrait-bg__figure" />
+            <div className="portrait-bg__figure portrait-bg__figure--top" />
+        </div>
+    );
 }

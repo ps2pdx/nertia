@@ -842,10 +842,16 @@ code, pre, kbd, samp {
 .hero-slider {
   position: relative;
   border-bottom: var(--w-hair) solid var(--line);
-  overflow: hidden;
+  /* No overflow clipping — slide-1 portrait deliberately overhangs
+     the bottom edge so it pops out over the fork section below. */
+  overflow: visible;
   isolation: isolate;
-  /* Reserve hero height even with all slides absolute. */
-  min-height: clamp(420px, 75vh, 880px);
+  /* Reserve hero height even with all slides absolute. The taller
+     slides (e.g. WEBSITES / & TOKENIZED / DESIGN SYSTEMS.) need
+     enough room for 3 lines of clamp(56px, 11vw, 168px) headline
+     plus eyebrow + caption + CTA + the controls/progress bar at
+     the bottom — so the upper bound has to clear ~960-1040px. */
+  min-height: clamp(640px, 88vh, 1080px);
   display: flex;
   flex-direction: column;
 }
@@ -854,17 +860,60 @@ code, pre, kbd, samp {
   inset: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--d-3, 600ms) var(--e-out, ease);
+  transition: opacity 520ms cubic-bezier(0.16, 0.84, 0.24, 1);
 }
-.hero-slide.is-active {
+.hero-slide[data-state="active"] {
   opacity: 1;
   pointer-events: auto;
   z-index: 2;
 }
+
+/* Copy slide-in/slide-out. Headline + CTA come in from the right and
+   exit left; caption goes the opposite way, with a slightly slower /
+   delayed timing so the two motions feel layered rather than synced.
+   Both use strong ease-out curves so each motion starts fast and
+   decelerates into place — reads as fast → slowmo. Backgrounds keep
+   their opacity crossfade only; the slide motion is text-only. */
+.hero-slide__content .home-hero__title,
+.hero-slide__content .hero-slide__cta {
+  transition: transform 640ms cubic-bezier(0.16, 0.84, 0.24, 1);
+  will-change: transform;
+}
+.hero-slide[data-state="active"] .home-hero__title,
+.hero-slide[data-state="active"] .hero-slide__cta {
+  transform: translateX(0);
+}
+.hero-slide[data-state="past"] .home-hero__title,
+.hero-slide[data-state="past"] .hero-slide__cta {
+  transform: translateX(-100%);
+}
+.hero-slide[data-state="future"] .home-hero__title,
+.hero-slide[data-state="future"] .hero-slide__cta {
+  transform: translateX(100%);
+}
+
+/* Caption goes the opposite direction (enters from left, exits right)
+   with a slightly slower duration and a small starting delay, so it
+   counters the headline rather than tracking it. */
+.hero-slide__content .home-hero__sub {
+  transition: transform 800ms cubic-bezier(0.12, 0.88, 0.22, 1) 80ms;
+  will-change: transform;
+}
+.hero-slide[data-state="active"] .home-hero__sub {
+  transform: translateX(0);
+}
+.hero-slide[data-state="past"] .home-hero__sub {
+  transform: translateX(100%);
+}
+.hero-slide[data-state="future"] .home-hero__sub {
+  transform: translateX(-100%);
+}
 .hero-slide__bg {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  /* No z-index here — let inner figures choose their own stacking
+     order vs. the .hero-slide__content text. */
+  overflow: visible;
 }
 .hero-slide__bg .hero-bg {
   display: block;
@@ -874,10 +923,13 @@ code, pre, kbd, samp {
 .hero-slide__content {
   position: relative;
   z-index: 2;
-  /* Top padding accommodates the extracted eyebrow that sits above each
-     slide (eyebrow row ≈ 20px + var(--s-6) margin gap = ~44px), so we
-     bump from var(--s-16) (64px) to var(--s-24) (96px). */
-  padding: var(--s-24) var(--s-8) var(--s-12);
+  /* Top padding accommodates the extracted eyebrow that sits above
+     each slide (eyebrow row ≈ 20px + var(--s-6) margin gap = ~44px),
+     so we bump from var(--s-16) (64px) to var(--s-24) (96px).
+     Bottom padding clears the centered controls (≈30px tall at
+     bottom: var(--s-4)) and the 2px progress bar — needs more
+     than var(--s-12) so the inline CTA doesn't crash into them. */
+  padding: var(--s-24) var(--s-8) calc(var(--s-12) + var(--s-12));
   pointer-events: none;
 }
 .hero-slide__content > * { pointer-events: auto; }
@@ -925,12 +977,49 @@ code, pre, kbd, samp {
   to   { transform: rotateX(0deg);  opacity: 1; }
 }
 
-.hero-slider__dots {
+/* Slide progress bar — fills 0% → 100% over the slide duration, then
+   resets when the active slide changes (parent uses key={active} to
+   remount the bar and restart the CSS animation). */
+.hero-slider__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 7;
+  background: color-mix(in oklab, var(--fg) 8%, transparent);
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-slider__progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--accent) 60%, transparent);
+  animation: heroProgressFill 12000ms linear forwards;
+}
+@keyframes heroProgressFill {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-slider__progress-bar { animation: none; width: 0; }
+}
+
+/* Centered control bar — prev arrow · dots · next arrow */
+.hero-slider__controls {
   position: absolute;
   bottom: var(--s-4);
-  right: var(--s-8);
-  z-index: 3;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
   display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.hero-slider__dots {
+  display: flex;
+  align-items: center;
   gap: var(--s-2);
 }
 .hero-slider__dot {
@@ -950,17 +1039,54 @@ code, pre, kbd, samp {
   border-color: var(--accent);
 }
 
+.hero-slider__arrow {
+  appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--fg) 30%, transparent);
+  color: var(--fg-muted);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-mono);
+  font-size: 14px;
+  line-height: 1;
+  transition: background var(--d-1) var(--e-out),
+              border-color var(--d-1) var(--e-out),
+              color var(--d-1) var(--e-out);
+}
+.hero-slider__arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.hero-slider__arrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .hero-slider__controls { bottom: var(--s-3); gap: var(--s-2); }
+  .hero-slider__arrow { width: 24px; height: 24px; font-size: 12px; }
+}
+
 @media (max-width: 1024px) {
-  /* var(--s-12) + ~36px → ~84px ≈ var(--s-16) + var(--s-3) */
-  .hero-slide__content { padding: calc(var(--s-16) + var(--s-3)) var(--s-6) var(--s-12); }
+  /* Top: var(--s-12) + ~36px → ~84px ≈ var(--s-16) + var(--s-3).
+     Bottom bumped so the CTA still clears the centered controls. */
+  .hero-slide__content {
+    padding: calc(var(--s-16) + var(--s-3)) var(--s-6) calc(var(--s-12) + var(--s-8));
+  }
   .hero-slider__eyebrow { top: var(--s-12); left: var(--s-6); right: var(--s-6); }
 }
 @media (max-width: 768px) {
-  .hero-slider { min-height: 60vh; }
-  /* var(--s-8) + ~36px → ~68px ≈ var(--s-16) + var(--s-1) */
-  .hero-slide__content { padding: calc(var(--s-16) + var(--s-1)) var(--s-4) var(--s-8); }
+  .hero-slider { min-height: clamp(560px, 88vh, 900px); }
+  /* Top: var(--s-8) + ~36px → ~68px ≈ var(--s-16) + var(--s-1) */
+  .hero-slide__content {
+    padding: calc(var(--s-16) + var(--s-1)) var(--s-4) calc(var(--s-8) + var(--s-12));
+  }
   .hero-slider__eyebrow { top: var(--s-8); left: var(--s-4); right: var(--s-4); }
-  .hero-slider__dots { right: var(--s-4); bottom: var(--s-3); }
 }
 .home-hero__eyebrow {
   display: flex; align-items: center; gap: var(--s-3);
@@ -987,6 +1113,82 @@ code, pre, kbd, samp {
   margin-top: var(--s-6); max-width: 540px;
   font-family: var(--f-mono); font-size: 13px; line-height: 1.6;
   color: var(--fg-muted); letter-spacing: 0.02em;
+}
+
+/* Slide 1 portrait — vector edge trace of the source photo over a
+   canvas atmosphere (faint blueprint grid, drifting motes, slow scan
+   line sweep). Figure colored via currentColor so it inherits --accent. */
+.portrait-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: var(--accent);
+  opacity: 0.88;
+  transition: opacity var(--d-3, 600ms) var(--e-out, ease);
+}
+.portrait-bg.is-active { opacity: 0.95; }
+
+.portrait-bg__atmosphere {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
+}
+
+/* The figure is the SVG silhouette rendered as a CSS mask. Two stacked
+   copies: a colored base (var(--accent)) and a white highlight nudged
+   slightly up-left so the line drawing reads as offset-printed.
+   Anchored flush bottom-right and oversized so it overhangs the
+   slider's bottom border, layering on top of the section below.
+   z-index above .hero-slide__content (z: 2) so the figure pops over
+   the headline. */
+.portrait-bg__figure {
+  position: absolute;
+  top: auto;
+  right: 0;
+  bottom: -8%;
+  left: auto;
+  width: 62%;
+  height: 110%;
+  max-width: 880px;
+  z-index: 5;
+  background-color: var(--accent);
+  -webkit-mask-image: url('/scott-portrait-blueprint.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-position: bottom right;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: url('/scott-portrait-blueprint.svg');
+  mask-size: contain;
+  mask-position: bottom right;
+  mask-repeat: no-repeat;
+  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 28%, transparent));
+  animation: portraitBreathe 7s var(--e-in-out, ease-in-out) infinite;
+}
+.portrait-bg__figure--top {
+  z-index: 6;
+  background-color: #f3f1ec; /* paper-900 — off-white highlight */
+  /* `translate` is a composited transform property — composes with
+     the keyframe's transform without overriding it, so the breathe
+     animation still applies to both layers. */
+  translate: -6px -4px;
+  filter: drop-shadow(0 0 8px color-mix(in oklab, #ffffff 22%, transparent));
+}
+@keyframes portraitBreathe {
+  0%, 100% { opacity: 0.92; transform: translateY(0); }
+  50%      { opacity: 1.0;  transform: translateY(-3px); }
+}
+
+@media (max-width: 768px) {
+  .portrait-bg__figure {
+    width: 78%;
+    height: 105%;
+    bottom: -6%;
+  }
+  .portrait-bg__figure--top { translate: -4px -3px; }
+  /* Mobile keeps the figure visible so it still pops; the headline
+     reads down-left of it. */
 }
 
 /* Inline per-slide CTA — small mono link below the caption. */
