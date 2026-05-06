@@ -65,6 +65,7 @@ const FLIP_STAGGER_MS = 12;
 
 export default function HeroSlider() {
     const [active, setActive] = useState(0);
+    const prevActive = usePrevious(active);
 
     useEffect(() => {
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -77,6 +78,18 @@ export default function HeroSlider() {
 
     const slide = SLIDES[active];
 
+    // Slide-state machine for the slide-in/slide-out transition. The
+    // active slide sits center; the slide that just left is "past"
+    // (translated off-left); everything else is "future" (waiting
+    // off-right). Only state changes trigger CSS transitions, so a
+    // slide that's been parked in 'future' for a while doesn't animate
+    // on every render.
+    const stateFor = (i: number): 'active' | 'past' | 'future' => {
+        if (i === active) return 'active';
+        if (i === prevActive) return 'past';
+        return 'future';
+    };
+
     return (
         <section className="hero-slider" aria-label="Featured">
             <div className="hero-slider__eyebrow home-hero__eyebrow">
@@ -87,12 +100,14 @@ export default function HeroSlider() {
 
             {SLIDES.map((s, i) => {
                 const isActive = i === active;
+                const slideState = stateFor(i);
                 const { Background } = s;
                 return (
                     <article
                         key={s.id}
-                        className={`hero-slide ${isActive ? 'is-active' : ''}`}
+                        className="hero-slide"
                         data-slide={s.id}
+                        data-state={slideState}
                         aria-hidden={!isActive}
                     >
                         <div className="hero-slide__bg">
@@ -193,4 +208,15 @@ function FlapText({ value, className = '' }: { value: string; className?: string
             ))}
         </span>
     );
+}
+
+// Returns the value of the previous render — used to track which slide
+// just transitioned out so we can park it on the left while the new
+// active slide enters from the right.
+function usePrevious<T>(value: T): T | undefined {
+    const ref = useRef<T | undefined>(undefined);
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
+    return ref.current;
 }

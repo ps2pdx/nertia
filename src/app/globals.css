@@ -856,12 +856,32 @@ code, pre, kbd, samp {
   inset: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--d-3, 600ms) var(--e-out, ease);
+  transition: opacity 520ms cubic-bezier(0.16, 0.84, 0.24, 1);
 }
-.hero-slide.is-active {
+.hero-slide[data-state="active"] {
   opacity: 1;
   pointer-events: auto;
   z-index: 2;
+}
+
+/* Copy slide-in/slide-out. The active slide's content sits center;
+   the slide that just left has its content parked off-left ('past');
+   future slides wait off-right ('future'). The cubic-bezier is a
+   strong ease-out — motion starts fast and decelerates into place,
+   reading as fast → slowmo. Backgrounds keep their opacity crossfade
+   only; the slide motion is text-only. */
+.hero-slide__content {
+  transition: transform 640ms cubic-bezier(0.16, 0.84, 0.24, 1);
+  will-change: transform;
+}
+.hero-slide[data-state="active"] .hero-slide__content {
+  transform: translateX(0);
+}
+.hero-slide[data-state="past"] .hero-slide__content {
+  transform: translateX(-100%);
+}
+.hero-slide[data-state="future"] .hero-slide__content {
+  transform: translateX(100%);
 }
 .hero-slide__bg {
   position: absolute;
