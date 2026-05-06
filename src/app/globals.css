@@ -748,6 +748,26 @@ code, pre, kbd, samp {
   min-height: calc(100vh - var(--header-height));
   display: flex; flex-direction: column;
   overflow-x: clip;
+  position: relative;
+}
+
+.double-slit-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.double-slit-field canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.home-hero,
+.home-fork,
+.home-ticker {
+  position: relative;
+  z-index: 1;
 }
 
 .home-hero {

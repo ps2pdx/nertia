@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import DoubleSlitField from '@/components/DoubleSlitField';
 
 export default function HomeDiptych() {
     return (
         <main className="home-root">
+            <DoubleSlitField />
             <section className="home-hero">
                 <div className="home-hero__eyebrow">
                     <span className="home-hero__bracket">[ SCOTT CAMPBELL ]</span>
