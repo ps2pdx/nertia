@@ -846,8 +846,12 @@ code, pre, kbd, samp {
      the bottom edge so it pops out over the fork section below. */
   overflow: visible;
   isolation: isolate;
-  /* Reserve hero height even with all slides absolute. */
-  min-height: clamp(420px, 75vh, 880px);
+  /* Reserve hero height even with all slides absolute. The taller
+     slides (e.g. WEBSITES / & TOKENIZED / DESIGN SYSTEMS.) need
+     enough room for 3 lines of clamp(56px, 11vw, 168px) headline
+     plus eyebrow + caption + CTA + the controls/progress bar at
+     the bottom — so the upper bound has to clear ~960-1040px. */
+  min-height: clamp(640px, 88vh, 1080px);
   display: flex;
   flex-direction: column;
 }
@@ -919,10 +923,13 @@ code, pre, kbd, samp {
 .hero-slide__content {
   position: relative;
   z-index: 2;
-  /* Top padding accommodates the extracted eyebrow that sits above each
-     slide (eyebrow row ≈ 20px + var(--s-6) margin gap = ~44px), so we
-     bump from var(--s-16) (64px) to var(--s-24) (96px). */
-  padding: var(--s-24) var(--s-8) var(--s-12);
+  /* Top padding accommodates the extracted eyebrow that sits above
+     each slide (eyebrow row ≈ 20px + var(--s-6) margin gap = ~44px),
+     so we bump from var(--s-16) (64px) to var(--s-24) (96px).
+     Bottom padding clears the centered controls (≈30px tall at
+     bottom: var(--s-4)) and the 2px progress bar — needs more
+     than var(--s-12) so the inline CTA doesn't crash into them. */
+  padding: var(--s-24) var(--s-8) calc(var(--s-12) + var(--s-12));
   pointer-events: none;
 }
 .hero-slide__content > * { pointer-events: auto; }
@@ -1066,14 +1073,19 @@ code, pre, kbd, samp {
 }
 
 @media (max-width: 1024px) {
-  /* var(--s-12) + ~36px → ~84px ≈ var(--s-16) + var(--s-3) */
-  .hero-slide__content { padding: calc(var(--s-16) + var(--s-3)) var(--s-6) var(--s-12); }
+  /* Top: var(--s-12) + ~36px → ~84px ≈ var(--s-16) + var(--s-3).
+     Bottom bumped so the CTA still clears the centered controls. */
+  .hero-slide__content {
+    padding: calc(var(--s-16) + var(--s-3)) var(--s-6) calc(var(--s-12) + var(--s-8));
+  }
   .hero-slider__eyebrow { top: var(--s-12); left: var(--s-6); right: var(--s-6); }
 }
 @media (max-width: 768px) {
-  .hero-slider { min-height: 60vh; }
-  /* var(--s-8) + ~36px → ~68px ≈ var(--s-16) + var(--s-1) */
-  .hero-slide__content { padding: calc(var(--s-16) + var(--s-1)) var(--s-4) var(--s-8); }
+  .hero-slider { min-height: clamp(560px, 88vh, 900px); }
+  /* Top: var(--s-8) + ~36px → ~68px ≈ var(--s-16) + var(--s-1) */
+  .hero-slide__content {
+    padding: calc(var(--s-16) + var(--s-1)) var(--s-4) calc(var(--s-8) + var(--s-12));
+  }
   .hero-slider__eyebrow { top: var(--s-8); left: var(--s-4); right: var(--s-4); }
 }
 .home-hero__eyebrow {

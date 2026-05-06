@@ -131,13 +131,17 @@ export default function EyeBackground({ active }: Props) {
         const sphere = buildSphere(8, 12, 36);
 
         // ── camera / projection ──────────────────────────────────
-        // Tightly framed on the central pyramid + eye-cap. Camera sits
-        // close, slightly to the left, roughly cap-level — places the
-        // cap (and the eye inside) in the upper-right of the canvas
-        // while the rest of the grid extends off into the distance.
-        const camPos: V3 = { x: -0.9, y: 1.45, z: -3.4 };
-        const camPitch = -0.05;          // mostly horizontal, slight down
-        const fov = 4.6;                 // perspective scale
+        // Wide-angle dramatic close-up. Camera sits very close to the
+        // central pyramid + eye, slightly left of center and above
+        // cap-level, looking down/forward — the eye dominates the
+        // upper-right of the canvas while the rest of the pyramid
+        // grid extends off into the distance with progressive blur.
+        const camPos: V3 = { x: -0.95, y: 1.2, z: -2.0 };
+        const camPitch = -0.18;          // look down-forward at the cap
+        const fov = 5.4;                 // wider perspective for dramatic foreshortening
+        // Focal depth — where the camera is "in focus". Pyramids
+        // closer or further than this get progressively blurred.
+        const focalDepth = 2.1;
 
         // Project a world point to canvas coords, returning null if it's
         // behind the camera.
