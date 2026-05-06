@@ -19,33 +19,40 @@ type Slide = {
 };
 
 const SLIDES: Slide[] = [
+    // Each slide follows the same five-slot ladder and shares no content
+    // with neighbors:
+    //   bracket  — concept umbrella for this slide
+    //   role     — 3 short tag descriptors (X · Y · Z)
+    //   headline — the punchline, large display
+    //   caption  — single explanatory sentence
+    //   cta      — action verb + destination
     {
         id: 'grid',
         eyebrowBracket: '[ NERTIA ]',
-        eyebrowRole: '10+ YEARS · PMM × AI-GTM × FULL-STACK',
+        eyebrowRole: 'PORTLAND · 10+ YEARS · PMM × AI-GTM',
         headline: { line1: 'CAMPBELL,', line2: 'DOUGLAS', line3: 'SCOTT', line3Mark: '.' },
         caption:
-            'Applied AI GTM pipelines, brand systems, production code. Built in Portland. Available for senior IC, lead, and contract work.',
+            'Product marketing operator with full-stack chops. Available for IC, lead, and contract roles.',
         cta: { label: '→ SEE THE RESUME', href: '/resume' },
         Background: GridBackground,
     },
     {
         id: 'topo',
         eyebrowBracket: '[ FREE ENERGY TOOLING ]',
-        eyebrowRole: 'WEBSITES & TOKENIZED DESIGN SYSTEMS',
-        headline: { line1: 'ZERO-POINT', line2: 'WEB &', line3: 'TOKENS', line3Mark: '.' },
+        eyebrowRole: 'AI-NATIVE · OPEN BETA · NO RUNTIME',
+        headline: { line1: 'WEBSITES', line2: '& TOKENIZED', line3: 'DESIGN SYSTEMS', line3Mark: '.' },
         caption:
-            'AI-FREE, AI-generated. Zero API calls, zero token costs at runtime — sites stay free because nothing’s running. Hosted at {slug}.nertia.ai.',
+            'AI-generated once, then static — no API calls, no token costs. Hosted free at {slug}.nertia.ai.',
         cta: { label: '→ SIGN UP FOR THE BETA', href: '/zero-point' },
         Background: TopoBackground,
     },
     {
         id: 'eye',
-        eyebrowBracket: '[ CAMPBELL, DOUGLAS SCOTT ]',
+        eyebrowBracket: '[ BRAND PHYSICS ]',
         eyebrowRole: 'PARTICLE · WAVE · ENTANGLEMENT',
         headline: { line1: 'OBSERVATION', line2: '', line3: 'SYNC', line3Mark: '.' },
         caption:
-            'Brand physics for the AI-native era. Zero-point as starting position. Particles of attention, observed into shape.',
+            'Brand systems for the AI-native era. Zero-point as the starting state — quanta of attention, collapsed to shape.',
         cta: { label: '→ READ THE THESIS', href: '/blog' },
         Background: EyeBackground,
     },
