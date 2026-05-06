@@ -145,6 +145,7 @@ export default function PortraitBackground({ active }: Props) {
         <div className={`portrait-bg ${active ? 'is-active' : ''}`} aria-hidden>
             <canvas ref={canvasRef} className="portrait-bg__atmosphere" />
             <div className="portrait-bg__figure" />
+            <div className="portrait-bg__figure portrait-bg__figure--top" />
         </div>
     );
 }

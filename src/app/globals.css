@@ -1011,11 +1011,10 @@ code, pre, kbd, samp {
   display: block;
 }
 
-/* The figure is the SVG silhouette rendered as a CSS mask. The fill
-   color comes from background-color (= var(--accent)), so the figure
-   tracks the theme automatically and we avoid the XML/innerHTML
-   pitfalls of inlining a potrace SVG. Positioned to the right ~half
-   of the slide so the headline reads cleanly. */
+/* The figure is the SVG silhouette rendered as a CSS mask. Two stacked
+   copies: a colored base (var(--accent)) and a white highlight nudged
+   slightly up-left so the line drawing reads as offset-printed —
+   gives the figure visual punch and depth. */
 .portrait-bg__figure {
   position: absolute;
   top: 4%;
@@ -1036,6 +1035,15 @@ code, pre, kbd, samp {
   filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 28%, transparent));
   animation: portraitBreathe 7s var(--e-in-out, ease-in-out) infinite;
 }
+.portrait-bg__figure--top {
+  z-index: 3;
+  background-color: #f3f1ec; /* paper-900 — off-white highlight */
+  /* `translate` is a composited transform property — composes with
+     the keyframe's transform without overriding it, so the breathe
+     animation still applies to both layers. */
+  translate: -6px -4px;
+  filter: drop-shadow(0 0 8px color-mix(in oklab, #ffffff 22%, transparent));
+}
 @keyframes portraitBreathe {
   0%, 100% { opacity: 0.92; transform: translateY(0); }
   50%      { opacity: 1.0;  transform: translateY(-3px); }
@@ -1047,6 +1055,7 @@ code, pre, kbd, samp {
     right: 10%;
     left: 10%;
   }
+  .portrait-bg__figure--top { translate: -4px -3px; }
   .portrait-bg { opacity: 0.18; }
 }
 
