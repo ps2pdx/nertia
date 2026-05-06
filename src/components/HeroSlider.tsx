@@ -36,7 +36,7 @@ const SLIDES: Slide[] = [
         headline: { line1: 'ZERO-POINT', line2: 'WEB &', line3: 'TOKENS', line3Mark: '.' },
         caption:
             'AI-FREE, AI-generated. Zero API calls, zero token costs at runtime — sites stay free because nothing’s running. Hosted at {slug}.nertia.ai.',
-        cta: { label: '→ TRY ZERO-POINT', href: '/zero-point' },
+        cta: { label: '→ SIGN UP FOR THE BETA', href: '/zero-point' },
         Background: TopoBackground,
     },
     {
