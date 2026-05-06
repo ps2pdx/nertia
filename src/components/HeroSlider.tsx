@@ -86,8 +86,8 @@ export default function HeroSlider() {
                             </h1>
 
                             <p className="home-hero__sub">
-                                Applied AI GTM pipelines, brand systems, and production code — built in Portland.
-                                Two clear paths from here.
+                                Applied AI GTM pipelines, brand systems, and production code automation.
+                                Designed universally. Built in Portland, OR.
                             </p>
                         </div>
                     </article>
