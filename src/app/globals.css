@@ -874,10 +874,45 @@ code, pre, kbd, samp {
 .hero-slide__content {
   position: relative;
   z-index: 2;
-  padding: var(--s-16) var(--s-8) var(--s-12);
+  /* Top padding accommodates the extracted eyebrow that sits above each
+     slide. Eyebrow row ≈ 24px + var(--s-6) margin-bottom. */
+  padding: calc(var(--s-16) + var(--s-9)) var(--s-8) var(--s-12);
   pointer-events: none;
 }
 .hero-slide__content > * { pointer-events: auto; }
+
+/* Shared eyebrow lifted out of individual slides so a single role span
+   can collapse-out / expand-in across slide changes. */
+.hero-slider__eyebrow {
+  position: absolute;
+  top: var(--s-16);
+  left: var(--s-8);
+  right: var(--s-8);
+  z-index: 4;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+.hero-slider__eyebrow > * { pointer-events: auto; }
+
+.home-hero__role {
+  display: inline-block;
+  transform-origin: left center;
+  white-space: nowrap;
+}
+.hero-eyebrow-role-collapsing {
+  animation: heroEyebrowCollapse 320ms var(--e-out, cubic-bezier(0.2, 0, 0.2, 1)) both;
+}
+.hero-eyebrow-role-expanding {
+  animation: heroEyebrowExpand 450ms var(--e-out, cubic-bezier(0.2, 0, 0.2, 1)) both;
+}
+@keyframes heroEyebrowCollapse {
+  from { transform: scaleX(1); opacity: 1; }
+  to   { transform: scaleX(0); opacity: 0; }
+}
+@keyframes heroEyebrowExpand {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
 
 .hero-slider__dots {
   position: absolute;
@@ -905,11 +940,13 @@ code, pre, kbd, samp {
 }
 
 @media (max-width: 1024px) {
-  .hero-slide__content { padding: var(--s-12) var(--s-6); }
+  .hero-slide__content { padding: calc(var(--s-12) + var(--s-9)) var(--s-6) var(--s-12); }
+  .hero-slider__eyebrow { top: var(--s-12); left: var(--s-6); right: var(--s-6); }
 }
 @media (max-width: 768px) {
   .hero-slider { min-height: 60vh; }
-  .hero-slide__content { padding: var(--s-8) var(--s-4); }
+  .hero-slide__content { padding: calc(var(--s-8) + var(--s-9)) var(--s-4) var(--s-8); }
+  .hero-slider__eyebrow { top: var(--s-8); left: var(--s-4); right: var(--s-4); }
   .hero-slider__dots { right: var(--s-4); bottom: var(--s-3); }
 }
 .home-hero__eyebrow {
