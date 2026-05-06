@@ -43,7 +43,7 @@ const SLIDES: Slide[] = [
         id: 'eye',
         eyebrowBracket: '[ CAMPBELL, DOUGLAS SCOTT ]',
         eyebrowRole: 'PARTICLE · WAVE · ENTANGLEMENT',
-        headline: { line1: 'SYNCHRONIZE', line2: 'THE', line3: 'OBSERVATION', line3Mark: '.' },
+        headline: { line1: 'OBSERVATION', line2: '', line3: 'SYNC', line3Mark: '.' },
         caption:
             'Brand physics for the AI-native era. Zero-point as starting position. Particles of attention, observed into shape.',
         cta: { label: '→ READ THE THESIS', href: '/blog' },
@@ -95,8 +95,12 @@ export default function HeroSlider() {
                             <h1 className="home-hero__title">
                                 {s.headline.line1}
                                 <br />
-                                <span className="home-hero__title-muted">{s.headline.line2} </span>
-                                <br />
+                                {s.headline.line2 && (
+                                    <>
+                                        <span className="home-hero__title-muted">{s.headline.line2} </span>
+                                        <br />
+                                    </>
+                                )}
                                 <span className="home-hero__title-mark">
                                     {s.headline.line3}
                                     <span className="home-hero__title-dot">{s.headline.line3Mark}</span>
