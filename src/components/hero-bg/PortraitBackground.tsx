@@ -144,7 +144,7 @@ export default function PortraitBackground({ active }: Props) {
             // ~50-55% down. Marker hovers at 82% / 18% — directly above.
             const cx = W * 0.82;
             const cy = H * 0.18;
-            const size = Math.min(W, H) * 0.075;
+            const size = Math.min(W, H) * 0.038;
 
             const rotY = t * 0.55;
             const bob = Math.sin(t * 1.3) * size * 0.10;
@@ -187,13 +187,12 @@ export default function PortraitBackground({ active }: Props) {
 
             ctx.save();
 
-            // Translucent face fills — back-to-front. Nearer faces get
-            // a slightly higher alpha so they "front-light".
+            // Translucent face fills — dim, back-to-front. Front faces
+            // a touch brighter than back ones for the lit-side feel.
             for (const [a, b, c] of sorted) {
                 const avgDepth =
                     (proj[a].depth + proj[b].depth + proj[c].depth) / 3;
-                // depth in [-0.55, 0.55] roughly; map to alpha.
-                const alpha = 0.14 + Math.max(0, -avgDepth) * 0.12;
+                const alpha = 0.07 + Math.max(0, -avgDepth) * 0.07;
                 ctx.fillStyle = `rgba(250, 204, 21, ${alpha})`;
                 ctx.beginPath();
                 ctx.moveTo(proj[a].x, proj[a].y);
@@ -210,9 +209,9 @@ export default function PortraitBackground({ active }: Props) {
                 [2, 4], [4, 3], [3, 5], [5, 2],
             ];
 
-            // Outer glow halo
-            ctx.strokeStyle = 'rgba(250, 204, 21, 0.20)';
-            ctx.lineWidth = 6;
+            // Outer glow halo (dimmed)
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.10)';
+            ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.beginPath();
             for (const [a, b] of edges) {
@@ -221,11 +220,12 @@ export default function PortraitBackground({ active }: Props) {
             }
             ctx.stroke();
 
-            // Solid bright edges with shadow glow
-            ctx.strokeStyle = 'rgba(250, 204, 21, 1)';
-            ctx.lineWidth = 1.8;
-            ctx.shadowColor = 'rgba(250, 204, 21, 0.75)';
-            ctx.shadowBlur = 10;
+            // Edge stroke — dimmed alpha so the marker reads as ambient
+            // rather than dominant.
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.60)';
+            ctx.lineWidth = 1.2;
+            ctx.shadowColor = 'rgba(250, 204, 21, 0.45)';
+            ctx.shadowBlur = 5;
             ctx.beginPath();
             for (const [a, b] of edges) {
                 ctx.moveTo(proj[a].x, proj[a].y);
@@ -233,12 +233,12 @@ export default function PortraitBackground({ active }: Props) {
             }
             ctx.stroke();
 
-            // Apex dots
-            ctx.shadowBlur = 5;
-            ctx.fillStyle = 'rgba(255, 230, 100, 1)';
+            // Apex dots (dim)
+            ctx.shadowBlur = 3;
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
             for (const i of [0, 1]) {
                 ctx.beginPath();
-                ctx.arc(proj[i].x, proj[i].y, 2, 0, Math.PI * 2);
+                ctx.arc(proj[i].x, proj[i].y, 1.4, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
