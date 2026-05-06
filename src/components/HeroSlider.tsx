@@ -87,7 +87,7 @@ export default function HeroSlider() {
 
                             <p className="home-hero__sub">
                                 Applied AI GTM pipelines, brand systems, and production code automation.
-                                Designed universally. Built in Portland, OR.
+                                Designed universally. Built in Portland.
                             </p>
                         </div>
                     </article>

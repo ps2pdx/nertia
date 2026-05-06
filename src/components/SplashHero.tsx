@@ -33,7 +33,7 @@ export default function SplashHero({ onDismiss }: Props) {
     const [fading, setFading] = useState(false);
     const wrapRef = useRef<HTMLDivElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const iRef = useRef<HTMLSpanElement | null>(null);
+    const emitterRef = useRef<HTMLSpanElement | null>(null);
 
     // Auto-dismiss timer + reduced-motion guard
     useEffect(() => {
@@ -78,14 +78,14 @@ export default function SplashHero({ onDismiss }: Props) {
 
         const findEmitter = () => {
             const wrapRect = wrap.getBoundingClientRect();
-            const iEl = iRef.current;
-            if (iEl) {
-                const iRect = iEl.getBoundingClientRect();
-                emitterX = iRect.left + iRect.width / 2 - wrapRect.left;
-                emitterY = iRect.bottom - wrapRect.top - 4;
+            const el = emitterRef.current;
+            if (el) {
+                const rect = el.getBoundingClientRect();
+                emitterX = rect.left + rect.width / 2 - wrapRect.left;
+                emitterY = rect.bottom - wrapRect.top - 1;
             } else {
                 emitterX = W * 0.5;
-                emitterY = H * 0.4;
+                emitterY = H * 0.6;
             }
             slit1cx = emitterX - SLIT_OFFSET_PX;
             slit2cx = emitterX + SLIT_OFFSET_PX;
@@ -100,9 +100,9 @@ export default function SplashHero({ onDismiss }: Props) {
             canvas.style.width = `${W}px`;
             canvas.style.height = `${H}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            // Slit line near the bottom of the splash viewport, leaving room
-            // for the subtitle above it.
-            lineY = H * 0.78;
+            // Slit line low in the splash viewport — emitter is in the
+            // subtitle area, so we need fall room beneath it.
+            lineY = H * 0.86;
             findEmitter();
             particles = [];
         };
@@ -266,12 +266,12 @@ export default function SplashHero({ onDismiss }: Props) {
                     FRAMEWORKS<br />
                     <span className="home-hero__title-muted">FOR </span>
                     <span className="home-hero__title-mark">
-                        PROPULS<span ref={iRef} className="home-hero__title-i">I</span>ON<span className="home-hero__title-dot">.</span>
+                        PROPULSION<span className="home-hero__title-dot">.</span>
                     </span>
                 </h1>
                 <p className="home-hero__sub">
                     Applied AI GTM pipelines, brand systems, and production code automation.
-                    Designed universally. Built in Portland, OR.
+                    Designed universally. Built in Portland<span ref={emitterRef} className="home-hero__sub-emitter">.</span>
                 </p>
             </div>
             <button
