@@ -49,11 +49,6 @@ export default function TopoBackground({ active }: Props) {
             { nx: 0.82, ny: 0.28, vx: -0.00005, vy: 0.00008, h: 2.5, radius: 150 },
         ];
 
-        // Smoothly-tracked HUD target — interpolates toward the focused peak.
-        let targetX = 0;
-        let targetY = 0;
-        let lastFocusIdx = -1;
-
         const resize = () => {
             const rect = parent.getBoundingClientRect();
             W = rect.width;
@@ -63,105 +58,6 @@ export default function TopoBackground({ active }: Props) {
             canvas.style.width = `${W}px`;
             canvas.style.height = `${H}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        };
-
-        const drawHud = (focusIdx: number) => {
-            const p = peaks[focusIdx];
-            const px = p.nx * W;
-            const py = p.ny * H;
-
-            // Snap-to-target with smoothing
-            const ease = lastFocusIdx === focusIdx ? 0.05 : 0.08;
-            targetX += (px - targetX) * ease;
-            targetY += (py - targetY) * ease;
-
-            const boxSize = 110;
-            const half = boxSize / 2;
-            const left = targetX - half;
-            const right = targetX + half;
-            const top = targetY - half;
-            const bot = targetY + half;
-
-            ctx.save();
-
-            // Corner brackets
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.7)';
-            ctx.lineWidth = 1.5;
-            ctx.shadowColor = 'rgba(34, 197, 94, 0.4)';
-            ctx.shadowBlur = 3;
-            const len = 16;
-            const bracket = (x: number, y: number, dx: number, dy: number) => {
-                ctx.beginPath();
-                ctx.moveTo(x, y + dy * len);
-                ctx.lineTo(x, y);
-                ctx.lineTo(x + dx * len, y);
-                ctx.stroke();
-            };
-            bracket(left, top, 1, 1);
-            bracket(right, top, -1, 1);
-            bracket(right, bot, -1, -1);
-            bracket(left, bot, 1, -1);
-
-            // Center crosshair
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.55)';
-            ctx.shadowBlur = 0;
-            ctx.beginPath();
-            ctx.moveTo(targetX - 9, targetY);
-            ctx.lineTo(targetX - 3, targetY);
-            ctx.moveTo(targetX + 3, targetY);
-            ctx.lineTo(targetX + 9, targetY);
-            ctx.moveTo(targetX, targetY - 9);
-            ctx.lineTo(targetX, targetY - 3);
-            ctx.moveTo(targetX, targetY + 3);
-            ctx.lineTo(targetX, targetY + 9);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(targetX, targetY, 1.5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(34, 197, 94, 0.85)';
-            ctx.fill();
-
-            // Label callout — anchored to top-right of the box, with a small
-            // dogleg connector.
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.45)';
-            ctx.beginPath();
-            ctx.moveTo(right, top);
-            ctx.lineTo(right + 12, top - 12);
-            ctx.lineTo(right + 96, top - 12);
-            ctx.stroke();
-
-            ctx.font = '10px ui-monospace, "JetBrains Mono", monospace';
-            ctx.fillStyle = 'rgba(34, 197, 94, 0.85)';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'alphabetic';
-            const elev = Math.round(p.h * 1240 + 800);
-            ctx.fillText(`PEAK ${String(focusIdx + 1).padStart(2, '0')}`, right + 16, top - 16);
-            ctx.fillStyle = 'rgba(160, 220, 180, 0.7)';
-            ctx.fillText(`ELEV ${elev}M`, right + 16, top - 4);
-
-            // Coords pinned bottom-left of box
-            const lat = (47 + p.ny * 0.4).toFixed(3);
-            const lon = (122 + p.nx * 0.5).toFixed(3);
-            ctx.fillStyle = 'rgba(160, 220, 180, 0.6)';
-            ctx.fillText(`${lat}°N`, left, bot + 14);
-            ctx.fillText(`${lon}°W`, left, bot + 26);
-
-            ctx.restore();
-        };
-
-        const drawFrameHud = (focusIdx: number) => {
-            ctx.save();
-            ctx.font = '10px ui-monospace, "JetBrains Mono", monospace';
-            ctx.fillStyle = 'rgba(34, 197, 94, 0.55)';
-            ctx.textBaseline = 'top';
-            ctx.fillText(`RECON · ${(t * 12).toFixed(0).padStart(4, '0')}`, 16, 16);
-            ctx.textAlign = 'right';
-            ctx.fillText(`SECTOR 47 · ${peaks.length} PEAKS`, W - 16, 16);
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(`ELEV BANDS · 240M`, 16, H - 16);
-            ctx.textAlign = 'right';
-            ctx.fillText(`TGT ${String(focusIdx + 1).padStart(2, '0')} · LOCK`, W - 16, H - 16);
-            ctx.restore();
         };
 
         const draw = () => {
@@ -175,18 +71,6 @@ export default function TopoBackground({ active }: Props) {
                 }
             }
             ctx.clearRect(0, 0, W, H);
-
-            // Compute the current focused peak — rotates every 4 seconds.
-            const focusIdx = Math.floor(t / 4) % peaks.length;
-            if (focusIdx !== lastFocusIdx) {
-                // First frame on a new focus — initialize target near the peak
-                // so it eases in rather than flying across the canvas.
-                if (lastFocusIdx === -1) {
-                    targetX = peaks[focusIdx].nx * W;
-                    targetY = peaks[focusIdx].ny * H;
-                }
-                lastFocusIdx = focusIdx;
-            }
 
             // ── Sample heightfield + draw contours via marching squares ──
             const cell = 12;
@@ -276,18 +160,12 @@ export default function TopoBackground({ active }: Props) {
                 ctx.fill();
             }
 
-            drawHud(focusIdx);
-            drawFrameHud(focusIdx);
-
             raf = requestAnimationFrame(draw);
         };
 
         const ro = new ResizeObserver(resize);
         ro.observe(parent);
         resize();
-        // Seed target so the box doesn't fly in from origin
-        targetX = peaks[0].nx * W;
-        targetY = peaks[0].ny * H;
         raf = requestAnimationFrame(draw);
 
         return () => {

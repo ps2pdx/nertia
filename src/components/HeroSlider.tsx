@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import GridBackground from '@/components/hero-bg/GridBackground';
 import TopoBackground from '@/components/hero-bg/TopoBackground';
-import HeatBackground from '@/components/hero-bg/HeatBackground';
 
-type SlideId = 'grid' | 'topo' | 'heat';
+type SlideId = 'grid' | 'topo';
 
 type Slide = {
     id: SlideId;
@@ -23,11 +22,6 @@ const SLIDES: Slide[] = [
         id: 'topo',
         headline: { line1: 'SIGNAL', line2: 'FROM THE', line3: 'VOID', line3Mark: '.' },
         Background: TopoBackground,
-    },
-    {
-        id: 'heat',
-        headline: { line1: 'PATTERNS', line2: 'IN THE', line3: 'NOISE', line3Mark: '.' },
-        Background: HeatBackground,
     },
 ];
 
