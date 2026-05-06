@@ -11,21 +11,28 @@ type Particle = {
     life: number;
     decay: number;
     phase: 'fall' | 'through' | 'blocked' | 'settled';
-    targetX: number | null;
     bucket?: number;
+    /** Which CTA the particle entered after passing a slit. */
+    side?: 'left' | 'right';
+    /** Stable phase offset for swishy lateral oscillation. */
+    seed?: number;
 };
+
+type Peg = { x: number; y: number; r: number };
 
 const SLIT_W = 36;
 // Slits sit at fixed pixel offset from the centerline so they stay close
 // together on wide screens (where a percentage-based offset would drift apart).
 const SLIT_OFFSET_PX = 32;
-const TARGET_LEFT_FRAC = 0.22;
-const TARGET_RIGHT_FRAC = 0.78;
 const MAX_PARTICLES = 600;
 const MOBILE_BREAKPOINT = 768;
 const BUCKET_W = 4;
 // Each settled particle adds this much to its bucket's pile height.
 const PILE_INCREMENT = 1.6;
+// Slit-wall stroke color (cyan-400). Particles stay accent-green; the wall
+// is intentionally a different color so the barrier reads as a separate
+// element, not part of the brand accent flow.
+const WALL_RGB = '34, 211, 238';
 
 export default function DoubleSlitField() {
     const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -84,6 +91,10 @@ export default function DoubleSlitField() {
         let mouseX = -9999;
         let mouseY = -9999;
         let mouseInHero = false;
+        let isMobile = false;
+        let emitterX = 0;
+        let emitterY = 0;
+        let pegs: Peg[] = [];
 
         const resize = () => {
             const rect = root.getBoundingClientRect();
@@ -120,6 +131,44 @@ export default function DoubleSlitField() {
             slit2cx = W / 2 + SLIT_OFFSET_PX;
             particles = [];
             heightField = new Float32Array(Math.ceil(W / BUCKET_W));
+
+            isMobile = mobileMql.matches;
+            if (isMobile) {
+                // Anchor emitter to the green period after PROPULSION.
+                const dot = root.querySelector<HTMLElement>('.home-hero__title-dot');
+                if (dot) {
+                    const dotRect = dot.getBoundingClientRect();
+                    emitterX = dotRect.left + dotRect.width / 2 - rect.left;
+                    emitterY = dotRect.bottom - rect.top - 2;
+                } else {
+                    emitterX = W * 0.5;
+                    emitterY = H * 0.3;
+                }
+                generatePegs();
+            } else {
+                pegs = [];
+            }
+        };
+
+        const generatePegs = () => {
+            pegs = [];
+            const startY = emitterY + 80;
+            const endY = H - 60;
+            if (endY <= startY) return;
+            const rowSpacing = 90;
+            const rows = Math.floor((endY - startY) / rowSpacing);
+            const colsPerRow = 4;
+            for (let row = 0; row < rows; row++) {
+                const y = startY + row * rowSpacing;
+                // Alternate row offsets for the classic Plinko interlock.
+                const shift = row % 2 === 0 ? 0 : W / (colsPerRow * 2);
+                for (let col = 0; col < colsPerRow; col++) {
+                    const x = shift + W * (0.18 + col * 0.21);
+                    if (x > 12 && x < W - 12) {
+                        pegs.push({ x, y, r: 3 });
+                    }
+                }
+            }
         };
 
         const onMove = (e: MouseEvent) => {
@@ -155,20 +204,13 @@ export default function DoubleSlitField() {
                 life: 1,
                 decay: 0.0016 + Math.random() * 0.0025,
                 phase: 'fall',
-                targetX: null,
             };
         };
 
         const inSlit = (x: number) =>
             Math.abs(x - slit1cx) < slitHw || Math.abs(x - slit2cx) < slitHw;
 
-        const slitTarget = (x: number) => {
-            const d1 = Math.abs(x - slit1cx);
-            const d2 = Math.abs(x - slit2cx);
-            return d1 < d2 ? W * TARGET_LEFT_FRAC : W * TARGET_RIGHT_FRAC;
-        };
-
-        const update = () => {
+        const updateDesktop = () => {
             if (mouseInHero && mouseY < lineY - 10 && particles.length < MAX_PARTICLES) {
                 const n = 2 + Math.floor(Math.random() * 2);
                 for (let i = 0; i < n; i++) {
@@ -208,7 +250,8 @@ export default function DoubleSlitField() {
                     if (p.y >= lineY) {
                         if (inSlit(p.x)) {
                             p.phase = 'through';
-                            p.targetX = slitTarget(p.x);
+                            p.side = p.x < W / 2 ? 'left' : 'right';
+                            p.seed = Math.random() * 1000;
                         } else {
                             p.y = lineY;
                             p.vx = 0;
@@ -218,31 +261,77 @@ export default function DoubleSlitField() {
                         }
                     }
                 } else if (p.phase === 'through') {
-                    if (p.targetX !== null) {
-                        const dx = p.targetX - p.x;
-                        p.vx += dx * 0.005;
-                        p.vx *= 0.91;
+                    // Gravity is biased toward the outer corner of the side
+                    // the particle entered: bottom-left for left, bottom-right
+                    // for right. The slit row is the only thing keeping each
+                    // side in its own panel, so divider clamping is also done
+                    // here.
+                    const cornerPullX = p.side === 'left' ? -0.026 : 0.026;
+                    const cornerPullY = 0.022;
+                    p.vx += cornerPullX;
+                    p.vy += cornerPullY;
+
+                    if (p.side === 'left') {
+                        // SWISHY — gentle sinusoidal lateral oscillation,
+                        // light viscosity. Reads as a slow slosh.
+                        const seed = p.seed ?? 0;
+                        p.vx += Math.sin(frameCount * 0.045 + seed) * 0.035;
+                        p.vx *= 0.985;
+                        p.vy *= 0.99;
+                    } else {
+                        // SWASHY — chaotic jitter and heavier drag, like
+                        // a turbulent splash.
+                        p.vx += (Math.random() - 0.5) * 0.10;
+                        p.vy += (Math.random() - 0.5) * 0.06;
+                        p.vx *= 0.94;
+                        p.vy *= 0.96;
                     }
-                    p.vy = Math.min(p.vy + 0.025, 3);
+
+                    // Velocity caps
+                    const maxV = 3.2;
+                    p.vx = Math.max(-maxV, Math.min(maxV, p.vx));
+                    p.vy = Math.max(-maxV, Math.min(maxV, p.vy));
+
                     p.x += p.vx;
                     p.y += p.vy;
 
-                    // Pile settling: land on top of whatever's already at this x.
+                    // Keep each side on its panel (center divider barrier).
+                    const dividerX = W / 2;
+                    if (p.side === 'left' && p.x > dividerX - 3) {
+                        p.x = dividerX - 3;
+                        p.vx = -Math.abs(p.vx) * 0.4;
+                    }
+                    if (p.side === 'right' && p.x < dividerX + 3) {
+                        p.x = dividerX + 3;
+                        p.vx = Math.abs(p.vx) * 0.4;
+                    }
+                    // And on the outer canvas edges.
+                    if (p.x < 2) { p.x = 2; p.vx = Math.abs(p.vx) * 0.3; }
+                    if (p.x > W - 2) { p.x = W - 2; p.vx = -Math.abs(p.vx) * 0.3; }
+
+                    // Pile settling — land on top of whatever's at this x.
                     const bucket = Math.max(
                         0,
                         Math.min(heightField.length - 1, Math.floor(p.x / BUCKET_W)),
                     );
                     const pileTopY = floorY - heightField[bucket];
                     if (p.y >= pileTopY) {
-                        p.y = pileTopY;
-                        p.vx = 0;
-                        p.vy = 0;
-                        p.phase = 'settled';
-                        p.bucket = bucket;
-                        // Slow fade so the pile breathes rather than freezing.
-                        p.decay = 0.0008 + Math.random() * 0.0008;
-                        if (heightField[bucket] < maxPileHeight) {
-                            heightField[bucket] += PILE_INCREMENT;
+                        // Swashy side: chance of splash bounce before settling.
+                        if (p.side === 'right' && p.vy > 0.6 && Math.random() < 0.45) {
+                            p.y = pileTopY - 1;
+                            p.vy = -Math.abs(p.vy) * 0.45;
+                            p.vx += (Math.random() - 0.5) * 0.6;
+                        } else {
+                            p.y = pileTopY;
+                            p.vx = 0;
+                            p.vy = 0;
+                            p.phase = 'settled';
+                            p.bucket = bucket;
+                            // Slow fade so the pile breathes rather than freezing.
+                            p.decay = 0.0008 + Math.random() * 0.0008;
+                            if (heightField[bucket] < maxPileHeight) {
+                                heightField[bucket] += PILE_INCREMENT;
+                            }
                         }
                     }
                 }
@@ -253,14 +342,14 @@ export default function DoubleSlitField() {
             particles = alive;
         };
 
-        const draw = () => {
+        const drawDesktop = () => {
             ctx.clearRect(0, 0, W, H);
 
-            // Slit line: solid green with two gaps
+            // Slit line: cyan wall with two gaps
             ctx.save();
-            ctx.strokeStyle = `rgb(${accentRgb})`;
+            ctx.strokeStyle = `rgb(${WALL_RGB})`;
             ctx.lineWidth = 1.5;
-            ctx.shadowColor = `rgb(${accentRgb})`;
+            ctx.shadowColor = `rgb(${WALL_RGB})`;
             ctx.shadowBlur = 6;
             ctx.beginPath();
             ctx.moveTo(0, lineY);
@@ -287,7 +376,10 @@ export default function DoubleSlitField() {
             // Particles
             for (const p of particles) {
                 const a = Math.max(0, p.life);
-                const colorRgb = p.phase === 'through' ? throughRgb : accentRgb;
+                const colorRgb =
+                    p.phase === 'through' ? throughRgb
+                    : p.phase === 'blocked' ? WALL_RGB
+                    : accentRgb;
                 const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4.5);
                 g.addColorStop(0, `rgba(${colorRgb},${a * 0.75})`);
                 g.addColorStop(0.45, `rgba(${colorRgb},${a * 0.2})`);
@@ -304,12 +396,115 @@ export default function DoubleSlitField() {
             }
         };
 
+        const updateMobile = () => {
+            // Permanent emitter at the period — no mouse on mobile.
+            if (frameCount % 4 === 0 && particles.length < MAX_PARTICLES) {
+                const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.55;
+                const speed = 0.4 + Math.random() * 0.55;
+                particles.push({
+                    x: emitterX + (Math.random() - 0.5) * 4,
+                    y: emitterY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    r: 0.9 + Math.random() * 1.0,
+                    life: 1,
+                    decay: 0.0009 + Math.random() * 0.001,
+                    phase: 'fall',
+                });
+            }
+
+            const alive: Particle[] = [];
+            for (const p of particles) {
+                p.life -= p.decay;
+                if (p.life <= 0.01 || p.y > H + 30) continue;
+
+                // Gravity + tiny lateral drift
+                p.vy = Math.min(p.vy + 0.04, 4);
+                p.vx *= 0.992;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Peg collisions — Plinko bounces
+                for (const peg of pegs) {
+                    const dx = p.x - peg.x;
+                    const dy = p.y - peg.y;
+                    const minDist = peg.r + p.r + 1;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < minDist * minDist) {
+                        const dist = Math.sqrt(distSq) || 0.0001;
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+                        // Push particle out of peg
+                        p.x = peg.x + nx * minDist;
+                        p.y = peg.y + ny * minDist;
+                        // Reflect velocity along the contact normal
+                        const dot = p.vx * nx + p.vy * ny;
+                        const bounciness = 0.65;
+                        p.vx -= (1 + bounciness) * dot * nx;
+                        p.vy -= (1 + bounciness) * dot * ny;
+                        // Plinko randomness so columns don't channel
+                        p.vx += (Math.random() - 0.5) * 0.7;
+                    }
+                }
+
+                // Edge bounces
+                if (p.x < 4) { p.x = 4; p.vx = Math.abs(p.vx) * 0.6; }
+                if (p.x > W - 4) { p.x = W - 4; p.vx = -Math.abs(p.vx) * 0.6; }
+
+                alive.push(p);
+            }
+            particles = alive;
+        };
+
+        const drawMobile = () => {
+            ctx.clearRect(0, 0, W, H);
+
+            // Pegs (faint cyan dots — same family as the desktop wall)
+            for (const peg of pegs) {
+                ctx.beginPath();
+                ctx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${WALL_RGB}, 0.45)`;
+                ctx.fill();
+            }
+
+            // Emitter glow at the period
+            const eg = ctx.createRadialGradient(emitterX, emitterY, 0, emitterX, emitterY, 18);
+            eg.addColorStop(0, `rgba(${accentRgb}, 0.3)`);
+            eg.addColorStop(0.5, `rgba(${accentRgb}, 0.08)`);
+            eg.addColorStop(1, `rgba(${accentRgb}, 0)`);
+            ctx.beginPath();
+            ctx.arc(emitterX, emitterY, 18, 0, Math.PI * 2);
+            ctx.fillStyle = eg;
+            ctx.fill();
+
+            // Particles
+            for (const p of particles) {
+                const a = Math.max(0, p.life);
+                const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4.5);
+                g.addColorStop(0, `rgba(${accentRgb}, ${a * 0.75})`);
+                g.addColorStop(0.45, `rgba(${accentRgb}, ${a * 0.2})`);
+                g.addColorStop(1, `rgba(${accentRgb}, 0)`);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * 4.5, 0, Math.PI * 2);
+                ctx.fillStyle = g;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${accentRgb}, ${a})`;
+                ctx.fill();
+            }
+        };
+
+        const update = () => (isMobile ? updateMobile() : updateDesktop());
+        const draw = () => (isMobile ? drawMobile() : drawDesktop());
+
         const drawStaticLine = () => {
             ctx.clearRect(0, 0, W, H);
             ctx.save();
-            ctx.strokeStyle = `rgb(${accentRgb})`;
+            ctx.strokeStyle = `rgb(${WALL_RGB})`;
             ctx.lineWidth = 1.5;
-            ctx.shadowColor = `rgb(${accentRgb})`;
+            ctx.shadowColor = `rgb(${WALL_RGB})`;
             ctx.shadowBlur = 4;
             ctx.beginPath();
             ctx.moveTo(0, lineY);
@@ -340,17 +535,12 @@ export default function DoubleSlitField() {
         const refreshMode = () => {
             stopAnimation();
             resize();
-            if (mobileMql.matches) {
-                // Below mobile breakpoint the fork stacks vertically — the
-                // double-slit metaphor doesn't apply. Hide the canvas entirely.
-                canvas.style.display = 'none';
-                return;
-            }
             canvas.style.display = 'block';
             if (reduceMotionMql.matches) {
                 // Honor prefers-reduced-motion: draw the slit line as a static
-                // graphic and skip particle simulation.
-                drawStaticLine();
+                // graphic on desktop, blank on mobile (no Plinko cascade).
+                if (!isMobile) drawStaticLine();
+                else ctx.clearRect(0, 0, W, H);
                 return;
             }
             loop();
