@@ -258,7 +258,7 @@ export default function SplashHero({ onDismiss }: Props) {
             <canvas ref={canvasRef} className="splash-hero__canvas" aria-hidden />
             <div className="splash-hero__content">
                 <div className="home-hero__eyebrow">
-                    <span className="home-hero__bracket">[ CAMPBELL, DOUGLAS SCOTT ]</span>
+                    <span className="home-hero__bracket">[ NERTIA ]</span>
                     <span className="home-hero__rule" aria-hidden />
                     <span className="home-hero__role">PMM × AI-GTM × FULL-STACK</span>
                 </div>
