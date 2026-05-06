@@ -122,7 +122,12 @@ export default function EyeBackground({ active }: Props) {
             return { latitudes, longitudes };
         };
 
-        const split = buildSplitTet(0.65);
+        // Cut at 0.55 — keeps the lower frustum dominant (~55% of pyramid
+        // height) while leaving the floating cap big enough to enclose
+        // the eye sphere comfortably. Reads as the dollar-bill silhouette:
+        // wide pyramid base below, small triangular eye-cap floating
+        // detached at the top.
+        const split = buildSplitTet(0.55);
         const sphere = buildSphere(8, 12, 36);
 
         // ── camera / projection ──────────────────────────────────
@@ -266,15 +271,21 @@ export default function EyeBackground({ active }: Props) {
         };
 
         // ── eye: sphere + eyelids + pupil ────────────────────────
-        // Centered inside the frustum, between the cut (y ≈ 0.0) and
-        // the base (y = -0.5). Sphere radius 0.42.
-        const EYE_OFFSET: V3 = { x: 0, y: -0.05, z: 0 };
-        const EYE_RADIUS = 0.42;
+        // Eye sits inside the floating cap (the disconnected upper
+        // portion), like the Eye of Providence on the dollar bill.
+        // Cap occupies y ≈ 0.325 → 1.0 in local space; eye centered
+        // at y = 0.55 (lower-middle of cap) with r = 0.18 to fit
+        // inside the cap's interior cross-section without touching
+        // the wireframe walls.
+        const EYE_OFFSET: V3 = { x: 0, y: 0.55, z: 0 };
+        const EYE_RADIUS = 0.18;
 
-        const drawEye = (instance: PyramidInstance) => {
+        const drawEye = (instance: PyramidInstance, capHoverY: number) => {
+            // Eye floats with the cap so it always sits inside the
+            // disconnected upper portion regardless of hover state.
             const eyeOffset: V3 = {
                 x: EYE_OFFSET.x + instance.offset.x,
-                y: EYE_OFFSET.y + instance.offset.y,
+                y: EYE_OFFSET.y + instance.offset.y + capHoverY,
                 z: EYE_OFFSET.z + instance.offset.z,
             };
 
@@ -342,7 +353,9 @@ export default function EyeBackground({ active }: Props) {
             );
             const irisProj = project(irisWorld);
             if (irisProj && blinkBurst < 0.95) {
-                const irisR = 18 * (fov / irisProj.depth) * instance.scale;
+                // Iris scales with the (smaller) eye sphere — was 18,
+                // now ~8 to stay proportional to EYE_RADIUS = 0.18.
+                const irisR = 8 * (fov / irisProj.depth) * instance.scale;
                 const pupilR = irisR * 0.45;
 
                 // Iris ring
@@ -407,7 +420,8 @@ export default function EyeBackground({ active }: Props) {
                 const fade = Math.max(0.18, Math.min(0.95, 8 / depth));
 
                 if (inst.isCenter) {
-                    // Frustum (lower portion)
+                    // Frustum (lower portion) — drawn first so it sits
+                    // behind the cap + eye in painter order.
                     drawEdges(
                         split.frustumVerts,
                         split.frustumEdges,
@@ -417,7 +431,11 @@ export default function EyeBackground({ active }: Props) {
                         fade * 0.85,
                         1.3,
                     );
-                    // Cap (apex portion), hovering above
+                    // Eye inside the cap — drawn before the cap so the
+                    // cap's wireframe overlays the eye, reinforcing
+                    // "eye enclosed in cap" reading.
+                    drawEye(inst, capHoverY);
+                    // Cap (apex portion), hovering above the frustum
                     const capOffset: V3 = {
                         x: inst.offset.x,
                         y: inst.offset.y + capHoverY,
@@ -432,8 +450,6 @@ export default function EyeBackground({ active }: Props) {
                         fade * 0.7,
                         1.0,
                     );
-                    // Eye inside
-                    drawEye(inst);
                 } else {
                     // Surrounding pyramids: full tetrahedron, no split
                     const verts: V3[] = [TET_APEX, ...TET_BASE];
