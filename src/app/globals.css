@@ -989,6 +989,34 @@ code, pre, kbd, samp {
   color: var(--fg-muted); letter-spacing: 0.02em;
 }
 
+/* Slide 1 portrait blueprint — vector edge trace of the source photo,
+   colored via currentColor so it inherits --accent. Right-aligned so
+   the figure sits beside the headline rather than under it. */
+.portrait-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  opacity: 0.88;
+  transition: opacity var(--d-3, 600ms) var(--e-out, ease);
+}
+.portrait-bg.is-active { opacity: 0.95; }
+.portrait-bg svg {
+  display: block;
+  height: 96%;
+  width: auto;
+  max-width: 52%;
+  margin-right: var(--s-8, 32px);
+  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 30%, transparent));
+}
+@media (max-width: 768px) {
+  .portrait-bg svg { max-width: 80%; margin-right: 0; }
+  .portrait-bg { justify-content: center; opacity: 0.18; }
+}
+
 /* Inline per-slide CTA — small mono link below the caption. */
 .hero-slide__cta {
   display: inline-block;
